@@ -1,0 +1,33 @@
+runtime:
+  shell_env: login
+  log_buffer_lines: 10000
+  stop_grace: 5s
+  shutdown_timeout: 5s
+
+apps:
+  backend:
+    type: generic
+    workdir: /home/nixos/Desktop/resume/ai_native/project_vibe_coded
+    command: ["docker", "compose", "-f", "infra/docker-compose.yml", "up", "-d", "postgres", "journey-service", "analytics-service", "platform-connectors-service", "ai-service"]
+    readiness:
+      - 'database system is ready to accept connections'
+      - 'Started .* in .* seconds'
+    restart:
+      policy: on-failure
+      backoff: [5s, 10s, 30s]
+
+  frontend:
+    type: node
+    workdir: /home/nixos/Desktop/resume/ai_native/project_vibe_coded/frontend
+    env:
+      - "VITE_JOURNEY_SERVICE_URL=http://localhost:8081"
+      - "VITE_ANALYTICS_SERVICE_URL=http://localhost:8082"
+      - "VITE_CONNECTORS_SERVICE_URL=http://localhost:8083"
+      - "VITE_AI_SERVICE_URL=http://localhost:8084"
+    command: ["npm", "run", "dev"]
+    readiness:
+      - 'Local:   http://localhost:5173'
+      - 'ready in'
+    restart:
+      policy: on-failure
+      backoff: [2s, 5s, 10s]

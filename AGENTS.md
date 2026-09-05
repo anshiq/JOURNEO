@@ -1,0 +1,1 @@
+since this is in very intial phase dont care about legecy product/item's backward compatibility, remove old items or upgrade them to fully support new schema. don't write any comment in any file only code/config should be written.

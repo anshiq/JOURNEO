@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "agent-runtime": {
+      "args": [
+        "serve"
+      ],
+      "command": "/home/nixos/.local/bin/agent-runtime"
+    }
+  }
+}
