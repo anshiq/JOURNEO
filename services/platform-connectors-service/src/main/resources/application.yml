@@ -1,0 +1,16 @@
+server:
+  port: 8083
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/connectors_db}
+    username: ${SPRING_DATASOURCE_USERNAME:journeo}
+    password: ${SPRING_DATASOURCE_PASSWORD:journeo_dev}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+internal-service-token: ${INTERNAL_SERVICE_TOKEN:journeo-internal-token-dev}
