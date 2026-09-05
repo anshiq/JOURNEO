@@ -1,0 +1,111 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-journeo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-journeo_dev}
+      POSTGRES_DB: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journeo -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  journey-service:
+    build:
+      context: ../services/journey-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/journey_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-journeo}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-journeo_dev}
+      ANALYTICS_SERVICE_URL: http://analytics-service:8082
+      CONNECTORS_SERVICE_URL: http://platform-connectors-service:8083
+      AI_SERVICE_URL: http://ai-service:8084
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  analytics-service:
+    build:
+      context: ../services/analytics-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/analytics_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-journeo}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-journeo_dev}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+      DEMO_DATA_SEED: ${DEMO_DATA_SEED:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  platform-connectors-service:
+    build:
+      context: ../services/platform-connectors-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/connectors_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-journeo}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-journeo_dev}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: ../services/ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      DATABASE_URL: postgresql://journeo:journeo_dev@postgres:5432/ai_db
+      ANALYTICS_SERVICE_URL: http://analytics-service:8082
+      CONNECTORS_SERVICE_URL: http://platform-connectors-service:8083
+      JOURNEY_SERVICE_URL: http://journey-service:8081
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-3.5-sonnet}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      GUARDRAIL_MODE: ${GUARDRAIL_MODE:-flag}
+      ANOMALY_SCAN_INTERVAL_MINUTES: ${ANOMALY_SCAN_INTERVAL_MINUTES:-15}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    environment:
+      VITE_JOURNEY_SERVICE_URL: http://localhost:8081
+      VITE_ANALYTICS_SERVICE_URL: http://localhost:8082
+      VITE_CONNECTORS_SERVICE_URL: http://localhost:8083
+      VITE_AI_SERVICE_URL: http://localhost:8084
+    depends_on:
+      - journey-service
+      - analytics-service
+      - platform-connectors-service
+      - ai-service
+
+volumes:
+  pgdata:
