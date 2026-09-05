@@ -1,0 +1,18 @@
+[project]
+name = "journeo-api"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]",
+  "sqlalchemy>=2.0",
+  "psycopg2-binary",
+  "pgvector",
+  "pydantic>=2",
+  "pydantic-settings",
+  "boto3",
+  "PyYAML",
+  "alembic",
+]
+[tool.ruff]
+line-length = 140

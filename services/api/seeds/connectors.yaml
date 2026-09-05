@@ -1,0 +1,42 @@
+- id: mock-apple-meta
+  platform: meta
+  external_id: act_apple_16pro_meta
+  name: Apple — iPhone 16 Pro (Meta Reels + Advantage+)
+  status: ACTIVE
+  daily_budget: 540.0
+  raw_json: '{"objective":"SALES","placements":["instagram_reels","facebook_feed"]}'
+- id: mock-apple-google
+  platform: google
+  external_id: customers/111/campaigns/1001
+  name: Apple — iPhone 16 Pro (YouTube + Search)
+  status: ACTIVE
+  daily_budget: 400.0
+  raw_json: '{"objective":"CONVERSIONS","placements":["youtube_instream","search"]}'
+- id: mock-nike-meta
+  platform: meta
+  external_id: act_nike_pegasus_meta
+  name: Nike — Air Zoom Pegasus 41 (Meta Feed + Stories)
+  status: ACTIVE
+  daily_budget: 380.0
+  raw_json: '{"objective":"SALES","placements":["instagram_feed","instagram_stories"]}'
+- id: mock-nike-google
+  platform: google
+  external_id: customers/222/campaigns/2002
+  name: Nike — Air Zoom Pegasus 41 (YouTube Shorts)
+  status: ACTIVE
+  daily_budget: 240.0
+  raw_json: '{"objective":"AWARENESS","placements":["youtube_shorts"]}'
+- id: mock-tesla-meta
+  platform: meta
+  external_id: act_tesla_modely_meta
+  name: Tesla — Model Y (Meta Lead)
+  status: ACTIVE
+  daily_budget: 620.0
+  raw_json: '{"objective":"LEADS","placements":["facebook_feed","instagram_reels"]}'
+- id: mock-tesla-google
+  platform: google
+  external_id: customers/333/campaigns/3003
+  name: Tesla — Model Y (Search + YouTube)
+  status: ACTIVE
+  daily_budget: 520.0
+  raw_json: '{"objective":"LEADS","placements":["search","youtube_instream"]}'

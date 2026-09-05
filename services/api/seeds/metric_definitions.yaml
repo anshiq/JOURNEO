@@ -1,0 +1,30 @@
+- key: ctr
+  label: Click-Through Rate
+  definition: clicks / impressions, as a percentage
+  unit: percent
+  formula: (clicks/impressions)*100
+- key: cpa
+  label: Cost Per Acquisition
+  definition: spend / conversions
+  unit: USD
+  formula: spend/conversions
+- key: roas
+  label: Return on Ad Spend
+  definition: revenue / spend
+  unit: ratio
+  formula: revenue/spend
+- key: reach
+  label: Reach
+  definition: unique users reached
+  unit: users
+  formula: count(distinct user)
+- key: frequency
+  label: Frequency
+  definition: average impressions per user
+  unit: impressions/user
+  formula: impressions/reach
+- key: viewability
+  label: Viewability
+  definition: viewable impressions / total impressions
+  unit: percent
+  formula: viewable/impressions*100

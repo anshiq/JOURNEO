@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: journeo-api
+    plan: free
+    runtime: docker
+    dockerfilePath: ./services/api/Dockerfile
+    dockerContext: ./services/api
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://journeo-frontend.onrender.com
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: google/gemma-4-31b-it:free
+      - key: OPENROUTER_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: GUARDRAIL_MODE
+        value: flag
+      - key: ANOMALY_SCAN_INTERVAL_MINUTES
+        value: "15"
+      - key: INTERNAL_SERVICE_TOKEN
+        sync: false
+      - key: KEEPALIVE_URLS
+        value: https://journeo-api.onrender.com,https://journeo-frontend.onrender.com
+      - key: KEEPALIVE_ENABLED
+        value: "true"
+      - key: KEEPALIVE_INTERVAL_MINUTES
+        value: "5"
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_PUBLIC_ENDPOINT
+        value: ""
+      - key: S3_PRESIGN_EXPIRY_SECONDS
+        value: "600"
+      - key: S3_MAX_IMAGE_MB
+        value: "25"
+      - key: S3_MAX_VIDEO_MB
+        value: "200"
+      - key: SEED_ON_START
+        value: "true"
+  - type: web
+    name: journeo-frontend
+    plan: free
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: VITE_API_URL
+        value: https://journeo-api.onrender.com

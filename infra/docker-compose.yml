@@ -1,0 +1,80 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-journeo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-journeo_dev}
+      POSTGRES_DB: postgres
+    ports:
+      - "5437:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journeo -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3.8
+    environment:
+      SERVICES: s3
+      AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+    volumes:
+      - ./localstack-init:/etc/localstack/init/ready.d:ro
+      - localstack-data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4566/_localstack/health | grep -q '\"s3\":' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://journeo:journeo_dev@postgres:5432/journeo
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-google/gemma-4-31b-it:free}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      GUARDRAIL_MODE: ${GUARDRAIL_MODE:-flag}
+      ANOMALY_SCAN_INTERVAL_MINUTES: ${ANOMALY_SCAN_INTERVAL_MINUTES:-15}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+      S3_BUCKET: ${S3_BUCKET:-journey-files}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:4566/journey-files}
+      S3_PRESIGN_EXPIRY_SECONDS: ${S3_PRESIGN_EXPIRY_SECONDS:-600}
+      S3_MAX_IMAGE_MB: ${S3_MAX_IMAGE_MB:-25}
+      S3_MAX_VIDEO_MB: ${S3_MAX_VIDEO_MB:-200}
+      SEED_ON_START: "true"
+      SEED_RESET: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  localstack-data:

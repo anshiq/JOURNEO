@@ -1,0 +1,266 @@
+- campaignId: apple-iphone-16-pro
+  name: Apple — iPhone 16 Pro Journey
+  status: PUBLISHED
+  version: 1
+  graph:
+    schemaVersion: 3
+    theme:
+      primary: '#4f46e5'
+      accent: '#f97316'
+      surface: '#ffffff'
+      foreground: '#111827'
+      font: Inter
+      radius: 16
+      cta: Continue
+    askAi:
+      id: ask-ai
+      placeholder: Ask about the iPhone 16 Pro...
+      buttonLabel: Ask
+      refusalMessage: This question is out of context.
+      ragK: 8
+      allowJourneyJump: true
+      allowRag: true
+      answerStyle: thread
+      persistence: session
+      pinnedPanel: true
+      allowPin: true
+      allowAdjust: true
+      maxConcurrentQueries: 3
+      historyLimit: 100
+    nodes:
+    - id: trigger
+      type: trigger
+      position: {x: -260, y: 220}
+      config: {}
+    - id: ask-ai-node
+      type: ask_ai
+      position: {x: -260, y: -60}
+      config:
+        placeholder: Ask about the iPhone 16 Pro...
+        buttonLabel: Ask
+        refusalMessage: This question is out of context.
+        ragK: 8
+        allowJourneyJump: true
+        allowRag: true
+        suggestedQuestions: []
+    - id: b1
+      type: hero_section
+      position: {x: 0, y: 0}
+      config:
+        headline: iPhone 16 Pro
+        subheadline: Built for Apple Intelligence. A18 Pro chip inside.
+        image: https://commons.wikimedia.org/wiki/Special:FilePath/Camera_of_iPhone_16_Pro.jpg
+        imagePosition: right
+        ctas: []
+    - id: b2
+      type: input
+      position: {x: 0, y: 1}
+      config:
+        type: email
+        label: Email for order updates
+        placeholder: you@example.com
+        required: true
+        checkUniqueness: true
+        blockKey: field_email_for_order_updates
+    - id: end
+      type: end
+      position: {x: 700, y: 220}
+      config:
+        redirectUrl: https://www.apple.com/iphone-16-pro/
+        redirectDelayMs: 1500
+    screens:
+    - id: s1
+      name: Welcome
+      position: {x: 60, y: 160}
+      size: {width: 440, height: 560}
+      blocks: [b1, b2]
+      layout: {mode: stack, direction: column, gap: 16px, padding: 16px, align: stretch, justify: start, scroll: auto}
+      advance: {mode: button, handle: default, label: Continue, position: bottom-sticky, variant: solid, fullWidth: true, requireValid: false, requireBlocks: []}
+      back: {show: false, label: Back}
+    edges:
+    - id: e-trigger-s1
+      source: trigger
+      target: s1
+      sourceHandle: null
+    - id: e-s1-end
+      source: s1
+      target: end
+      sourceHandle: default
+- campaignId: nike-air-zoom-pegasus-41
+  name: Nike — Air Zoom Pegasus 41 Journey
+  status: PUBLISHED
+  version: 1
+  graph:
+    schemaVersion: 3
+    theme:
+      primary: '#4f46e5'
+      accent: '#f97316'
+      surface: '#ffffff'
+      foreground: '#111827'
+      font: Inter
+      radius: 16
+      cta: Continue
+    askAi:
+      id: ask-ai
+      placeholder: Ask about the Pegasus 41...
+      buttonLabel: Ask
+      refusalMessage: This question is out of context.
+      ragK: 8
+      allowJourneyJump: true
+      allowRag: true
+      answerStyle: thread
+      persistence: session
+      pinnedPanel: true
+      allowPin: true
+      allowAdjust: true
+      maxConcurrentQueries: 3
+      historyLimit: 100
+    nodes:
+    - id: trigger
+      type: trigger
+      position: {x: -260, y: 220}
+      config: {}
+    - id: ask-ai-node
+      type: ask_ai
+      position: {x: -260, y: -60}
+      config:
+        placeholder: Ask about the Pegasus 41...
+        buttonLabel: Ask
+        refusalMessage: This question is out of context.
+        ragK: 8
+        allowJourneyJump: true
+        allowRag: true
+        suggestedQuestions: []
+    - id: b1
+      type: hero_section
+      position: {x: 0, y: 0}
+      config:
+        headline: Nike Air Zoom Pegasus 41
+        subheadline: ReactX foam. Dual Air Zoom. Ready for every mile.
+        image: https://commons.wikimedia.org/wiki/Special:FilePath/Nike_Zoom_Pegasus_38_running_shoe.jpg
+        imagePosition: right
+        ctas: []
+    - id: b2
+      type: select
+      position: {x: 0, y: 1}
+      config:
+        label: Size
+        placeholder: Choose your US size
+        options:
+        - {value: '9', label: US 9}
+        - {value: '10', label: US 10}
+        required: true
+        blockKey: field_size
+    - id: end
+      type: end
+      position: {x: 700, y: 220}
+      config:
+        redirectUrl: https://www.nike.com/t/air-zoom-pegasus-41-road-running-shoes
+        redirectDelayMs: 1500
+    screens:
+    - id: s1
+      name: Welcome
+      position: {x: 60, y: 160}
+      size: {width: 440, height: 540}
+      blocks: [b1, b2]
+      layout: {mode: stack, direction: column, gap: 16px, padding: 16px, align: stretch, justify: start, scroll: auto}
+      advance: {mode: button, handle: default, label: Continue, position: bottom-sticky, variant: solid, fullWidth: true, requireValid: false, requireBlocks: []}
+      back: {show: false, label: Back}
+    edges:
+    - id: e-trigger-s1
+      source: trigger
+      target: s1
+      sourceHandle: null
+    - id: e-s1-end
+      source: s1
+      target: end
+      sourceHandle: default
+- campaignId: tesla-model-y-2026
+  name: Tesla — Model Y (2026) Journey
+  status: PUBLISHED
+  version: 1
+  graph:
+    schemaVersion: 3
+    theme:
+      primary: '#4f46e5'
+      accent: '#f97316'
+      surface: '#ffffff'
+      foreground: '#111827'
+      font: Inter
+      radius: 16
+      cta: Continue
+    askAi:
+      id: ask-ai
+      placeholder: Ask about the 2026 Model Y...
+      buttonLabel: Ask
+      refusalMessage: This question is out of context.
+      ragK: 8
+      allowJourneyJump: true
+      allowRag: true
+      answerStyle: thread
+      persistence: session
+      pinnedPanel: true
+      allowPin: true
+      allowAdjust: true
+      maxConcurrentQueries: 3
+      historyLimit: 100
+    nodes:
+    - id: trigger
+      type: trigger
+      position: {x: -260, y: 220}
+      config: {}
+    - id: ask-ai-node
+      type: ask_ai
+      position: {x: -260, y: -60}
+      config:
+        placeholder: Ask about the 2026 Model Y...
+        buttonLabel: Ask
+        refusalMessage: This question is out of context.
+        ragK: 8
+        allowJourneyJump: true
+        allowRag: true
+        suggestedQuestions: []
+    - id: b1
+      type: hero_section
+      position: {x: 0, y: 0}
+      config:
+        headline: Tesla Model Y
+        subheadline: The Juniper refresh. Six configurations, one mission.
+        image: https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Model_Y_Front_View.jpg
+        imagePosition: right
+        ctas: []
+    - id: b2
+      type: select
+      position: {x: 0, y: 1}
+      config:
+        label: Configuration
+        placeholder: Choose a configuration
+        options:
+        - {value: standard-rwd, label: Standard RWD — $39,990 · 321mi}
+        - {value: premium-awd, label: Premium AWD — $49,990 · 327mi}
+        required: true
+        blockKey: field_configuration
+    - id: end
+      type: end
+      position: {x: 700, y: 220}
+      config:
+        redirectUrl: https://www.tesla.com/modely
+        redirectDelayMs: 1500
+    screens:
+    - id: s1
+      name: Welcome
+      position: {x: 60, y: 160}
+      size: {width: 440, height: 540}
+      blocks: [b1, b2]
+      layout: {mode: stack, direction: column, gap: 16px, padding: 16px, align: stretch, justify: start, scroll: auto}
+      advance: {mode: button, handle: default, label: Continue, position: bottom-sticky, variant: solid, fullWidth: true, requireValid: false, requireBlocks: []}
+      back: {show: false, label: Back}
+    edges:
+    - id: e-trigger-s1
+      source: trigger
+      target: s1
+      sourceHandle: null
+    - id: e-s1-end
+      source: s1
+      target: end
+      sourceHandle: default

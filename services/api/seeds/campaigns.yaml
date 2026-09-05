@@ -1,0 +1,18 @@
+- id: apple-iphone-16-pro
+  name: Apple — iPhone 16 Pro
+  description: iPhone 16 Pro — A18 Pro chip, 48MP Fusion camera with 5x Telephoto, and Apple Intelligence built in.
+  objective: Drive qualified pre-orders and trade-ins for iPhone 16 Pro
+  audience: iOS upgraders and camera-first smartphone shoppers
+  status: ACTIVE
+- id: nike-air-zoom-pegasus-41
+  name: Nike — Air Zoom Pegasus 41
+  description: Nike Air Zoom Pegasus 41 — ReactX foam midsole, dual Air Zoom units, and an engineered mesh upper for daily miles.
+  objective: Grow direct-to-consumer sales of the Pegasus 41
+  audience: Daily-trainer runners and everyday-mile sneaker shoppers
+  status: ACTIVE
+- id: tesla-model-y-2026
+  name: Tesla — Model Y (2026)
+  description: 2026 Tesla Model Y — the Juniper-refreshed lineup, from Standard RWD to Performance AWD and the six-seat Model Y L.
+  objective: Generate configurator sessions and reservations for the 2026 Model Y
+  audience: EV shoppers comparing range, price, and trims
+  status: ACTIVE

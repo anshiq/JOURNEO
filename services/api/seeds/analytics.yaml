@@ -1,0 +1,13 @@
+seed: 42
+days: 91
+campaigns:
+- id: apple-iphone-16-pro
+  ctr_base: 1.9
+  surge: false
+- id: nike-air-zoom-pegasus-41
+  ctr_base: 1.5
+  surge: true
+  surge_days: 14
+- id: tesla-model-y-2026
+  ctr_base: 1.7
+  surge: false
