@@ -1,0 +1,1 @@
+{"id":"campaign-c-spike","campaign_id":"campaign-c","analytics_snapshot":{"campaign_id":"campaign-c","metrics":[{"key":"cpa","value":45.2},{"key":"ctr","value":0.7}]},"human_baseline":{"proposals":[{"platform":"meta","action":"pause_campaign","params":{"campaignId":"campaign-c"},"rationale":"Critical CPA spike 45 vs 18 baseline, auto-pause","confidence":0.9}]}}
