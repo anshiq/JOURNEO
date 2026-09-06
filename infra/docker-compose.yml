@@ -57,6 +57,8 @@ services:
       S3_PRESIGN_EXPIRY_SECONDS: ${S3_PRESIGN_EXPIRY_SECONDS:-600}
       S3_MAX_IMAGE_MB: ${S3_MAX_IMAGE_MB:-25}
       S3_MAX_VIDEO_MB: ${S3_MAX_VIDEO_MB:-200}
+      DEMO_DATA_SEED: ${DEMO_DATA_SEED:-false}
+      DEMO_DATA_RESET: ${DEMO_DATA_RESET:-false}
     depends_on:
       postgres:
         condition: service_healthy

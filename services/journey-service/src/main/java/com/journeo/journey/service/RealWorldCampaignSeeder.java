@@ -8,12 +8,17 @@ import org.springframework.stereotype.Component;
 public class RealWorldCampaignSeeder implements CommandLineRunner {
     private final CampaignRepository campRepo;
     private final JourneyRepository jourRepo;
-    @Value("${demo-data-seed:true}") private boolean enabled;
+    @Value("${demo-data-seed:false}") private boolean enabled;
+    @Value("${demo-data-reset:false}") private boolean reset;
     public RealWorldCampaignSeeder(CampaignRepository c, JourneyRepository j){ this.campRepo=c; this.jourRepo=j; }
     @Override public void run(String... args){
         if(!enabled) return;
-        campRepo.deleteAll();
-        jourRepo.deleteAll();
+        if(reset){
+            campRepo.deleteAll();
+            jourRepo.deleteAll();
+        } else if(campRepo.count()>0){
+            return;
+        }
         seedAppleIPhone15Pro();
         seedNikeAirJordan1();
         seedTeslaModelY();

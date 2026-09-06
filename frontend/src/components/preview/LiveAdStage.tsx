@@ -105,17 +105,50 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
   const client = ref.current
   const node = state.status === 'node' ? state.node : null
   currentNodeRef.current = node ? node.id : null
+  const [overlay, setOverlay] = React.useState<Record<string, { config?: any; style?: any }>>({})
+  const graphVersionRef = React.useRef<number | null>(null)
+  React.useEffect(() => {
+    const handler = (p: any) => {
+      setOverlay(prev => {
+        const existing = prev[p.nodeId] || {}
+        return {
+          ...prev,
+          [p.nodeId]: {
+            config: p.config ? { ...existing.config, ...p.config } : existing.config,
+            style: p.style ? { ...existing.style, ...p.style } : existing.style,
+          },
+        }
+      })
+    }
+    bus.on('node:update', handler as any)
+    return () => { bus.off('node:update', handler as any) }
+  }, [])
+  React.useEffect(() => {
+    if (state.status !== 'node') return
+    if (graphVersionRef.current !== null && state.graphVersion > graphVersionRef.current) {
+      setOverlay({})
+    }
+    graphVersionRef.current = state.graphVersion
+  }, [state])
+  const patchedNode = React.useMemo(() => {
+    if (!node) return null
+    const nodeOverlay = overlay[node.id]
+    if (!nodeOverlay) return node
+    return {
+      ...node,
+      config: {
+        ...node.config,
+        ...(nodeOverlay.config || {}),
+        style: { ...(node.config?.style || {}), ...(nodeOverlay.style || {}) },
+      },
+    }
+  }, [node, overlay])
   const [fetchedAskAi, setFetchedAskAi] = React.useState<any | null>(null)
   const askAiResolved = askAiConfig !== undefined ? askAiConfig : fetchedAskAi
   React.useEffect(() => {
     if (askAiConfig !== undefined) return
     let cancelled = false
     setFetchedAskAi(null)
-    const pick = (journeys: any[]) => {
-      const list = Array.isArray(journeys) ? journeys : []
-      if (start.journeyId) return list.find((j: any) => j.id === start.journeyId) || null
-      return list[0] || null
-    }
     const extract = (journey: any) => {
       try {
         const g = JSON.parse(journey?.graphJson || '{}')
@@ -124,11 +157,9 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
       } catch { if (!cancelled) setFetchedAskAi(null) }
     }
     if (!start.campaignId) return () => { cancelled = true }
-    if (start.journeyId) {
-      journeyApi.get(`/api/campaigns/${start.campaignId}/journeys/${start.journeyId}`).then(r => extract(r.data)).catch(() => { if (!cancelled) setFetchedAskAi(null) })
-    } else {
-      journeyApi.get(`/api/campaigns/${start.campaignId}/journeys`).then(r => extract(pick(r.data))).catch(() => { if (!cancelled) setFetchedAskAi(null) })
-    }
+    journeyApi.get(`/api/campaigns/${start.campaignId}/journey`)
+      .then(r => { if (r.status !== 204 && (!start.journeyId || r.data?.id === start.journeyId)) extract(r.data) })
+      .catch(() => { if (!cancelled) setFetchedAskAi(null) })
     return () => { cancelled = true }
   }, [key, askAiConfig])
   const flash = React.useCallback((nodeId: string) => {
@@ -163,7 +194,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
     bus.on('node:select', handler as any)
     return () => { bus.off('node:select', handler as any) }
   }, [studio, flash])
-  const theme = getTheme(node?.config)
+  const theme = getTheme(patchedNode?.config)
   const layout = adLayoutFor(viewportId)
   const content = (
     <div data-ad-content className="my-auto w-full" style={{ maxWidth: layout.contentMaxWidth }}>
@@ -184,8 +215,8 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
           <p className="mt-1 font-mono text-[10px] text-muted-foreground">{state.sessionId.slice(0, 8)}</p>
           <button onClick={() => client.restart()} className="mt-4 rounded-lg px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary, borderRadius: theme.radius }}>Restart</button>
         </div>
-      ) : node ? (
-        <LiveCard client={client} node={node} theme={theme} cardPadding={layout.cardPadding} studio={studio} isSelected={selectedId === node.id} isFlashing={flashingId === node.id} onSelect={() => bus.emit('node:select', { nodeId: selectedId === node.id ? null : node.id, source: 'device' })} />
+      ) : patchedNode ? (
+        <LiveCard client={client} node={patchedNode} theme={theme} cardPadding={layout.cardPadding} studio={studio} isSelected={selectedId === patchedNode.id} isFlashing={flashingId === patchedNode.id} onSelect={() => bus.emit('node:select', { nodeId: selectedId === patchedNode.id ? null : patchedNode.id, source: 'device' })} />
       ) : null}
     </div>
   )

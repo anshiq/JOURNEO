@@ -1,29 +1,24 @@
-import { useEffect, useMemo, useState, useCallback, useRef, type DragEvent } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import ReactFlow, { Background, Controls, useNodesState, useEdgesState, addEdge, Connection, Edge, Node, type ReactFlowInstance } from 'reactflow'
-import 'reactflow/dist/style.css'
 import { aiApi, journeyApi } from '../lib/api'
-import { allNodeTypes, defaultConfigFor } from '../nodes/_core/registry'
-import type { NodeType } from '../nodes/_core/types'
-import type { NodeStyle } from '../nodes/_core/types'
-import { validateGraph } from '../lib/validation'
-import JourneyNodeRenderer from '../components/nodes/JourneyNodeRenderer'
+import { getStyleConfig } from '../nodes/_core/registry'
+import type { NodeStyle, ThemeConfig } from '../nodes/_core/types'
 import LiveAdStage from '../components/preview/LiveAdStage'
 import FloatingDevicePreview from '../components/preview/FloatingDevicePreview'
 import { DEVICE_CHOICES, DEVICE_GROUPS, viewportForDevice, type FrameDevice } from '../components/preview/devices'
-import { JourneyConfigRouter, StyleConfigRouter } from '../nodes/_core/ConfigRouter'
-import { NODE_DRAG_MIME } from './JourneyCanvas'
-import { type FlowNode, type FlowEdge } from '../components/preview/types'
+import { StyleConfigRouter } from '../nodes/_core/ConfigRouter'
+import JourneyGraphEditor from '../components/journey/JourneyGraphEditor'
 import { bus, useEvent } from '../lib/eventBus'
 import { DEVICE_VIEWPORTS, isViewportId } from '../lib/viewports'
 import { devLinkFor } from '../lib/devLink'
+import { useCampaignJourney } from '../hooks/useCampaignJourney'
+import { hasContent, effectiveTheme } from '../lib/journeyGraph'
 import {
   ArrowLeft,
   ArrowRight,
   Brain,
   Check,
   CheckCircle2,
-  ChevronDown,
   Circle,
   Copy,
   ExternalLink,
@@ -32,29 +27,19 @@ import {
   Globe,
   HelpCircle,
   Layers,
-  LayoutGrid,
   Link2,
   LockKeyhole,
-  Maximize2,
   MessageSquare,
-  MoveHorizontal,
   Palette,
   PanelLeftClose,
   PanelLeftOpen,
-  Plus,
   Rocket,
   RotateCcw,
   Save,
   Smartphone,
-  Sparkles,
-  Square,
   Target,
-  Trash2,
-  Type as TypeIcon,
   Upload,
   Users,
-  X,
-  Zap,
 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { Button } from '../components/ui/Button'
@@ -71,10 +56,8 @@ import { Label } from '../components/ui/Label'
 import { Badge } from '../components/ui/Badge'
 import { Separator } from '../components/ui/Separator'
 import { Slider } from '../components/ui/Slider'
-import { Progress } from '../components/ui/Progress'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs'
 
-type Theme = { primary: string; accent: string; surface: string; foreground: string; font: string; radius: number; cta: string }
+type Theme = ThemeConfig
 
 const steps = [
   { id: 'campaign', title: 'Define', subtitle: 'Name, audience & objective', icon: Target },
@@ -83,512 +66,6 @@ const steps = [
   { id: 'knowledge', title: 'Knowledge', subtitle: 'Train campaign RAG', icon: Brain },
   { id: 'publish', title: 'Publish', subtitle: 'Live link & distribution', icon: Rocket },
 ] as const
-
-const nodeInfo: Record<string, string> = {
-  trigger: 'Starts an audience session',
-  condition: 'Branches on customer data',
-  end: 'Completes the journey',
-  text: 'Displays rich text content',
-  image: 'Shows an image',
-  video: 'Plays a video',
-  button: 'Clickable button',
-  input: 'Text input field',
-  select: 'Dropdown select',
-  checkbox: 'Checkbox input',
-  rating: 'Star rating',
-  badge: 'Label tag',
-  divider: 'Separator line',
-  alert: 'Alert notification',
-  container: 'Layout container',
-  card: 'Content card',
-  hero_section: 'Hero banner section',
-  quiz: 'Interactive quiz',
-  form: 'Data collection form',
-  countdown: 'Countdown timer',
-}
-
-const initialTheme: Theme = { primary: '#4f46e5', accent: '#f97316', surface: '#ffffff', foreground: '#111827', font: 'Inter', radius: 16, cta: 'Explore the collection' }
-
-const STEP_COLORS = [
-  { hex: '#22c55e', bg: 'bg-emerald-500', label: 'Initial reveal' },
-  { hex: '#f43f5e', bg: 'bg-rose-500', label: 'Interaction 1' },
-  { hex: '#3b82f6', bg: 'bg-blue-500', label: 'Interaction 2' },
-  { hex: '#8b5cf6', bg: 'bg-violet-500', label: 'Interaction 3' },
-  { hex: '#f59e0b', bg: 'bg-amber-500', label: 'Interaction 4' },
-  { hex: '#06b6d4', bg: 'bg-cyan-500', label: 'Interaction 5' },
-  { hex: '#ec4899', bg: 'bg-pink-500', label: 'Interaction 6' },
-  { hex: '#6366f1', bg: 'bg-indigo-500', label: 'Interaction 7' },
-]
-
-type LegacyNodeStyleAlias = { label?: string; bg?: string; text?: string; border?: string; highlight?: string; shadow?: string; padding?: string; animation?: string }
-
-const reactFlowNodeTypes = { journeyNode: JourneyNodeRenderer }
-
-function EdgeSummary({ edgeId, edges, nodes }: { edgeId: string; edges: Edge[]; nodes: Node[] }) {
-  const edge = edges.find(e => e.id === edgeId)
-  if (!edge) return null
-  const source = nodes.find(n => n.id === edge.source)
-  const target = nodes.find(n => n.id === edge.target)
-  const label = (edge.data as any)?.label || (edge as any).label
-  return (
-    <div className="flex items-center gap-1.5 px-1 text-xs text-muted-foreground">
-      <span className="font-mono text-[10px] text-foreground/80">
-        {(source?.data as any)?.type?.replace(/_/g, ' ') || edge.source}
-      </span>
-      <ArrowRight className="h-3 w-3 text-primary" />
-      <span className="font-mono text-[10px] text-foreground/80">
-        {(target?.data as any)?.type?.replace(/_/g, ' ') || edge.target}
-      </span>
-      {label && (
-        <>
-          <span className="h-4 w-px bg-border" />
-          <Badge variant="outline" className="h-5 px-1.5 font-normal text-[10px]">
-            {label}
-          </Badge>
-        </>
-      )}
-    </div>
-  )
-}
-
-function EdgesList({
-  edges, nodes, selectedEdgeId, onSelect, onDelete,
-}: {
-  edges: Edge[]
-  nodes: Node[]
-  selectedEdgeId: string | null
-  onSelect: (id: string) => void
-  onDelete: (id: string) => void
-}) {
-  if (edges.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-center">
-        <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <Link2 className="h-3.5 w-3.5" />
-        </div>
-        <p className="text-xs font-medium text-foreground">No connections yet</p>
-        <p className="mt-1 text-[11px] text-muted-foreground">
-          Drag from a node&apos;s edge handle to another node to create a connection.
-        </p>
-      </div>
-    )
-  }
-  return (
-    <div className="flex flex-col gap-1.5">
-      {edges.map(e => {
-        const source = nodes.find(n => n.id === e.source)
-        const target = nodes.find(n => n.id === e.target)
-        const isSelected = e.id === selectedEdgeId
-        return (
-          <div
-            key={e.id}
-            className={cn(
-              'group flex items-center gap-2 rounded-md border bg-card px-2 py-1.5 text-xs transition-colors',
-              isSelected ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border/60 hover:border-primary/30 hover:bg-primary/5',
-            )}
-          >
-            <button
-              type="button"
-              onClick={() => onSelect(e.id)}
-              className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
-              title="Select edge"
-            >
-              <span className="truncate font-mono text-[10px] text-foreground/80">
-                {(source?.data as any)?.type?.replace(/_/g, ' ') || e.source}
-              </span>
-              <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-              <span className="truncate font-mono text-[10px] text-foreground/80">
-                {(target?.data as any)?.type?.replace(/_/g, ' ') || e.target}
-              </span>
-            </button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 shrink-0 text-muted-foreground opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 data-[visible=true]:opacity-100"
-              onClick={() => onDelete(e.id)}
-              aria-label="Delete edge"
-              data-visible={isSelected}
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function ConnectionsDropdown({ edges, nodes, selectedEdgeId, onSelect, onDelete }: { edges: Edge[]; nodes: Node[]; selectedEdgeId: string | null; onSelect: (id: string) => void; onDelete: (id: string) => void }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="rounded-lg border border-border/60 bg-card">
-      <button type="button" onClick={() => setOpen(o => !o)} className="flex w-full items-center justify-between px-3 py-2 text-left">
-        <span className="flex items-center gap-2 text-xs font-semibold">
-          <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
-          Connections
-          <Badge variant="muted" className="font-mono text-[10px]">{edges.length}</Badge>
-        </span>
-        <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? '' : '-rotate-90'}`} />
-      </button>
-      {open && (
-        <div className="border-t border-border/60 p-2">
-          <EdgesList edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={onSelect} onDelete={onDelete} />
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            Tip: select an edge and press <kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">Delete</kbd> to remove it.
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { campaignId: string; onComplete: () => void; onGraphChange?: (g: { nodes: FlowNode[]; edges: FlowEdge[] }) => void }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const [selected, setSelected] = useState<any>(null)
-  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null)
-  const [highlightedId, setHighlightedId] = useState<string | null>(null)
-  const highlightTimer = useRef<number | null>(null)
-  const [validation, setValidation] = useState<any[]>([])
-  const [jid, setJid] = useState<string | null>(null)
-  const [sidePanel, setSidePanel] = useState<'config' | 'preview'>('config')
-  const [previewKey, setPreviewKey] = useState(0)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
-  const [paletteSearch, setPaletteSearch] = useState('')
-  const rfInstance = useRef<ReactFlowInstance | null>(null)
-
-  const onConnect = useCallback((params: Connection) => setEdges(eds => addEdge({ ...params, id: `e-${Date.now()}` }, eds)), [setEdges])
-
-  const addNode = useCallback((type: NodeType, position?: { x: number; y: number }) => {
-    if (type === 'ask_ai') {
-      const existing = (rfInstance.current?.getNodes() || nodes).find(n => (n.data as any)?.type === 'ask_ai')
-      if (existing) {
-        setSelected(existing as any)
-        bus.emit('node:select', { nodeId: existing.id, source: 'canvas' })
-        return existing.id
-      }
-    }
-    const nid = `n-${Date.now()}`
-    const cfg = defaultConfigFor(type)
-    const pos = position || { x: 100 + Math.random() * 400, y: 100 + Math.random() * 300 }
-    const newNode: Node = { id: nid, type: 'journeyNode', position: pos, data: { label: `${type} ${nid.slice(0, 4)}`, type, config: cfg } }
-    setNodes(nds => [...nds, newNode])
-    bus.emit('node:track', { nodeId: nid, type, viewportId: 'iphone14' as any })
-    bus.emit('node:select', { nodeId: nid, source: 'canvas' })
-    return nid
-  }, [setNodes, nodes])
-
-  const flashNode = useCallback((nodeId: string) => {
-    setHighlightedId(nodeId)
-    if (highlightTimer.current) window.clearTimeout(highlightTimer.current)
-    highlightTimer.current = window.setTimeout(() => setHighlightedId(null), 500)
-  }, [])
-
-  useEvent('node:select', useCallback((p: any) => {
-    if (!p.nodeId) { setSelected(null); return }
-    const node = nodes.find(n => n.id === p.nodeId)
-    if (node) { setSelected(node); setSelectedEdgeId(null); flashNode(p.nodeId) }
-    else { setSelected(null) }
-  }, [nodes, flashNode]))
-
-  const onNodeClick = useCallback((_: any, node: Node) => {
-    setSelected(node)
-    setSelectedEdgeId(null)
-    flashNode(node.id)
-    bus.emit('node:select', { nodeId: node.id, source: 'canvas' })
-  }, [flashNode])
-
-  const onEdgeClick = useCallback((_: any, edge: Edge) => {
-    setSelectedEdgeId(edge.id)
-    setSelected(null)
-  }, [])
-
-  const onPaneClick = useCallback(() => {
-    setSelectedEdgeId(null)
-  }, [])
-
-  const onGraphChangeRef = useRef(onGraphChange)
-  onGraphChangeRef.current = onGraphChange
-  useEffect(() => {
-    onGraphChangeRef.current?.({
-      nodes: nodes.map(n => ({ id: n.id, type: (n.data as any)?.type, config: (n.data as any)?.config || {}, position: n.position } as FlowNode)),
-      edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label } as FlowEdge)),
-    })
-  }, [nodes, edges])
-
-  const deleteEdge = useCallback((edgeId: string) => {
-    setEdges(eds => eds.filter(e => e.id !== edgeId))
-    setSelectedEdgeId(prev => (prev === edgeId ? null : prev))
-  }, [setEdges])
-
-  const handleEdgesChange = useCallback((changes: any[]) => {
-    onEdgesChange(changes)
-    changes.forEach(c => {
-      if (c.type === 'remove') setSelectedEdgeId(prev => (prev === c.id ? null : prev))
-    })
-  }, [onEdgesChange])
-
-  const onDragOver = useCallback((e: DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-  }, [])
-
-  const onDrop = useCallback((e: DragEvent) => {
-    e.preventDefault()
-    const type = e.dataTransfer.getData(NODE_DRAG_MIME) as string
-    if (!type || !(allNodeTypes as string[]).includes(type)) return
-    const flowPos = rfInstance.current?.screenToFlowPosition({ x: e.clientX, y: e.clientY })
-    const nid = addNode(type as any, flowPos || undefined)
-    setTimeout(() => {
-      setNodes(curr => {
-        const found = curr.find(n => n.id === nid)
-        if (found) setSelected(found)
-        return curr
-      })
-    }, 0)
-  }, [addNode])
-
-  useEffect(() => {
-    const errs = validateGraph(nodes.map(n => ({ id: n.id, type: (n.data as any).type, config: (n.data as any).config })), edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label })))
-    const hasTrigger = nodes.some(n => (n.data as any).type === 'trigger')
-    const draft = !jid || !hasTrigger || edges.length === 0
-    const filtered = draft ? errs.filter(e => e.message !== 'Unreachable node') : errs
-    setValidation(filtered)
-  }, [nodes, edges, jid])
-
-  const errorNodeIds = useMemo(() => new Set(validation.map(e => e.nodeId)), [validation])
-  const errorsByNode = useMemo(() => {
-    const m = new Map<string, string[]>()
-    validation.forEach(e => {
-      if (e.nodeId === 'graph' || e.nodeId === 'edges') return
-      if (!m.has(e.nodeId)) m.set(e.nodeId, [])
-      m.get(e.nodeId)!.push(e.message)
-    })
-    return m
-  }, [validation])
-  const nodesWithErrorFlag = useMemo(() => nodes.map(n => ({ ...n, data: { ...n.data, hasError: errorNodeIds.has(n.id), isHighlighted: highlightedId === n.id } })), [nodes, errorNodeIds, highlightedId])
-
-  const save = async () => {
-    const graph = { nodes: nodes.map(n => ({ id: n.id, type: (n.data as any).type, config: (n.data as any).config, position: n.position })), edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label })) }
-    setSaving(true)
-    setSaveError(null)
-    try {
-      if (!jid) {
-        const res = await journeyApi.post(`/api/campaigns/${campaignId}/journeys`, { name: 'Journey ' + (Date.now() % 1000), graph })
-        setJid(res.data.id)
-      } else {
-        await journeyApi.put(`/api/campaigns/${campaignId}/journeys/${jid}`, { graph })
-      }
-    } catch (error) {
-      setSaveError('Could not save your journey. Check your connection and try again.')
-      throw error
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const loadJourney = (journey: any) => {
-    try {
-      const g = JSON.parse(journey.graphJson || '{}')
-      if (g.nodes) {
-        let keptAskAi = false
-        const cleaned = (g.nodes as any[]).filter((n: any) => {
-          if (n.type !== 'ask_ai') return true
-          if (!keptAskAi) { keptAskAi = true; return true }
-          return false
-        })
-        setNodes(cleaned.map((n: any, i: number) => ({ id: n.id, position: n.position || { x: 100 + i * 220, y: 100 + (i % 2) * 140 }, data: { label: `${n.type} ${n.id.slice(0, 4)}`, type: n.type, config: n.config }, type: 'journeyNode' })))
-        setEdges((g.edges || []).map((e: any) => ({ id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle, label: e.label })))
-        setJid(journey.id)
-      }
-    } catch { }
-  }
-
-  const hasFitInitial = useRef(false)
-  useEffect(() => {
-    if (nodes.length === 0 || hasFitInitial.current) return
-    const t = setTimeout(() => {
-      rfInstance.current?.fitView({ padding: 0.2, duration: 200 })
-      hasFitInitial.current = true
-    }, 150)
-    return () => clearTimeout(t)
-  }, [nodes])
-
-  useEffect(() => {
-    if (!campaignId) return
-    journeyApi.get(`/api/campaigns/${campaignId}/journeys`).then(r => {
-      if (r.data && r.data.length > 0) loadJourney(r.data[0])
-    }).catch(() => { })
-  }, [campaignId])
-
-  return (
-    <div className="flex h-full flex-col gap-2">
-      {validation.length > 0 && (
-        <div className="flex items-start gap-1.5 rounded-md border border-destructive/30 bg-destructive/5 px-2 py-1.5 text-xs text-destructive">
-          <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          <div className="flex flex-col gap-0.5">
-            {validation.slice(0,3).map((e, i) => (
-              <div key={i}><span className="font-mono opacity-70">{e.nodeId}:</span> {e.message}</div>
-            ))}
-            {validation.length>3 && <div className="opacity-70">+{validation.length-3} more</div>}
-          </div>
-        </div>
-      )}
-
-      <div className="flex h-full min-h-0 flex-1 gap-3">
-        <Card className="flex h-full w-44 shrink-0 flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b px-2 py-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Palette</span>
-            <Badge variant="muted" className="h-5 px-1.5 text-[10px]">{allNodeTypes.length}</Badge>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
-            <Input value={paletteSearch} onChange={e=>setPaletteSearch(e.target.value)} placeholder="Search..." className="h-7 mb-2 text-xs" />
-            {allNodeTypes.filter(t=> !paletteSearch || t.toLowerCase().includes(paletteSearch.toLowerCase())).map(t => (
-              <div
-                key={t}
-                draggable
-                onDragStart={e => { e.dataTransfer.setData(NODE_DRAG_MIME, t); e.dataTransfer.effectAllowed = 'move' }}
-                onDoubleClick={() => addNode(t as any)}
-                title={nodeInfo[t] || `Drag to canvas · double-click to add`}
-                className="group mb-0.5 flex cursor-grab items-center justify-between rounded-md border border-border/60 bg-background px-1.5 py-1 text-[11px] text-foreground/80 transition-colors hover:border-primary/40 hover:bg-primary/5 active:cursor-grabbing"
-              >
-                <span className="truncate">{t.replace(/_/g, ' ')}</span>
-                <Plus className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-60" />
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="relative h-full w-full bg-muted/20" onDragOver={onDragOver} onDrop={onDrop}>
-            <ReactFlow
-              nodes={nodesWithErrorFlag}
-              edges={edges.map(e => ({
-                ...e,
-                animated: e.id === selectedEdgeId,
-                style: {
-                  strokeWidth: e.id === selectedEdgeId ? 2.5 : 1.75,
-                  stroke: e.id === selectedEdgeId ? 'hsl(var(--primary))' : 'hsl(215 16% 47%)',
-                },
-              }))}
-              nodeTypes={reactFlowNodeTypes}
-              onNodesChange={onNodesChange}
-              onEdgesChange={handleEdgesChange}
-              onConnect={onConnect}
-              onNodeClick={onNodeClick}
-              onEdgeClick={onEdgeClick}
-              onPaneClick={onPaneClick}
-              deleteKeyCode={['Delete', 'Backspace']}
-              onInit={inst => { rfInstance.current = inst }}
-              fitView
-              minZoom={0.1}
-            >
-              <Background gap={16} size={1} />
-              <Controls className="!shadow-sm" />
-            </ReactFlow>
-            {selectedEdgeId && (
-              <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2">
-                <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 px-2 py-1 shadow-elevated backdrop-blur">
-                  <EdgeSummary edgeId={selectedEdgeId} edges={edges} nodes={nodes} />
-                  <span className="h-4 w-px bg-border" />
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-7 gap-1 rounded-full px-3 text-xs"
-                    onClick={() => deleteEdge(selectedEdgeId)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete edge
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 rounded-full px-2 text-xs"
-                    onClick={() => setSelectedEdgeId(null)}
-                    aria-label="Deselect edge"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        <Card className="flex w-[320px] shrink-0 flex-col overflow-hidden">
-          <Tabs value={sidePanel} onValueChange={v => setSidePanel(v as 'config' | 'preview')} className="flex h-full flex-col">
-            <div className="border-b px-3 pt-3">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="config" className="gap-1.5"><Palette className="h-3.5 w-3.5" /> Config</TabsTrigger>
-                <TabsTrigger value="preview" className="gap-1.5"><Eye className="h-3.5 w-3.5" /> Preview</TabsTrigger>
-              </TabsList>
-            </div>
-            <div className="flex-1 overflow-y-auto p-1.5 scrollbar-thin">
-              <TabsContent value="config" className="mt-0 flex flex-col gap-4">
-                <div>
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold">Node configuration</h3>
-                    {selected && (
-                      <Badge variant="outline" className="font-mono text-[10px]">
-                        {(selected.data as any).type}
-                      </Badge>
-                    )}
-                  </div>
-                  {selected ? (
-                    <JourneyConfigRouter
-                      type={(selected.data as any).type}
-                      config={(selected.data as any).config}
-                      errors={errorsByNode.get(selected.id)}
-                      onChange={next => {
-                        setNodes(nds => nds.map(n => n.id === selected.id ? { ...n, data: { ...n.data, config: next } } : n))
-                        setSelected((prev: any) => prev ? { ...prev, data: { ...prev.data, config: next } } : prev)
-                      }}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 px-4 py-10 text-center">
-                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Palette className="h-4 w-4" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground">No node selected</p>
-                      <p className="mt-1 text-xs text-muted-foreground">Click a node on the canvas to edit its configuration.</p>
-                    </div>
-                  )}
-                </div>
-                <Separator />
-                <ConnectionsDropdown edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={setSelectedEdgeId} onDelete={deleteEdge} />
-              </TabsContent>
-              <TabsContent value="preview" className="mt-0 h-full">
-                <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed bg-muted/30 px-4 py-10 text-center">
-                  <p className="text-xs text-muted-foreground">The device preview floats above the workspace. Drag it anywhere on screen.</p>
-                  <Button variant="outline" size="sm" onClick={() => setPreviewKey(k => k + 1)}>Reset device position</Button>
-                </div>
-              </TabsContent>
-            </div>
-          </Tabs>
-        </Card>
-      </div>
-
-      <div className="flex items-center justify-between border-t pt-2">
-        <div className="flex items-center gap-2">
-          {jid && <Badge variant="muted" className="font-mono text-[10px]">{jid.slice(0, 8)}</Badge>}
-          <Button onClick={save} size="sm" disabled={saving} className="h-8 gap-1.5">
-            <Save className="h-3.5 w-3.5" />
-            {saving ? 'Saving…' : jid ? 'Save changes' : 'Save journey'}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          {saveError && <span className="text-xs text-destructive">{saveError}</span>}
-          <Button onClick={() => { save().then(onComplete).catch(() => undefined) }} variant="default" disabled={saving} className="gap-2">
-            {saving ? 'Saving…' : 'Save and continue'}
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      <FloatingDevicePreview key={previewKey} start={{ mode: 'test', campaignId, journeyId: jid || undefined }} viewportId="iphone14" studio askAiConfig={nodes.length > 0 ? ((nodes.find(n => (n.data as any)?.type === 'ask_ai')?.data as any)?.config ?? null) : undefined} />
-    </div>
-  )
-}
 
 function StatusPill({ kind, children }: { kind: 'success' | 'warning' | 'info' | 'muted'; children: React.ReactNode }) {
   return <Badge variant={kind}>{children}</Badge>
@@ -761,19 +238,14 @@ export default function CampaignSetup() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try { return localStorage.getItem('workspace:sidebarCollapsed') === '1' } catch { return false }
   })
+  const journey = useCampaignJourney(id)
   const [campaign, setCampaign] = useState<any>(null)
   const [name, setName] = useState('')
   const [objective, setObjective] = useState('')
   const [audience, setAudience] = useState('')
   const [brief, setBrief] = useState('')
-  const [theme, setTheme] = useState<Theme>(initialTheme)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [expDevice, setExpDevice] = useState<FrameDevice>('iphone-16-pro')
-  const [nodeOverrides, setNodeOverrides] = useState<Record<string, Partial<Theme>>>({})
-  const [nodeStyles, setNodeStyles] = useState<Record<string, NodeStyle>>({})
-  const [campaignNodes, setCampaignNodes] = useState<FlowNode[]>([])
-  const [campaignEdges, setCampaignEdges] = useState<FlowEdge[]>([])
-  const [journeys, setJourneys] = useState<any[]>([])
   const [website, setWebsite] = useState('')
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
@@ -812,17 +284,18 @@ export default function CampaignSetup() {
   }, [])
   const hasSyncedUrlRef = useRef(false)
   useEffect(() => {
-    if (hasSyncedUrlRef.current || campaignNodes.length === 0) return
+    if (hasSyncedUrlRef.current || journey.status !== 'loaded') return
     const qp = new URLSearchParams(window.location.search)
     const qpNode = qp.get('node')
     const qpViewport = qp.get('viewport')
     let did = false
-    if (qpNode && campaignNodes.some(n => n.id === qpNode)) { bus.emit('node:select', { nodeId: qpNode, source: 'toolbar' }); did = true }
+    if (qpNode && journey.graph.nodes.some(n => n.id === qpNode)) { bus.emit('node:select', { nodeId: qpNode, source: 'toolbar' }); did = true }
     if (isViewportId(qpViewport)) { bus.emit('device:viewportChange', { viewportId: qpViewport, width: DEVICE_VIEWPORTS[qpViewport].width, height: DEVICE_VIEWPORTS[qpViewport].height }); did = true }
     if (did) hasSyncedUrlRef.current = true
-  }, [campaignNodes])
+  }, [journey.status, journey.graph])
   useEffect(() => {
     const hNode = (p: any) => {
+      if (p.source === 'device') return
       if (!p.nodeId) {
         setSearchParams(prev => {
           const next = new URLSearchParams(prev)
@@ -847,52 +320,32 @@ export default function CampaignSetup() {
     bus.on('node:select', hNode as any)
     bus.on('device:viewportChange', hVp as any)
     return () => { bus.off('node:select', hNode as any); bus.off('device:viewportChange', hVp as any) }
-  }, [setSearchParams])
+  }, [])
 
   useEvent('node:select', useCallback((p: any) => setSelectedNodeId(p.nodeId), []))
-  useEvent('node:update', useCallback((p: any) => {
-    if (p.style) setNodeStyles(prev => ({ ...prev, [p.nodeId]: { ...prev[p.nodeId], ...p.style } }))
-    if (p.config?.theme) setNodeOverrides(prev => ({ ...prev, [p.nodeId]: { ...prev[p.nodeId], ...p.config.theme } }))
-  }, []))
 
-  const updateNodeOverride = (key: keyof Theme, value: string | number) => {
+  useEffect(() => {
+    if (selectedNodeId && !journey.graph.nodes.some(n => n.id === selectedNodeId)) {
+      setSelectedNodeId(null)
+    }
+  }, [journey.graph, selectedNodeId])
+
+  const updateNodeTheme = (key: keyof Theme, value: string | number) => {
     if (!selectedNodeId) return
-    setNodeOverrides(prev => ({ ...prev, [selectedNodeId]: { ...prev[selectedNodeId], [key]: value } }))
+    journey.applyNodePatch(selectedNodeId, { theme: { [key]: value } })
     bus.emit('node:update', { nodeId: selectedNodeId, config: { theme: { [key]: value } } })
   }
 
   const updateNodeStyle = (key: keyof NodeStyle, value: any) => {
     if (!selectedNodeId) return
-    setNodeStyles(prev => ({ ...prev, [selectedNodeId]: { ...prev[selectedNodeId], [key]: value } }))
-    bus.emit('node:update', { nodeId: selectedNodeId, config: {}, style: { [key]: value } as any })
+    journey.applyNodePatch(selectedNodeId, { style: { [key]: value } })
+    bus.emit('node:update', { nodeId: selectedNodeId, style: { [key]: value } as NodeStyle })
   }
 
   const updateNodeConfig = (next: any) => {
     if (!selectedNodeId) return
-    setCampaignNodes(prev => prev.map(n => n.id === selectedNodeId ? { ...n, config: next } : n))
+    journey.applyNodePatch(selectedNodeId, { config: next })
     bus.emit('node:update', { nodeId: selectedNodeId, config: next })
-  }
-
-  const refreshJourneys = async () => {
-    if (!id) return
-    const response = await journeyApi.get(`/api/campaigns/${id}/journeys`)
-    setJourneys(response.data || [])
-    if (response.data && response.data.length > 0) {
-      try {
-        const g = JSON.parse(response.data[0].graphJson || '{}')
-        let keptAskAi = false
-        const cleaned = ((g.nodes || []) as any[]).filter((n: any) => {
-          if (n.type !== 'ask_ai') return true
-          if (!keptAskAi) { keptAskAi = true; return true }
-          return false
-        })
-        setCampaignNodes(cleaned.map((n: any) => ({ id: n.id, type: n.type, config: n.config || {}, position: n.position })))
-        setCampaignEdges((g.edges || []).map((e: any) => ({ id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle, label: e.label })))
-        if (g.theme) setTheme(g.theme)
-        if (g.nodeStyles) setNodeStyles(g.nodeStyles)
-        if (g.nodeOverrides) setNodeOverrides(g.nodeOverrides)
-      } catch { }
-    }
   }
 
   useEffect(() => {
@@ -900,9 +353,14 @@ export default function CampaignSetup() {
     journeyApi.get(`/api/campaigns/${id}`).then(response => {
       setCampaign(response.data)
       setName(response.data.name || '')
+      setObjective(response.data.objective || '')
+      setAudience(response.data.audience || '')
       setBrief(response.data.description || '')
     }).catch(() => navigate('/campaigns'))
-    refreshJourneys().catch(() => undefined)
+  }, [id])
+
+  useEffect(() => {
+    if (id) journey.load()
   }, [id])
 
   useEffect(() => {
@@ -910,19 +368,47 @@ export default function CampaignSetup() {
     else setSidebarCollapsed(false)
   }, [step])
 
+  const prevSaveStateRef = useRef(journey.saveState)
+  useEffect(() => {
+    const prev = prevSaveStateRef.current
+    prevSaveStateRef.current = journey.saveState
+    if (step !== 2) return
+    if (journey.saveState === 'saving') {
+      setStyleSaveStatus({ kind: 'info', message: 'Saving styles…' })
+    } else if (journey.saveState === 'clean' && prev === 'saving') {
+      setStyleSaveStatus({ kind: 'success', message: 'Styles saved' })
+    } else if (journey.saveState === 'error') {
+      setStyleSaveStatus({ kind: 'error', message: journey.error || 'Could not save styles. Check your connection and try again.' })
+    }
+  }, [journey.saveState, journey.error, step])
+  useEffect(() => {
+    if (styleSaveStatus?.kind !== 'success') return
+    const t = setTimeout(() => setStyleSaveStatus(null), 2000)
+    return () => clearTimeout(t)
+  }, [styleSaveStatus])
+
+  useEffect(() => {
+    if (step !== 2) return
+    if (journey.saveState !== 'dirty') return
+    const t = setTimeout(() => { journey.save() }, 800)
+    return () => clearTimeout(t)
+  }, [step, journey.saveState, journey.save])
+
   const productLink = useMemo(() => `${window.location.origin}/c/${id}`, [id])
   const devLink = useMemo(() => campaign?.devToken ? devLinkFor(campaign.devToken) : '', [campaign?.devToken])
-  const isPublished = journeys[0]?.status === 'PUBLISHED'
+  const isPublished = journey.journeyStatus === 'PUBLISHED'
   const shareLink = useMemo(() => isPublished ? productLink : (devLink || productLink), [isPublished, devLink, productLink])
-  const updateTheme = (key: keyof Theme, value: string | number) => setTheme(current => ({ ...current, [key]: value }))
+  const updateTheme = (key: keyof Theme, value: string | number) => {
+    journey.applyGraph({ ...journey.graph, theme: { ...journey.graph.theme, [key]: value } })
+  }
 
   const saveDetails = async () => {
     if (!name.trim()) return
     try {
-      const response = await journeyApi.put(`/api/campaigns/${id}`, { name, description: brief })
+      const response = await journeyApi.put(`/api/campaigns/${id}`, { name, description: brief, objective, audience })
       setCampaign(response.data)
       setStep(1)
-    } catch { setCampaign((current: any) => ({ ...current, name, description: brief })) ; setStep(1) }
+    } catch { setCampaign((current: any) => ({ ...current, name, description: brief, objective, audience })) ; setStep(1) }
   }
 
   const ingestWebsite = async () => {
@@ -956,19 +442,16 @@ export default function CampaignSetup() {
   }
 
   const publish = async () => {
-    const journey = journeys[0]
-    if (!journey) { setPublishStatus({ kind: 'error', message: 'Create and save a journey before publishing.' }); return }
+    if (!journey.journeyId) { setPublishStatus({ kind: 'error', message: 'Create and save a journey before publishing.' }); return }
     setPublishing(true); setPublishStatus({ kind: 'info', message: 'Validating and publishing…' })
-    try {
-      await persistStyledGraph()
-      const res = await journeyApi.post(`/api/campaigns/${id}/journeys/${journey.id}/publish`)
-      setJourneys(prev => prev.map(j => j.id === journey.id ? { ...j, status: 'PUBLISHED', graphJson: res.data?.graphJson || j.graphJson } : j))
+    const res = await journey.publish()
+    if (res.ok) {
       setPublishStatus({ kind: 'success', message: 'Published successfully. Your campaign link is ready to share.' })
-      await refreshJourneys()
-    } catch (error: any) {
-      const messages = error?.response?.data?.errors?.map((item: any) => item.message).join(' ') || 'Resolve journey validation issues and try again.'
+    } else {
+      const messages = res.errors?.map((item: any) => item.message).filter(Boolean).join(' ') || 'Resolve journey validation issues and try again.'
       setPublishStatus({ kind: 'error', message: messages })
-    } finally { setPublishing(false) }
+    }
+    setPublishing(false)
   }
 
   const copyShareLink = () => {
@@ -989,72 +472,14 @@ export default function CampaignSetup() {
     bus.emit('campaign:devLinkRotated', { campaignId: id, devToken: res.data.devToken })
   }
 
-  const mergeCanvasGraph = useCallback((g: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
-    if (!g || g.nodes.length === 0) return
-    setCampaignNodes(prev => {
-      const prevById = new Map(prev.map(n => [n.id, n]))
-      const next = g.nodes.map(n => {
-        const existing = prevById.get(n.id)
-        if (existing) return { ...existing, type: (n as any).type, position: (n as any).position }
-        return n
-      })
-      if (next.length === prev.length && next.every((n, i) => n.id === prev[i].id && (n as any).type === (prev[i] as any).type && JSON.stringify((n as any).position) === JSON.stringify((prev[i] as any).position))) return prev
-      return next
-    })
-    setCampaignEdges(g.edges)
-  }, [])
-
-  const persistStyledGraph = useCallback(async () => {
-    if (!id || campaignNodes.length === 0) return
-    const j = journeys[0]
-    const graph = {
-      nodes: campaignNodes.map((n: any) => {
-        const style = nodeStyles[n.id] || {}
-        const override = nodeOverrides[n.id] || {}
-        const base = n.config || {}
-        const hasOverride = Object.keys(override).length > 0
-        const hasStyle = Object.keys(style).length > 0
-        return {
-          id: n.id,
-          type: n.type,
-          position: (n as any).position,
-          config: {
-            ...base,
-            theme: hasOverride || !base.theme ? { primary: override.primary || theme.primary, accent: override.accent || theme.accent, surface: override.surface || theme.surface, foreground: override.foreground || theme.foreground, font: override.font || theme.font, radius: override.radius ?? theme.radius, cta: override.cta || theme.cta } : base.theme,
-            style: hasStyle ? style : base.style
-          }
-        }
-      }),
-      edges: campaignEdges,
-      theme,
-      nodeStyles,
-      nodeOverrides
-    }
-    if (!j) {
-      const res = await journeyApi.post(`/api/campaigns/${id}/journeys`, { name: 'Journey ' + (Date.now() % 1000), graph })
-      setJourneys(prev => [res.data, ...prev])
-    } else {
-      await journeyApi.put(`/api/campaigns/${id}/journeys/${j.id}`, { graph })
-    }
-  }, [id, journeys, campaignNodes, campaignEdges, theme, nodeStyles, nodeOverrides])
-  const hasPersistedRef = useRef(false)
-  useEffect(() => {
-    if (campaignNodes.length === 0 || !hasPersistedRef.current) { hasPersistedRef.current = true; return }
-    const t = setTimeout(() => {
-      persistStyledGraph()
-        .then(() => setStyleSaveStatus({ kind: 'success', message: 'Styles saved' }))
-        .catch(() => setStyleSaveStatus({ kind: 'error', message: 'Could not auto-save styles. Check your connection.' }))
-    }, 800)
-    return () => clearTimeout(t)
-  }, [theme, nodeStyles, nodeOverrides, campaignNodes, persistStyledGraph])
-  useEffect(() => { if (journeys.length > 0) hasPersistedRef.current = false }, [journeys.length])
-
-  const selectedNode = selectedNodeId ? campaignNodes.find(n => n.id === selectedNodeId) : null
+  const styleableNodes = useMemo(() => journey.graph.nodes.filter(n => getStyleConfig(n.type) != null), [journey.graph])
+  const selectedNode = selectedNodeId ? journey.graph.nodes.find(n => n.id === selectedNodeId) ?? null : null
+  const selectedNodeTheme = useMemo(() => effectiveTheme(journey.graph, selectedNodeId), [journey.graph, selectedNodeId])
   const progressPct = useMemo(() => {
-    const known = [Boolean(name.trim()), journeys.length > 0, campaignNodes.length > 0, Boolean(knowledgeStatus?.kind === 'success'), Boolean(publishStatus?.kind === 'success')]
+    const known = [Boolean(name.trim()), Boolean(journey.journeyId), hasContent(journey.graph), Boolean(knowledgeStatus?.kind === 'success'), Boolean(publishStatus?.kind === 'success')]
     const done = known.filter(Boolean).length
     return Math.round((done / known.length) * 100)
-  }, [name, journeys, campaignNodes, knowledgeStatus, publishStatus])
+  }, [name, journey.journeyId, journey.graph, knowledgeStatus, publishStatus])
 
   const currentStep = steps[step]
   const StepIcon = currentStep.icon
@@ -1217,10 +642,42 @@ export default function CampaignSetup() {
             )}
 
             {step === 1 && (
-              <div className="flex h-full min-h-0 flex-col">
+              <div className="flex h-full min-h-0 flex-col gap-2">
                 <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-background shadow-soft">
-                  <EmbeddedJourneyCanvas campaignId={id} onComplete={() => { refreshJourneys(); setStep(2) }} onGraphChange={mergeCanvasGraph} />
+                  <JourneyGraphEditor
+                    graph={journey.graph}
+                    onGraphChange={journey.applyGraph}
+                    selectedNodeId={selectedNodeId}
+                    onSelectNode={setSelectedNodeId}
+                  />
                 </div>
+                <div className="flex items-center justify-between border-t pt-2">
+                  <div className="flex items-center gap-2">
+                    {journey.journeyId && <Badge variant="muted" className="font-mono text-[10px]">{journey.journeyId.slice(0, 8)}</Badge>}
+                    <Button onClick={() => journey.save()} size="sm" disabled={journey.saveState === 'saving' || journey.status !== 'loaded'} className="h-8 gap-1.5">
+                      <Save className="h-3.5 w-3.5" />
+                      {journey.saveState === 'saving' ? 'Saving…' : 'Save journey'}
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {journey.saveState === 'error' && journey.error && <span className="text-xs text-destructive">{journey.error}</span>}
+                    <Button
+                      onClick={async () => { await journey.save(); setStep(2) }}
+                      variant="default"
+                      disabled={journey.saveState === 'saving' || journey.status !== 'loaded'}
+                      className="gap-2"
+                    >
+                      {journey.saveState === 'saving' ? 'Saving…' : 'Save and continue'}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <FloatingDevicePreview
+                  start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined }}
+                  viewportId="iphone14"
+                  studio
+                  askAiConfig={hasContent(journey.graph) ? (journey.graph.nodes.find(n => n.type === 'ask_ai')?.config ?? null) : undefined}
+                />
               </div>
             )}
 
@@ -1238,9 +695,9 @@ export default function CampaignSetup() {
                       </select>
                     </div>
                     <div className="flex min-h-0 flex-1 flex-col p-2">
-                      {campaignNodes.length > 0 ? (
+                      {hasContent(journey.graph) ? (
                         <div className="h-full min-h-[420px]">
-                          <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journeys[0]?.id, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={campaignNodes.length > 0 ? ((campaignNodes.find(n => (n as any)?.type === 'ask_ai') as any)?.config ?? null) : undefined} />
+                          <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={journey.graph.nodes.find(n => n.type === 'ask_ai')?.config ?? null} />
                         </div>
                       ) : (
                         <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg border border-dashed bg-muted/20">
@@ -1260,9 +717,9 @@ export default function CampaignSetup() {
                     <div className="flex items-center gap-2 border-b bg-muted/20 px-3 py-2 shrink-0">
                       <Palette className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className="text-xs font-medium">Active node</span>
-                      <select value={selectedNodeId || ''} onChange={e => { const v = e.target.value || null; setSelectedNodeId(v); bus.emit('node:select', { nodeId: v, source: 'toolbar' }) }} className="flex-1 rounded-md border bg-background px-2 py-1 text-xs">
+                      <select aria-label="Active node" value={selectedNodeId || ''} onChange={e => { const v = e.target.value || null; setSelectedNodeId(v); bus.emit('node:select', { nodeId: v, source: 'toolbar' }) }} className="flex-1 rounded-md border bg-background px-2 py-1 text-xs">
                         <option value="">Global theme</option>
-                        {campaignNodes.map(n => (
+                        {styleableNodes.map(n => (
                           <option key={n.id} value={n.id}>{n.type.replace(/_/g, ' ')} · {n.id.slice(0,4)}</option>
                         ))}
                       </select>
@@ -1275,16 +732,16 @@ export default function CampaignSetup() {
                             <h3 className="text-xs font-semibold capitalize">{selectedNode.type.replace(/_/g,' ')}</h3>
                             <Badge variant="outline" className="font-mono text-[10px]">{selectedNode.id.slice(0,6)}</Badge>
                           </div>
-                          <StyleConfigRouter type={selectedNode.type} style={nodeStyles[selectedNode.id] || {}} onChange={(k,v)=> updateNodeStyle(k,v)} theme={theme} config={selectedNode.config} onConfigChange={updateNodeConfig} />
-                          <Button variant="outline" size="sm" onClick={() => { setNodeOverrides(prev => { const n={...prev}; delete n[selectedNode.id]; return n}); setNodeStyles(prev => { const n={...prev}; delete n[selectedNode.id]; return n}) }} className="w-full gap-2">Reset node style</Button>
+                          <StyleConfigRouter type={selectedNode.type} style={selectedNode.config.style || {}} onChange={(k,v)=> updateNodeStyle(k,v)} theme={selectedNodeTheme} config={selectedNode.config} onConfigChange={updateNodeConfig} />
+                          <Button variant="outline" size="sm" onClick={() => selectedNodeId && journey.applyNodePatch(selectedNodeId, { style: null, theme: null })} className="w-full gap-2">Reset node style</Button>
                           <Button variant="ghost" size="sm" onClick={() => { setSelectedNodeId(null); bus.emit('node:select', { nodeId: null, source: 'toolbar' }) }} className="w-full">Close</Button>
                         </div>
                       ) : (
-                        <GlobalThemeEditor theme={theme} updateTheme={updateTheme} />
+                        <GlobalThemeEditor theme={journey.graph.theme} updateTheme={updateTheme} />
                       )}
                     </div>
                     <div className="border-t p-2 bg-muted/10 flex items-center gap-2">
-                      <Button size="sm" onClick={() => persistStyledGraph().then(() => setStyleSaveStatus({ kind: 'success', message: 'Styles saved' })).catch(() => setStyleSaveStatus({ kind: 'error', message: 'Could not save styles. Check your connection and try again.' }))} className="flex-1 gap-1.5"><Save className="h-3.5 w-3.5" /> Save styles</Button>
+                      <Button size="sm" onClick={() => journey.save()} className="flex-1 gap-1.5"><Save className="h-3.5 w-3.5" /> Save styles</Button>
                       {styleSaveStatus ? <PublishStatusBanner status={styleSaveStatus} /> : <span className="text-[10px] text-muted-foreground">Auto-saves</span>}
                     </div>
                   </Card>
@@ -1402,21 +859,21 @@ export default function CampaignSetup() {
                         <div className="flex items-center gap-2">
                           <div className={cn(
                             'flex h-8 w-8 items-center justify-center rounded-lg',
-                            journeys.length ? 'bg-amber-500/15 text-amber-700' : 'bg-muted text-muted-foreground',
+                            journey.journeyId ? 'bg-amber-500/15 text-amber-700' : 'bg-muted text-muted-foreground',
                           )}>
                             <Layers className="h-3.5 w-3.5" />
                           </div>
                           <div>
                             <p className="text-sm font-medium">Journey readiness</p>
                             <p className="text-[11px] text-muted-foreground">
-                              {journeys.length
+                              {journey.journeyId
                                 ? 'Your saved journey will be validated and marked published.'
                                 : 'Return to the journey step and save a flow first.'}
                             </p>
                           </div>
                         </div>
-                        <StatusPill kind={journeys.length ? 'warning' : 'muted'}>
-                          {journeys.length ? journeys[0].status : 'No journey'}
+                        <StatusPill kind={journey.journeyId ? 'warning' : 'muted'}>
+                          {journey.journeyId ? (journey.journeyStatus || 'DRAFT') : 'No journey'}
                         </StatusPill>
                       </div>
                     </div>
@@ -1424,7 +881,7 @@ export default function CampaignSetup() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Button
                         onClick={publish}
-                        disabled={!journeys.length || publishing}
+                        disabled={!journey.journeyId || publishing}
                         className="gap-2"
                       >
                         <Rocket className="h-4 w-4" />

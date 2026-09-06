@@ -85,7 +85,6 @@ export function getDefaultConfig(type: string) { return (nodeRegistry as any)[ty
 export function getDevice(type: string) { return (nodeRegistry as any)[type]?.Device }
 export function getJourneyConfig(type: string) { return (nodeRegistry as any)[type]?.JourneyConfig }
 export function getStyleConfig(type: string) { return (nodeRegistry as any)[type]?.StyleConfig }
-export { styleSchema, type NodeStyle } from './types'
 
 export const defaultConfigFor = getDefaultConfig
 export { validateNodeConfig } from './helpers'

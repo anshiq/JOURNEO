@@ -9,6 +9,11 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0'
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
   define: {
     'import.meta.env.VITE_JOURNEY_SERVICE_URL': JSON.stringify(process.env.VITE_JOURNEY_SERVICE_URL || 'http://localhost:8081'),
     'import.meta.env.VITE_ANALYTICS_SERVICE_URL': JSON.stringify(process.env.VITE_ANALYTICS_SERVICE_URL || 'http://localhost:8082'),

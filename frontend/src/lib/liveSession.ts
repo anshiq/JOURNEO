@@ -66,6 +66,8 @@ export class LiveSessionClient {
   private params: StartParams | null = null
   private staleTimer: number | null = null
   private queryPending: { resolve: (r: QueryResult) => void; reject: (e: any) => void; timer: number } | null = null
+  private pendingGotoNodeId: string | null = null
+  private lastNodeId: string | null = null
   state: LiveState = { status: 'connecting' }
 
   subscribe(fn: (s: LiveState) => void): () => void {
@@ -93,13 +95,27 @@ export class LiveSessionClient {
       try { msg = JSON.parse(ev.data) } catch { return }
       if (!msg || typeof msg !== 'object') return
       if (msg.type === 'node') {
+        this.lastNodeId = msg.node?.id || null
         this.set({ status: 'node', sessionId: msg.sessionId, graphVersion: msg.graphVersion, stepIndex: msg.stepIndex, node: msg.node, choices: msg.choices || [] })
+        if (this.pendingGotoNodeId && this.params?.mode === 'test' && this.pendingGotoNodeId !== msg.node?.id) {
+          const target = this.pendingGotoNodeId
+          this.pendingGotoNodeId = null
+          this.sendGoto(target)
+        } else {
+          this.pendingGotoNodeId = null
+        }
       } else if (msg.type === 'end') {
         this.set({ status: 'ended', sessionId: msg.sessionId, reason: msg.reason || 'completed' })
       } else if (msg.type === 'graph-stale') {
         this.set({ status: 'stale', serverVersion: msg.serverVersion })
         if (this.staleTimer) window.clearTimeout(this.staleTimer)
-        this.staleTimer = window.setTimeout(() => { if (this.params) this.connect(this.params) }, 800)
+        const resumeNodeId = this.params?.mode === 'test' ? this.lastNodeId : null
+        this.staleTimer = window.setTimeout(() => {
+          if (this.params) {
+            this.pendingGotoNodeId = resumeNodeId
+            this.connect(this.params)
+          }
+        }, 800)
       } else if (msg.type === 'query_result') {
         const pending = this.queryPending
         this.queryPending = null

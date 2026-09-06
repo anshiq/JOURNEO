@@ -3,6 +3,7 @@ export interface FlowNode {
   id: string
   type: string
   label?: string
+  position?: { x: number; y: number }
   config: any
   style?: NodeStyle
   children?: FlowNode[]

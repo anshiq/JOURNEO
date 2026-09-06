@@ -75,10 +75,10 @@ async def resolve_graph(mode, campaign_id, journey_id, dev_token):
     if not campaign_id:
         raise ResolveError("missing-campaign", "campaignId or devToken is required")
     try:
-        journeys = await spring_mod.fetch_journeys(campaign_id)
+        journey_record = await spring_mod.fetch_journey(campaign_id)
     except Exception:
-        raise ResolveError("spring-unreachable", "could not load journeys from storage")
-    journey = spring_mod.pick_journey(journeys, mode, journey_id)
+        raise ResolveError("spring-unreachable", "could not load journey from storage")
+    journey = spring_mod.pick_journey(journey_record, mode, journey_id)
     if journey is None:
         if mode == "live":
             raise ResolveError("not-live", "campaign is not live yet")

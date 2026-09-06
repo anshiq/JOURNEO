@@ -13,17 +13,19 @@ async def fetch_campaign_by_token(dev_token):
         return resp.json()
 
 
-async def fetch_journeys(campaign_id):
+async def fetch_journey(campaign_id):
     async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.get(f"{base()}/api/campaigns/{campaign_id}/journeys")
+        resp = await client.get(f"{base()}/api/campaigns/{campaign_id}/journey")
+        if resp.status_code == 204:
+            return None
         resp.raise_for_status()
         data = resp.json()
-        return data if isinstance(data, list) else []
+        return data if isinstance(data, dict) else None
 
 
-async def fetch_graph_version(campaign_id, journey_id):
+async def fetch_graph_version(campaign_id):
     async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.get(f"{base()}/api/campaigns/{campaign_id}/journeys/{journey_id}/graph-version")
+        resp = await client.get(f"{base()}/api/campaigns/{campaign_id}/journey/graph-version")
         resp.raise_for_status()
         return resp.json()
 
@@ -41,15 +43,11 @@ def parse_graph(graph_json):
     return {"nodes": nodes, "edges": edges, "theme": raw.get("theme", {})}
 
 
-def pick_journey(journeys, mode, journey_id=None):
-    if journey_id:
-        for j in journeys:
-            if j.get("id") == journey_id:
-                return j
+def pick_journey(journey, mode, journey_id=None):
+    if journey is None:
         return None
-    if mode == "live":
-        for j in journeys:
-            if (j.get("status") or "") == "PUBLISHED":
-                return j
+    if journey_id and journey.get("id") != journey_id:
         return None
-    return journeys[0] if journeys else None
+    if mode == "live" and (journey.get("status") or "") != "PUBLISHED":
+        return None
+    return journey
