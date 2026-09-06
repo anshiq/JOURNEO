@@ -254,6 +254,7 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { camp
   const [sidePanel, setSidePanel] = useState<'config' | 'preview'>('config')
   const [previewKey, setPreviewKey] = useState(0)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [paletteSearch, setPaletteSearch] = useState('')
   const rfInstance = useRef<ReactFlowInstance | null>(null)
 
@@ -371,6 +372,7 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { camp
   const save = async () => {
     const graph = { nodes: nodes.map(n => ({ id: n.id, type: (n.data as any).type, config: (n.data as any).config, position: n.position })), edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label })) }
     setSaving(true)
+    setSaveError(null)
     try {
       if (!jid) {
         const res = await journeyApi.post(`/api/campaigns/${campaignId}/journeys`, { name: 'Journey ' + (Date.now() % 1000), graph })
@@ -378,6 +380,9 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { camp
       } else {
         await journeyApi.put(`/api/campaigns/${campaignId}/journeys/${jid}`, { graph })
       }
+    } catch (error) {
+      setSaveError('Could not save your journey. Check your connection and try again.')
+      throw error
     } finally {
       setSaving(false)
     }
@@ -572,10 +577,13 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { camp
             {saving ? 'Saving…' : jid ? 'Save changes' : 'Save journey'}
           </Button>
         </div>
-        <Button onClick={onComplete} variant="default" className="gap-2">
-          I&apos;ve saved my journey
-          <ArrowRight className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {saveError && <span className="text-xs text-destructive">{saveError}</span>}
+          <Button onClick={() => { save().then(onComplete).catch(() => undefined) }} variant="default" disabled={saving} className="gap-2">
+            {saving ? 'Saving…' : 'Save and continue'}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <FloatingDevicePreview key={previewKey} start={{ mode: 'test', campaignId, journeyId: jid || undefined }} viewportId="iphone14" studio askAiConfig={nodes.length > 0 ? ((nodes.find(n => (n.data as any)?.type === 'ask_ai')?.data as any)?.config ?? null) : undefined} />
     </div>
@@ -772,6 +780,7 @@ export default function CampaignSetup() {
   const [knowledgeStatus, setKnowledgeStatus] = useState<{ kind: 'loading' | 'success' | 'error'; message: string } | null>(null)
   const [publishing, setPublishing] = useState(false)
   const [publishStatus, setPublishStatus] = useState<{ kind: 'success' | 'error' | 'info'; message: string } | null>(null)
+  const [styleSaveStatus, setStyleSaveStatus] = useState<{ kind: 'success' | 'error' | 'info'; message: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const [devCopied, setDevCopied] = useState(false)
   useEffect(() => {
@@ -996,8 +1005,8 @@ export default function CampaignSetup() {
   }, [])
 
   const persistStyledGraph = useCallback(async () => {
+    if (!id || campaignNodes.length === 0) return
     const j = journeys[0]
-    if (!j || !id || campaignNodes.length === 0) return
     const graph = {
       nodes: campaignNodes.map((n: any) => {
         const style = nodeStyles[n.id] || {}
@@ -1021,12 +1030,21 @@ export default function CampaignSetup() {
       nodeStyles,
       nodeOverrides
     }
-    await journeyApi.put(`/api/campaigns/${id}/journeys/${j.id}`, { graph })
+    if (!j) {
+      const res = await journeyApi.post(`/api/campaigns/${id}/journeys`, { name: 'Journey ' + (Date.now() % 1000), graph })
+      setJourneys(prev => [res.data, ...prev])
+    } else {
+      await journeyApi.put(`/api/campaigns/${id}/journeys/${j.id}`, { graph })
+    }
   }, [id, journeys, campaignNodes, campaignEdges, theme, nodeStyles, nodeOverrides])
   const hasPersistedRef = useRef(false)
   useEffect(() => {
-    if (!journeys[0] || campaignNodes.length === 0 || !hasPersistedRef.current) { hasPersistedRef.current = true; return }
-    const t = setTimeout(() => { persistStyledGraph().catch(() => undefined) }, 800)
+    if (campaignNodes.length === 0 || !hasPersistedRef.current) { hasPersistedRef.current = true; return }
+    const t = setTimeout(() => {
+      persistStyledGraph()
+        .then(() => setStyleSaveStatus({ kind: 'success', message: 'Styles saved' }))
+        .catch(() => setStyleSaveStatus({ kind: 'error', message: 'Could not auto-save styles. Check your connection.' }))
+    }, 800)
     return () => clearTimeout(t)
   }, [theme, nodeStyles, nodeOverrides, campaignNodes, persistStyledGraph])
   useEffect(() => { if (journeys.length > 0) hasPersistedRef.current = false }, [journeys.length])
@@ -1266,8 +1284,8 @@ export default function CampaignSetup() {
                       )}
                     </div>
                     <div className="border-t p-2 bg-muted/10 flex items-center gap-2">
-                      <Button size="sm" onClick={() => persistStyledGraph().catch(()=>undefined)} className="flex-1 gap-1.5"><Save className="h-3.5 w-3.5" /> Save styles</Button>
-                      <span className="text-[10px] text-muted-foreground">Auto-saves</span>
+                      <Button size="sm" onClick={() => persistStyledGraph().then(() => setStyleSaveStatus({ kind: 'success', message: 'Styles saved' })).catch(() => setStyleSaveStatus({ kind: 'error', message: 'Could not save styles. Check your connection and try again.' }))} className="flex-1 gap-1.5"><Save className="h-3.5 w-3.5" /> Save styles</Button>
+                      {styleSaveStatus ? <PublishStatusBanner status={styleSaveStatus} /> : <span className="text-[10px] text-muted-foreground">Auto-saves</span>}
                     </div>
                   </Card>
               </div>
