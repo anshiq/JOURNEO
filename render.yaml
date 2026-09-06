@@ -67,7 +67,7 @@ services:
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
       - key: S3_BUCKET
-        value: journey-files
+        value: journey-files-458552014605-us-east-1-an
       - key: S3_PUBLIC_ENDPOINT
         value: ""
       - key: S3_PRESIGN_EXPIRY_SECONDS

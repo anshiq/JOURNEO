@@ -20,7 +20,8 @@ public class FileStorageService {
     private final S3Client s3;
     private final S3Presigner presigner;
     @Value("${s3.bucket:journey-files}") String bucket;
-    @Value("${s3.public-endpoint:http://localhost:4566}") String publicEndpoint;
+    @Value("${s3.public-endpoint:}") String publicEndpoint;
+    @Value("${aws.region:us-east-1}") String region;
     @Value("${s3.presign-expiry-seconds:600}") long expirySeconds;
     @Value("${s3.max-image-mb:25}") long maxImageMb;
     @Value("${s3.max-video-mb:200}") long maxVideoMb;
@@ -51,9 +52,16 @@ public class FileStorageService {
         PutObjectRequest put = PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType).contentLength(size).build();
         PutObjectPresignRequest req = PutObjectPresignRequest.builder().putObjectRequest(put).signatureDuration(Duration.ofSeconds(expirySeconds)).build();
         String uploadUrl = presigner.presignPutObject(req).url().toString();
-        String base = publicEndpoint.endsWith("/") ? publicEndpoint.substring(0, publicEndpoint.length() - 1) : publicEndpoint;
-        String publicUrl = base + "/" + bucket + "/" + key;
+        String publicUrl = publicUrl(key);
         return Map.of("uploadUrl", uploadUrl, "publicUrl", publicUrl, "key", key, "bucket", bucket, "expiresIn", expirySeconds);
+    }
+
+    private String publicUrl(String key) {
+        if (publicEndpoint == null || publicEndpoint.isBlank()) {
+            return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
+        }
+        String base = publicEndpoint.endsWith("/") ? publicEndpoint.substring(0, publicEndpoint.length() - 1) : publicEndpoint;
+        return base + "/" + key;
     }
 
     private void ensureBucket() {

@@ -27,7 +27,7 @@ aws:
   secret-access-key: ${AWS_SECRET_ACCESS_KEY:test}
 s3:
   bucket: ${S3_BUCKET:journey-files}
-  public-endpoint: ${S3_PUBLIC_ENDPOINT:http://localhost:4566}
+  public-endpoint: ${S3_PUBLIC_ENDPOINT:http://localhost:4566/journey-files}
   presign-expiry-seconds: ${S3_PRESIGN_EXPIRY_SECONDS:600}
   max-image-mb: ${S3_MAX_IMAGE_MB:25}
   max-video-mb: ${S3_MAX_VIDEO_MB:200}

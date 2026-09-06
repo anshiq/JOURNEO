@@ -15,7 +15,8 @@ class FileStorageServiceTest {
   private FileStorageService service(S3Client s3, S3Presigner p) throws Exception {
     FileStorageService s = new FileStorageService(s3, p);
     set(s, "bucket", "journey-files");
-    set(s, "publicEndpoint", "http://localhost:4566");
+    set(s, "publicEndpoint", "http://localhost:4566/journey-files");
+    set(s, "region", "us-east-1");
     set(s, "expirySeconds", 600L);
     set(s, "maxImageMb", 25L);
     set(s, "maxVideoMb", 200L);
