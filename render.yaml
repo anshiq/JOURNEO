@@ -1,6 +1,7 @@
 services:
   - type: web
     name: journeo-ai-service
+    plan: free
     runtime: docker
     dockerfilePath: ./services/ai-service/Dockerfile
     dockerContext: ./services/ai-service
@@ -36,6 +37,7 @@ services:
         value: "4"
   - type: web
     name: journeo-journey-service
+    plan: free
     runtime: docker
     dockerfilePath: ./services/journey-service/Dockerfile
     dockerContext: ./services/journey-service
@@ -78,6 +80,7 @@ services:
         value: "false"
   - type: web
     name: journeo-analytics-service
+    plan: free
     runtime: docker
     dockerfilePath: ./services/analytics-service/Dockerfile
     dockerContext: ./services/analytics-service
@@ -96,6 +99,7 @@ services:
         value: "false"
   - type: web
     name: journeo-platform-connectors-service
+    plan: free
     runtime: docker
     dockerfilePath: ./services/platform-connectors-service/Dockerfile
     dockerContext: ./services/platform-connectors-service
@@ -112,6 +116,7 @@ services:
         value: https://journeo.yourdomain.com
   - type: web
     name: journeo-frontend
+    plan: free
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
