@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.middleware.request_context import RequestContextMiddleware, get_request_id
@@ -12,7 +13,8 @@ from sqlalchemy import text
 app=FastAPI(title="Journeo AI Service", version="0.1.0")
 
 app.add_middleware(RequestContextMiddleware)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+_cors_origins=[o.strip() for o in (os.environ.get("CORS_ALLOWED_ORIGINS","*").split(",")) if o.strip()] or ["*"]
+app.add_middleware(CORSMiddleware, allow_origins=_cors_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.on_event("startup")
 async def startup():
@@ -51,18 +53,42 @@ async def startup():
             except: pass
         sched=BackgroundScheduler(daemon=True)
         sched.add_job(job, 'interval', minutes=int(settings.anomaly_scan_interval_minutes))
+        def self_ping_job():
+            raw=(settings.self_ping_url or "").strip()
+            if not settings.self_ping_enabled or not raw:
+                return
+            try:
+                urls=[u.strip() for u in raw.split(",") if u.strip()]
+                targets=[]
+                for u in urls:
+                    targets.append(u)
+                    targets.append(u.rstrip("/") + "/health")
+                with httpx.Client(timeout=20, follow_redirects=True) as client:
+                    for target in targets:
+                        try:
+                            resp=client.get(target)
+                            print(f"self ping {target} -> {resp.status_code}")
+                        except Exception as e:
+                            print(f"self ping {target} failed {e}")
+            except Exception as e:
+                print(f"self ping failed {e}")
+        if settings.self_ping_enabled and (settings.self_ping_url or "").strip():
+            sched.add_job(self_ping_job, 'interval', minutes=int(settings.self_ping_interval_minutes))
+            print(f"Self ping scheduler started every {settings.self_ping_interval_minutes} minutes")
         sched.start()
         print("Anomaly scheduler started")
     except Exception as e:
         print(f"scheduler failed {e}")
 
-from app.routers import decision_nodes, knowledge, optimizer, studio_ai, anomaly, eval
+from app.routers import decision_nodes, knowledge, optimizer, studio_ai, anomaly, eval, sessions, query
 app.include_router(decision_nodes.router)
 app.include_router(knowledge.router)
 app.include_router(optimizer.router)
 app.include_router(studio_ai.router)
 app.include_router(anomaly.router)
 app.include_router(eval.router)
+app.include_router(sessions.router)
+app.include_router(query.router)
 
 @app.get("/health")
 async def health(): return {"status":"ok"}

@@ -9,6 +9,8 @@ export function validateGraph(nodes:any[], edges:any[]){
   const errs:any[]=[]
   const triggers=nodes.filter(n=>n.type==='trigger')
   if(triggers.length!==1) errs.push({nodeId:'graph', field:'trigger', message:`Exactly one trigger required, found ${triggers.length}`})
+  const askAi=nodes.filter(n=>n.type==='ask_ai')
+  if(askAi.length>1) errs.push({nodeId:'graph', field:'ask_ai', message:'At most one ask_ai floating node is allowed'})
   // orphan check BFS
   if(triggers.length===1){
     const adj=new Map<string,string[]>()
@@ -16,7 +18,7 @@ export function validateGraph(nodes:any[], edges:any[]){
     const visited=new Set<string>([triggers[0].id])
     const q=[triggers[0].id]
     while(q.length){ const cur=q.shift()!; (adj.get(cur)||[]).forEach(t=>{if(!visited.has(t)){visited.add(t); q.push(t)}})}
-    nodes.forEach(n=>{if(!visited.has(n.id)) errs.push({nodeId:n.id, field:'graph', message:'Unreachable node'})})
+    nodes.forEach(n=>{ if(n.type==='ask_ai') return; if(!visited.has(n.id)) errs.push({nodeId:n.id, field:'graph', message:'Unreachable node'})})
   }
   // typed config validation, one schema per node type (see nodeSchemas.ts)
   nodes.forEach(n=>{

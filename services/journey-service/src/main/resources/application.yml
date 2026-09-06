@@ -1,11 +1,14 @@
 server:
-  port: 8081
+  port: ${PORT:8081}
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/journey_db}
     username: ${SPRING_DATASOURCE_USERNAME:journeo}
     password: ${SPRING_DATASOURCE_PASSWORD:journeo_dev}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-init-sql: ${SPRING_DATASOURCE_INIT_SQL:SET search_path TO public}
+      maximum-pool-size: 10
   jpa:
     hibernate:
       ddl-auto: update

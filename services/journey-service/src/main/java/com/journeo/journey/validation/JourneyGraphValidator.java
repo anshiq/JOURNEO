@@ -6,7 +6,7 @@ public class JourneyGraphValidator {
     public static class ValidationError { public String nodeId; public String field; public String message;
         public ValidationError(String n,String f,String m){nodeId=n;field=f;message=m;}}
     private static final ObjectMapper M=new ObjectMapper();
-    private static final Set<String> KEPT_TYPES = Set.of("trigger","condition","end","text","image","video","button","input","select","checkbox","rating","container","divider","card","hero_section","quiz","form","countdown","alert","badge");
+    private static final Set<String> KEPT_TYPES = Set.of("trigger","condition","end","text","image","video","button","input","select","checkbox","rating","container","divider","card","hero_section","quiz","form","countdown","alert","badge","ask_ai");
     private static final Set<String> BRANCH_TYPES = Set.of("condition","quiz","video");
     private static final Map<String,String> PRUNED_MAP = Map.ofEntries(
         Map.entry("gallery","image"), Map.entry("poll","quiz"), Map.entry("media_carousel","image"), Map.entry("stats_card","card"),
@@ -30,9 +30,11 @@ public class JourneyGraphValidator {
             if(nodes==null||!nodes.isArray()||nodes.size()==0){ errs.add(new ValidationError("graph","nodes","At least one node required")); return errs; }
             Map<String,JsonNode> nodeMap=new HashMap<>();
             int triggerCount=0; String triggerId=null;
+            int askAiCount=0;
             for(JsonNode n: nodes){
                 String id=n.path("id").asText(); String type=n.path("type").asText(); nodeMap.put(id,n);
                 if("trigger".equals(type)){triggerCount++; triggerId=id;}
+                if("ask_ai".equals(type)){askAiCount++;}
                 if(!KEPT_TYPES.contains(type)){
                     String migrated = PRUNED_MAP.get(type);
                     if(migrated!=null) errs.add(new ValidationError(id,"type","Unknown node type: "+type+" (migrated to "+migrated+")"));
@@ -60,13 +62,14 @@ public class JourneyGraphValidator {
                 if("badge".equals(type)){ if(cfg.path("label").asText().isBlank()) errs.add(new ValidationError(id,"config.label","badge requires label")); }
             }
             if(triggerCount!=1) errs.add(new ValidationError("graph","trigger","Exactly one trigger required, found "+triggerCount));
+            if(askAiCount>1) errs.add(new ValidationError("graph","ask_ai","At most one ask_ai floating node is allowed"));
             if(edges!=null && triggerId!=null){
                 Map<String,List<JsonNode>> adj=new HashMap<>();
                 for(JsonNode e: edges){ String src=e.path("source").asText(); String tgt=e.path("target").asText(); adj.computeIfAbsent(src,k->new ArrayList<>()).add(e); }
                 for(JsonNode n: nodes){ String id=n.path("id").asText(); String type=n.path("type").asText(); if(BRANCH_TYPES.contains(type)){ List<JsonNode> out=adj.getOrDefault(id,List.of()); boolean hasDefault=out.stream().anyMatch(e->"default".equals(e.path("label").asText())||"default".equals(e.path("sourceHandle").asText())||e.path("sourceHandle").asText().contains("default")); if(!out.isEmpty() && !hasDefault && out.size()<2) errs.add(new ValidationError(id,"edges",type+" should route via labeled outgoing edges, not a single implicit edge")); } }
                 Set<String> visited=new HashSet<>(); Queue<String> q=new LinkedList<>(); q.add(triggerId); visited.add(triggerId);
                 while(!q.isEmpty()){ String cur=q.poll(); for(JsonNode e: adj.getOrDefault(cur,List.of())){ String t=e.path("target").asText(); if(!visited.contains(t)){visited.add(t); q.add(t);} } }
-                for(String nid: nodeMap.keySet()) if(!visited.contains(nid)) errs.add(new ValidationError(nid,"graph","Unreachable node"));
+                for(String nid: nodeMap.keySet()){ JsonNode nn=nodeMap.get(nid); if(nn!=null && "ask_ai".equals(nn.path("type").asText())) continue; if(!visited.contains(nid)) errs.add(new ValidationError(nid,"graph","Unreachable node")); }
                 if(hasCycle(adj, nodeMap.keySet())) errs.add(new ValidationError("graph","edges","Cycle detected outside subflow boundary"));
             }
         }catch(Exception e){ errs.add(new ValidationError("graph","json","Invalid JSON: "+e.getMessage())); }

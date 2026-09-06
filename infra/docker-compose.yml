@@ -109,7 +109,7 @@ services:
       CONNECTORS_SERVICE_URL: http://platform-connectors-service:8083
       JOURNEY_SERVICE_URL: http://journey-service:8081
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-anthropic/claude-3.5-sonnet}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-google/gemma-4-31b-it:free}
       OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       GUARDRAIL_MODE: ${GUARDRAIL_MODE:-flag}
       ANOMALY_SCAN_INTERVAL_MINUTES: ${ANOMALY_SCAN_INTERVAL_MINUTES:-15}

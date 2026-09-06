@@ -11,3 +11,12 @@ def retrieve(query: str, k=4):
     if top < SIM_FLOOR:
         return {"grounded":False, "results":results, "reason":f"top similarity {top:.2f} < floor {SIM_FLOOR}"}
     return {"grounded":True, "results":results}
+
+def retrieve_for_llm(query: str, k=8):
+    emb_model=get_embeddings()
+    q_emb=emb_model.embed_query(query)
+    try:
+        results=similarity_search(q_emb, k=k)
+    except Exception as e:
+        return []
+    return results or []

@@ -8,7 +8,9 @@ import type { NodeType } from '../nodes/_core/types'
 import type { NodeStyle } from '../nodes/_core/types'
 import { validateGraph } from '../lib/validation'
 import JourneyNodeRenderer from '../components/nodes/JourneyNodeRenderer'
-import DevicePreviewPanel from '../components/preview/DevicePreviewPanel'
+import LiveAdStage from '../components/preview/LiveAdStage'
+import FloatingDevicePreview from '../components/preview/FloatingDevicePreview'
+import { DEVICE_CHOICES, DEVICE_GROUPS, viewportForDevice, type FrameDevice } from '../components/preview/devices'
 import { JourneyConfigRouter, StyleConfigRouter } from '../nodes/_core/ConfigRouter'
 import { NODE_DRAG_MIME } from './JourneyCanvas'
 import { type FlowNode, type FlowEdge } from '../components/preview/types'
@@ -43,6 +45,7 @@ import {
   Rocket,
   RotateCcw,
   Save,
+  Smartphone,
   Sparkles,
   Square,
   Target,
@@ -239,7 +242,7 @@ function ConnectionsDropdown({ edges, nodes, selectedEdgeId, onSelect, onDelete 
   )
 }
 
-function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string; onComplete: () => void }) {
+function EmbeddedJourneyCanvas({ campaignId, onComplete, onGraphChange }: { campaignId: string; onComplete: () => void; onGraphChange?: (g: { nodes: FlowNode[]; edges: FlowEdge[] }) => void }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selected, setSelected] = useState<any>(null)
@@ -249,6 +252,7 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
   const [validation, setValidation] = useState<any[]>([])
   const [jid, setJid] = useState<string | null>(null)
   const [sidePanel, setSidePanel] = useState<'config' | 'preview'>('config')
+  const [previewKey, setPreviewKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [paletteSearch, setPaletteSearch] = useState('')
   const rfInstance = useRef<ReactFlowInstance | null>(null)
@@ -256,6 +260,14 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
   const onConnect = useCallback((params: Connection) => setEdges(eds => addEdge({ ...params, id: `e-${Date.now()}` }, eds)), [setEdges])
 
   const addNode = useCallback((type: NodeType, position?: { x: number; y: number }) => {
+    if (type === 'ask_ai') {
+      const existing = (rfInstance.current?.getNodes() || nodes).find(n => (n.data as any)?.type === 'ask_ai')
+      if (existing) {
+        setSelected(existing as any)
+        bus.emit('node:select', { nodeId: existing.id, source: 'canvas' })
+        return existing.id
+      }
+    }
     const nid = `n-${Date.now()}`
     const cfg = defaultConfigFor(type)
     const pos = position || { x: 100 + Math.random() * 400, y: 100 + Math.random() * 300 }
@@ -264,7 +276,7 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
     bus.emit('node:track', { nodeId: nid, type, viewportId: 'iphone14' as any })
     bus.emit('node:select', { nodeId: nid, source: 'canvas' })
     return nid
-  }, [setNodes])
+  }, [setNodes, nodes])
 
   const flashNode = useCallback((nodeId: string) => {
     setHighlightedId(nodeId)
@@ -294,6 +306,15 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
   const onPaneClick = useCallback(() => {
     setSelectedEdgeId(null)
   }, [])
+
+  const onGraphChangeRef = useRef(onGraphChange)
+  onGraphChangeRef.current = onGraphChange
+  useEffect(() => {
+    onGraphChangeRef.current?.({
+      nodes: nodes.map(n => ({ id: n.id, type: (n.data as any)?.type, config: (n.data as any)?.config || {}, position: n.position } as FlowNode)),
+      edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label } as FlowEdge)),
+    })
+  }, [nodes, edges])
 
   const deleteEdge = useCallback((edgeId: string) => {
     setEdges(eds => eds.filter(e => e.id !== edgeId))
@@ -366,7 +387,13 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
     try {
       const g = JSON.parse(journey.graphJson || '{}')
       if (g.nodes) {
-        setNodes(g.nodes.map((n: any, i: number) => ({ id: n.id, position: n.position || { x: 100 + i * 220, y: 100 + (i % 2) * 140 }, data: { label: `${n.type} ${n.id.slice(0, 4)}`, type: n.type, config: n.config }, type: 'journeyNode' })))
+        let keptAskAi = false
+        const cleaned = (g.nodes as any[]).filter((n: any) => {
+          if (n.type !== 'ask_ai') return true
+          if (!keptAskAi) { keptAskAi = true; return true }
+          return false
+        })
+        setNodes(cleaned.map((n: any, i: number) => ({ id: n.id, position: n.position || { x: 100 + i * 220, y: 100 + (i % 2) * 140 }, data: { label: `${n.type} ${n.id.slice(0, 4)}`, type: n.type, config: n.config }, type: 'journeyNode' })))
         setEdges((g.edges || []).map((e: any) => ({ id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle, label: e.label })))
         setJid(journey.id)
       }
@@ -390,18 +417,16 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
     }).catch(() => { })
   }, [campaignId])
 
-  const flowNodes: FlowNode[] = nodes.map(n => ({ id: n.id, type: (n.data as any).type, config: (n.data as any).config }))
-  const flowEdges: FlowEdge[] = edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label }))
-
   return (
     <div className="flex h-full flex-col gap-2">
       {validation.length > 0 && (
         <div className="flex items-start gap-1.5 rounded-md border border-destructive/30 bg-destructive/5 px-2 py-1.5 text-xs text-destructive">
           <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <div className="flex flex-col gap-0.5">
-            {validation.map((e, i) => (
+            {validation.slice(0,3).map((e, i) => (
               <div key={i}><span className="font-mono opacity-70">{e.nodeId}:</span> {e.message}</div>
             ))}
+            {validation.length>3 && <div className="opacity-70">+{validation.length-3} more</div>}
           </div>
         </div>
       )}
@@ -529,8 +554,9 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
                 <ConnectionsDropdown edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={setSelectedEdgeId} onDelete={deleteEdge} />
               </TabsContent>
               <TabsContent value="preview" className="mt-0 h-full">
-                <div className="h-[420px]">
-                  <DevicePreviewPanel nodes={flowNodes} edges={flowEdges} />
+                <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed bg-muted/30 px-4 py-10 text-center">
+                  <p className="text-xs text-muted-foreground">The device preview floats above the workspace. Drag it anywhere on screen.</p>
+                  <Button variant="outline" size="sm" onClick={() => setPreviewKey(k => k + 1)}>Reset device position</Button>
                 </div>
               </TabsContent>
             </div>
@@ -551,6 +577,7 @@ function EmbeddedJourneyCanvas({ campaignId, onComplete }: { campaignId: string;
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
+      <FloatingDevicePreview key={previewKey} start={{ mode: 'test', campaignId, journeyId: jid || undefined }} viewportId="iphone14" studio askAiConfig={nodes.length > 0 ? ((nodes.find(n => (n.data as any)?.type === 'ask_ai')?.data as any)?.config ?? null) : undefined} />
     </div>
   )
 }
@@ -733,6 +760,7 @@ export default function CampaignSetup() {
   const [brief, setBrief] = useState('')
   const [theme, setTheme] = useState<Theme>(initialTheme)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [expDevice, setExpDevice] = useState<FrameDevice>('iphone-16-pro')
   const [nodeOverrides, setNodeOverrides] = useState<Record<string, Partial<Theme>>>({})
   const [nodeStyles, setNodeStyles] = useState<Record<string, NodeStyle>>({})
   const [campaignNodes, setCampaignNodes] = useState<FlowNode[]>([])
@@ -817,11 +845,6 @@ export default function CampaignSetup() {
     if (p.style) setNodeStyles(prev => ({ ...prev, [p.nodeId]: { ...prev[p.nodeId], ...p.style } }))
     if (p.config?.theme) setNodeOverrides(prev => ({ ...prev, [p.nodeId]: { ...prev[p.nodeId], ...p.config.theme } }))
   }, []))
-  useEffect(() => {
-    const handler = (p: any) => { if (id) journeyApi.post(`/api/campaigns/${id}/track`, { nodeId: p.nodeId, type: p.type, handle: p.handle, viewportId: p.viewportId, devToken: campaign?.devToken }).catch(() => {}) }
-    bus.on('node:track', handler as any)
-    return () => { bus.off('node:track', handler as any) }
-  }, [id, campaign?.devToken])
 
   const updateNodeOverride = (key: keyof Theme, value: string | number) => {
     if (!selectedNodeId) return
@@ -848,7 +871,13 @@ export default function CampaignSetup() {
     if (response.data && response.data.length > 0) {
       try {
         const g = JSON.parse(response.data[0].graphJson || '{}')
-        setCampaignNodes((g.nodes || []).map((n: any) => ({ id: n.id, type: n.type, config: n.config || {}, position: n.position })))
+        let keptAskAi = false
+        const cleaned = ((g.nodes || []) as any[]).filter((n: any) => {
+          if (n.type !== 'ask_ai') return true
+          if (!keptAskAi) { keptAskAi = true; return true }
+          return false
+        })
+        setCampaignNodes(cleaned.map((n: any) => ({ id: n.id, type: n.type, config: n.config || {}, position: n.position })))
         setCampaignEdges((g.edges || []).map((e: any) => ({ id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle, label: e.label })))
         if (g.theme) setTheme(g.theme)
         if (g.nodeStyles) setNodeStyles(g.nodeStyles)
@@ -951,26 +980,21 @@ export default function CampaignSetup() {
     bus.emit('campaign:devLinkRotated', { campaignId: id, devToken: res.data.devToken })
   }
 
-  const styledPreviewNodes = useMemo(() => campaignNodes.map(n => {
-    const override = nodeOverrides[n.id] || {}
-    const customStyle = nodeStyles[n.id] || {}
-    return {
-      ...n,
-      config: {
-        ...n.config,
-        theme: {
-          primary: override.primary || theme.primary,
-          accent: override.accent || theme.accent,
-          surface: override.surface || theme.surface,
-          foreground: override.foreground || theme.foreground,
-          font: override.font || theme.font,
-          radius: override.radius ?? theme.radius,
-          cta: override.cta || theme.cta
-        },
-        style: customStyle
-      }
-    }
-  }), [campaignNodes, theme, nodeOverrides, nodeStyles])
+  const mergeCanvasGraph = useCallback((g: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    if (!g || g.nodes.length === 0) return
+    setCampaignNodes(prev => {
+      const prevById = new Map(prev.map(n => [n.id, n]))
+      const next = g.nodes.map(n => {
+        const existing = prevById.get(n.id)
+        if (existing) return { ...existing, type: (n as any).type, position: (n as any).position }
+        return n
+      })
+      if (next.length === prev.length && next.every((n, i) => n.id === prev[i].id && (n as any).type === (prev[i] as any).type && JSON.stringify((n as any).position) === JSON.stringify((prev[i] as any).position))) return prev
+      return next
+    })
+    setCampaignEdges(g.edges)
+  }, [])
+
   const persistStyledGraph = useCallback(async () => {
     const j = journeys[0]
     if (!j || !id || campaignNodes.length === 0) return
@@ -1177,7 +1201,7 @@ export default function CampaignSetup() {
             {step === 1 && (
               <div className="flex h-full min-h-0 flex-col">
                 <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-background shadow-soft">
-                  <EmbeddedJourneyCanvas campaignId={id} onComplete={() => { refreshJourneys(); setStep(2) }} />
+                  <EmbeddedJourneyCanvas campaignId={id} onComplete={() => { refreshJourneys(); setStep(2) }} onGraphChange={mergeCanvasGraph} />
                 </div>
               </div>
             )}
@@ -1185,9 +1209,21 @@ export default function CampaignSetup() {
             {step === 2 && (
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:overflow-hidden">
                   <Card className="flex min-h-[420px] flex-col overflow-hidden bg-card shadow-sm lg:min-h-0">
+                    <div className="flex shrink-0 items-center gap-2 border-b bg-muted/20 px-3 py-1.5">
+                      <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+                      <select value={expDevice} onChange={e => setExpDevice(e.target.value as FrameDevice)} className="h-7 min-w-0 flex-1 rounded-md border bg-background px-1.5 text-xs font-medium" aria-label="Preview device">
+                        {DEVICE_GROUPS.map(g => (
+                          <optgroup key={g} label={g}>
+                            {DEVICE_CHOICES.filter(c => c.group === g).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
                     <div className="flex min-h-0 flex-1 flex-col p-2">
                       {campaignNodes.length > 0 ? (
-                        <DevicePreviewPanel nodes={styledPreviewNodes} edges={campaignEdges} />
+                        <div className="h-full min-h-[420px]">
+                          <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journeys[0]?.id, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={campaignNodes.length > 0 ? ((campaignNodes.find(n => (n as any)?.type === 'ask_ai') as any)?.config ?? null) : undefined} />
+                        </div>
                       ) : (
                         <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg border border-dashed bg-muted/20">
                           <div className="max-w-sm text-center p-6">

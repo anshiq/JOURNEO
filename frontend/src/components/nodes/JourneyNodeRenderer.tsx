@@ -1,12 +1,13 @@
 import { Handle, Position, type NodeProps } from 'reactflow'
 import {
-  Zap, GitBranch, Flag,
+  Zap, GitBranch, Flag, MessageCircle,
   Type, Image, Video, MousePointer, Square, List, CheckSquare, Star, Minus, Layout, Bell, CreditCard, Clock, AlertTriangle,
 } from 'lucide-react'
 const ICONS: Record<string, any> = {
   trigger: Zap,
   condition: GitBranch,
   end: Flag,
+  ask_ai: MessageCircle,
   text: Type,
   image: Image,
   video: Video,
@@ -46,12 +47,14 @@ const ACCENT: Record<string, string> = {
   countdown: 'border-l-orange-500',
   alert: 'border-l-yellow-500',
   badge: 'border-l-indigo-500',
+  ask_ai: 'border-l-cyan-500',
 }
 const OUTCOME_HANDLES: Record<string, string[]> = {
   condition: ['true', 'false'],
   quiz: ['answered', 'skipped'],
   video: ['watched', 'skipped'],
 }
+const FLOATING_NODE_TYPES = ['ask_ai']
 function truncate(s: string | undefined, n: number) {
   if (!s) return ''
   return s.length > n ? s.slice(0, n) + '…' : s
@@ -101,6 +104,8 @@ function Preview({ type, config }: { type: string; config: any }) {
       return <div className="text-xs text-slate-700">{cfg.title || cfg.message || 'Alert'}</div>
     case 'badge':
       return <span className="text-xs px-2 py-0.5 rounded bg-slate-100">{cfg.label || 'Badge'}</span>
+    case 'ask_ai':
+      return <div className="text-xs text-slate-700">{truncate(cfg.placeholder, 40) || 'Ask anything...'}</div>
     default:
       return <div className="text-xs text-slate-400">{type}</div>
   }
@@ -110,30 +115,32 @@ export default function JourneyNodeRenderer({ data, selected }: NodeProps) {
   const Icon = ICONS[type] || AlertTriangle
   const accent = ACCENT[type] || 'border-l-slate-400'
   const handles = OUTCOME_HANDLES[type]
+  const isFloating = FLOATING_NODE_TYPES.includes(type)
   const hasError = !!data.hasError
   const isHighlighted = !!data.isHighlighted
   return (
     <div className={`relative rounded-lg shadow-sm border bg-white w-56 border-l-4 transition-all duration-150 ${accent} ${selected ? 'ring-2 ring-blue-400' : ''} ${hasError ? 'ring-2 ring-red-400' : ''} ${isHighlighted ? 'ring-2 ring-amber-400 shadow-lg scale-[1.03]' : ''}`}>
-      <Handle type="target" position={Position.Left} className="!bg-slate-400" />
+      {!isFloating && <Handle type="target" position={Position.Left} className="!bg-slate-400" />}
       <div className="px-3 py-2 flex items-center gap-2 border-b">
         <Icon size={14} className="text-slate-500 flex-shrink-0" />
         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 truncate">{type.replace(/_/g, ' ')}</span>
+        {isFloating && <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-600 border border-cyan-200">floating</span>}
         {hasError && <AlertTriangle size={12} className="text-red-500 ml-auto flex-shrink-0" />}
       </div>
       <div className="p-3">
         <Preview type={type} config={data.config} />
       </div>
-      {handles
+      {!isFloating && (handles
         ? <div className="flex justify-between px-3 pb-1 text-[9px] text-slate-400">
             {handles.map(h => <span key={h}>{h}</span>)}
           </div>
-        : null}
-      {handles
+        : null)}
+      {!isFloating && (handles
         ? handles.map((h, i) => (
             <Handle key={h} id={h} type="source" position={Position.Right}
               style={{ top: `${35 + i * 20}%` }} className="!bg-slate-400" />
           ))
-        : <Handle type="source" position={Position.Right} className="!bg-slate-400" />}
+        : <Handle type="source" position={Position.Right} className="!bg-slate-400" />)}
     </div>
   )
 }

@@ -2,12 +2,12 @@ import { useCallback, useState, useEffect, useRef, useMemo, type DragEvent } fro
 import ReactFlow, { Background, Controls, useNodesState, useEdgesState, addEdge, Connection, Edge, Node, type ReactFlowInstance } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { journeyApi, JOURNEY_URL } from '../lib/api'
+import { journeyApi } from '../lib/api'
 import { validateGraph } from '../lib/validation'
 import { allNodeTypes, defaultConfigFor } from '../nodes/_core/registry'
 import type { NodeType } from '../nodes/_core/types'
 import JourneyNodeRenderer from '../components/nodes/JourneyNodeRenderer'
-import DevicePreviewPanel from '../components/preview/DevicePreviewPanel'
+import LiveAdStage from '../components/preview/LiveAdStage'
 import { JourneyConfigRouter } from '../nodes/_core/ConfigRouter'
 import { bus, useEvent } from '../lib/eventBus'
 
@@ -27,13 +27,15 @@ export default function JourneyCanvas(){
   const [paletteSearch,setPaletteSearch]=useState('')
   const [validation,setValidation]=useState<any[]>([])
   const [jid,setJid]=useState<string|null>(presetJid)
-  const [running,setRunning]=useState(false)
-  const [sessionLogs,setSessionLogs]=useState<any[]>([])
-  const [wsConnected,setWsConnected]=useState(false)
   const [sidePanel,setSidePanel]=useState<'config'|'device'>('config')
   const rfInstance=useRef<ReactFlowInstance|null>(null)
 
-  const onConnect=useCallback((params:Connection)=> setEdges(eds=> addEdge({...params, id:`e-${Date.now()}`}, eds)),[setEdges])
+  const onConnect=useCallback((params:Connection)=>{
+    const src=nodes.find(n=>n.id===params.source)
+    const tgt=nodes.find(n=>n.id===params.target)
+    if((src?.data as any)?.type==='ask_ai' || (tgt?.data as any)?.type==='ask_ai') return
+    setEdges(eds=> addEdge({...params, id:`e-${Date.now()}`}, eds))
+  },[setEdges,nodes])
 
   const highlightedIdRef=useRef<string|null>(null)
   const [highlightedId, setHighlightedId]=useState<string|null>(null)
@@ -43,14 +45,12 @@ export default function JourneyCanvas(){
     const found=nodes.find(n=>n.id===p.nodeId)
     if(found){ setSelected(found); setSelectedEdgeId(null); flashNode(p.nodeId) }
   },[nodes,flashNode]))
-  useEffect(()=>{
-    const h=(p:any)=>{ if(id) journeyApi.post(`/api/campaigns/${id}/track`, { nodeId:p.nodeId, type:p.type, handle:p.handle, viewportId:p.viewportId }).catch(()=>{}) }
-    bus.on('node:track', h as any)
-    return ()=>{ bus.off('node:track', h as any) }
-  },[id])
 
   const addNode=(type:NodeType, position?:{x:number;y:number})=>{
-    const nid=`n-${Date.now()}`
+    if(type==='ask_ai'){
+      const existing=nodes.find(n=>(n.data as any)?.type==='ask_ai')
+      if(existing){ setSelected(existing); flashNode(existing.id); bus.emit('node:select', { nodeId:existing.id, source:'canvas' }); return existing.id }
+    }    const nid=`n-${Date.now()}`
     const cfg=defaultConfigFor(type)
     const pos=position || {x:120+Math.random()*360,y:120+Math.random()*260}
     const newNode:Node={id:nid, type:'journeyNode', position:pos, data:{label:`${type} ${nid.slice(0,4)}`, type, config:cfg}}
@@ -58,6 +58,21 @@ export default function JourneyCanvas(){
     bus.emit('node:track', { nodeId:nid, type, viewportId:'iphone14' as any })
     bus.emit('node:select', { nodeId:nid, source:'canvas' })
     return nid
+  }
+
+  const ensureAskAi=(list:Node[])=>{
+    if(list.some(n=>(n.data as any)?.type==='ask_ai')) return dedupeAskAi(list)
+    const cfg=defaultConfigFor('ask_ai' as any)
+    return [...list, {id:`n-ask-ai`, type:'journeyNode', position:{x:40,y:40}, data:{label:'ask ai', type:'ask_ai', config:cfg}} as Node]
+  }
+
+  const dedupeAskAi=(list:Node[])=>{
+    let kept=false
+    return list.filter(n=>{
+      if((n.data as any)?.type!=='ask_ai') return true
+      if(!kept){ kept=true; return true }
+      return false
+    })
   }
 
   const onNodeClick=(_:any, node:Node)=> { setSelected(node); setSelectedEdgeId(null); flashNode(node.id); bus.emit('node:select', { nodeId:node.id, source:'canvas' }) }
@@ -142,49 +157,11 @@ export default function JourneyCanvas(){
     await journeyApi.post(`/api/campaigns/${id}/journeys/${jid}/publish`)
     alert('Published')
   }
-  const runSim=async()=>{
-    if(!jid) return alert('Save first')
-    setRunning(true); setSessionLogs([])
-    const res=await journeyApi.post(`/api/campaigns/${id}/journeys/${jid}/simulate`,{sessionCount:3})
-    const {requestId, sessionIds}=res.data
-    // Connect websocket via SockJS + Stomp; polling provides delivery resilience.
-    const sid=sessionIds[0]
-    let tries=0
-    const poll=setInterval(async()=>{
-      tries++
-      try{
-        const execs=await journeyApi.get(`/api/sessions/${sid}/executions`)
-        setSessionLogs(execs.data)
-        if(execs.data.length>0 && tries>10) {clearInterval(poll); setRunning(false)}
-      }catch{}
-      if(tries>20){clearInterval(poll); setRunning(false)}
-    },800)
-    // Also try STOMP over /ws
-    try{
-      const SockJS=await import('sockjs-client')
-      const Stomp=await import('stompjs')
-      const sock=new (SockJS as any).default(`${JOURNEY_URL}/ws`)
-      const client=(Stomp as any).over(sock)
-      client.debug=()=>{}
-      client.connect({},()=>{
-        setWsConnected(true)
-        sessionIds.forEach((s:string)=>{
-          client.subscribe(`/topic/sessions/${s}`,(msg:any)=>{
-            const body=JSON.parse(msg.body)
-            setSessionLogs(prev=>[...prev, body])
-          })
-        })
-      })
-    }catch(e){ console.log('ws fail',e)}
-  }
-
   const loadJourney=(journey:any)=>{
     try{
       const g=JSON.parse(journey.graphJson||'{}')
       if(g.nodes){
-        // Stagger x when the graph has no positions (for example, API-created graphs).
-        // so nodes never stack on top of each other at a shared default
-        setNodes(g.nodes.map((n:any,i:number)=>({id:n.id, position:n.position||{x:100+i*220,y:100+(i%2)*140}, data:{label:`${n.type} ${n.id.slice(0,4)}`, type:n.type, config:n.config}, type:'journeyNode'})))
+        setNodes(ensureAskAi(g.nodes.map((n:any,i:number)=>({id:n.id, position:n.position||{x:100+i*220,y:100+(i%2)*140}, data:{label:`${n.type} ${n.id.slice(0,4)}`, type:n.type, config:n.config}, type:'journeyNode'}))))
         setEdges((g.edges||[]).map((e:any)=>({id:e.id, source:e.source, target:e.target, sourceHandle:e.sourceHandle, label:e.label})))
         setJid(journey.id)
       }
@@ -207,6 +184,7 @@ export default function JourneyCanvas(){
     } else {
       journeyApi.get(`/api/campaigns/${id}/journeys`).then(r=>{
         if(r.data && r.data.length>0) loadJourney(r.data[0])
+        else setNodes(nds=>ensureAskAi(nds))
       })
     }
   },[presetJid,id])
@@ -217,10 +195,8 @@ export default function JourneyCanvas(){
       <button onClick={save} className="bg-blue-600 text-white px-4 py-1 rounded text-sm">Save</button>
       <button onClick={validate} className="border px-4 py-1 rounded text-sm">Validate</button>
       <button onClick={publish} className="bg-green-600 text-white px-4 py-1 rounded text-sm">Publish</button>
-      <button onClick={runSim} disabled={running} className="bg-purple-600 text-white px-4 py-1 rounded text-sm disabled:opacity-50">{running?'Running...':'Run Simulation (3 sessions)'}</button>
-      {wsConnected && <span className="text-xs text-green-600">WS connected</span>}
     </div>
-    {validation.length>0 && <div className="bg-red-50 border border-red-200 p-2 mb-2 text-xs">{validation.map((e,i)=><div key={i}>{e.nodeId}: {e.message}</div>)}</div>}
+    {validation.length>0 && <div className="bg-red-50 border border-red-200 p-2 mb-2 text-xs">{validation.slice(0,3).map((e,i)=><div key={i}>{e.nodeId}: {e.message}</div>)}{validation.length>3 && <div className="text-slate-500">+{validation.length-3} more</div>}</div>}
     <div className="flex-1 flex gap-4 min-h-0">
       <div className="w-44 border rounded bg-white p-2 overflow-auto flex-shrink-0">
         <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 px-1 mb-1">Palette</div>
@@ -276,10 +252,9 @@ export default function JourneyCanvas(){
           <button onClick={()=>setSidePanel('device')} className={`text-xs px-3 py-1 rounded ${sidePanel==='device'?'bg-slate-900 text-white':'text-slate-500'}`}>📱 Test on device</button>
         </div>
         {sidePanel==='device'
-          ? <DevicePreviewPanel
-              nodes={nodes.map(n=>({id:n.id, type:(n.data as any).type, config:(n.data as any).config}))}
-              edges={edges.map(e=>({id:e.id, source:e.source, target:e.target, sourceHandle:(e as any).sourceHandle, label:(e as any).label}))}
-            />
+          ? (jid
+            ? <div className="h-[560px]"><LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: jid }} framed studio askAiConfig={nodes.length > 0 ? ((nodes.find(n => (n.data as any)?.type === 'ask_ai')?.data as any)?.config ?? null) : undefined} /></div>
+            : <div className="text-xs opacity-60 mt-2">Save the journey first to test it on device.</div>)
           : <>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold">Node config</h3>
@@ -295,10 +270,6 @@ export default function JourneyCanvas(){
             bus.emit('node:update', { nodeId: selected.id, config: next })
           }}
         /> : <div className="text-xs opacity-60 mt-2">Click a node on the canvas to edit its configuration.</div>}
-        <h3 className="font-semibold mt-6">Live Execution</h3>
-        <div className="text-xs space-y-1 mt-2">
-          {sessionLogs.map((l,i)=><div key={i} className="border-l-2 pl-2">{l.event||l.nodeType} {l.nodeId} {JSON.stringify(l).slice(0,80)}</div>)}
-        </div>
         </>}
         {jid && <div className="mt-4 text-xs opacity-60">Journey ID: {jid}</div>}
       </div>

@@ -18,6 +18,7 @@ import { formDefinition } from '../form'
 import { countdownDefinition } from '../countdown'
 import { alertDefinition } from '../alert'
 import { badgeDefinition } from '../badge'
+import { askAiDefinition } from '../ask_ai'
 
 export const nodeRegistry = {
   trigger: triggerDefinition,
@@ -40,6 +41,7 @@ export const nodeRegistry = {
   countdown: countdownDefinition,
   alert: alertDefinition,
   badge: badgeDefinition,
+  ask_ai: askAiDefinition,
 } as const
 
 export type RegistryType = typeof nodeRegistry
@@ -51,7 +53,7 @@ export const nodeCategories: Record<string, NodeType[]> = {
   'Form': ['button','input','select','checkbox','rating'],
   'Layout': ['container','divider'],
   'Display': ['card','hero_section'],
-  'Interactive': ['quiz','form','countdown'],
+  'Interactive': ['quiz','form','countdown','ask_ai'],
 }
 export const nodeInfo: Record<NodeType, string> = {
   trigger: 'Journey entry point',
@@ -74,6 +76,7 @@ export const nodeInfo: Record<NodeType, string> = {
   countdown: 'Countdown timer',
   alert: 'Alert notification',
   badge: 'Label tag',
+  ask_ai: 'Floating AI query',
 }
 export const branchCapableNodeTypes: NodeType[] = ['condition','quiz','video']
 export function getDefinition(type: string) { return (nodeRegistry as any)[type] }
