@@ -123,13 +123,13 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+      args:
+        VITE_JOURNEY_SERVICE_URL: http://localhost:8081
+        VITE_ANALYTICS_SERVICE_URL: http://localhost:8082
+        VITE_CONNECTORS_SERVICE_URL: http://localhost:8083
+        VITE_AI_SERVICE_URL: http://localhost:8084
     ports:
       - "5173:80"
-    environment:
-      VITE_JOURNEY_SERVICE_URL: http://localhost:8081
-      VITE_ANALYTICS_SERVICE_URL: http://localhost:8082
-      VITE_CONNECTORS_SERVICE_URL: http://localhost:8083
-      VITE_AI_SERVICE_URL: http://localhost:8084
     depends_on:
       - journey-service
       - analytics-service
