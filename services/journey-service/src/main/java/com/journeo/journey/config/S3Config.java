@@ -24,28 +24,34 @@ public class S3Config {
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
     }
 
-    private S3Configuration pathStyle() {
-        return S3Configuration.builder().pathStyleAccessEnabled(true).build();
+    private S3Configuration pathStyle(boolean enabled) {
+        return S3Configuration.builder().pathStyleAccessEnabled(enabled).build();
     }
 
     @Bean
     public S3Client s3Client() {
-        return S3Client.builder()
-                .endpointOverride(URI.create(endpointUrl))
+        var builder = S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(credentials())
-                .serviceConfiguration(pathStyle())
-                .httpClient(ApacheHttpClient.create())
-                .build();
+                .httpClient(ApacheHttpClient.create());
+        if (endpointUrl != null && !endpointUrl.isBlank()) {
+            builder.endpointOverride(URI.create(endpointUrl)).serviceConfiguration(pathStyle(true));
+        } else {
+            builder.serviceConfiguration(pathStyle(false));
+        }
+        return builder.build();
     }
 
     @Bean
     public S3Presigner s3Presigner() {
-        return S3Presigner.builder()
-                .endpointOverride(URI.create(publicEndpoint))
+        var builder = S3Presigner.builder()
                 .region(Region.of(region))
-                .credentialsProvider(credentials())
-                .serviceConfiguration(pathStyle())
-                .build();
+                .credentialsProvider(credentials());
+        if (publicEndpoint != null && !publicEndpoint.isBlank()) {
+            builder.endpointOverride(URI.create(publicEndpoint)).serviceConfiguration(pathStyle(true));
+        } else {
+            builder.serviceConfiguration(pathStyle(false));
+        }
+        return builder.build();
     }
 }
