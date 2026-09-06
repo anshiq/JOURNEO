@@ -1,18 +1,10 @@
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { videoSchema } from './schema'
+import type { JourneyConfigProps } from '../_core/config'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
-import { Button } from '@/components/ui/Button'
-import type { JourneyConfigProps } from '../_core/config'
-import type { z } from 'zod'
-type Config = z.infer<typeof videoSchema>
-export const VideoJourneyConfig: React.FC<JourneyConfigProps<Config>> = ({ config, onChange }) => {
-  const form = useForm<any>({ resolver: zodResolver(videoSchema as any), defaultValues: config })
-  const v = form.watch()
-  React.useEffect(() => { if (config) form.reset(config) }, [JSON.stringify(config)])
-  React.useEffect(() => { onChange(form.getValues()) }, [JSON.stringify(v)])
-  return <div className="space-y-3"><div className="space-y-1"><Label>Video URL (YouTube)</Label><Input {...form.register('url')} placeholder="https://youtube.com/watch?v=..." /></div><div className="space-y-1"><Label>Or direct video src</Label><Input {...form.register('src')} placeholder="https://..." /></div><div className="space-y-1"><Label>Thumbnail URL</Label><Input {...form.register('poster')} placeholder="https://..." /></div><div className="flex items-center gap-2"><label className="flex items-center gap-1 text-xs"><input type="checkbox" {...form.register('autoplay')} /> Autoplay</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" {...form.register('loop')} /> Loop</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" {...form.register('controls')} /> Controls</label></div><div className="flex items-center gap-2"><label className="flex items-center gap-1 text-xs"><input type="checkbox" {...form.register('showWatchedButton')} /> Watched btn</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" {...form.register('showSkipButton')} /> Skip btn</label></div><div className="grid grid-cols-2 gap-2"><div className="space-y-1"><Label>Watched label</Label><Input {...form.register('watchedLabel')} /></div><div className="space-y-1"><Label>Skip label</Label><Input {...form.register('skipLabel')} /></div></div><Button type="button" variant="outline" size="sm" onClick={() => onChange({ controls: true } as any)}>Reset</Button></div>
+export const VideoJourneyConfig: React.FC<JourneyConfigProps> = ({ config, onChange }) => {
+  const cfg = config || {}
+  const set = (patch: any) => onChange({ ...cfg, ...patch })
+  return <div className="space-y-3"><div className="overflow-hidden rounded-md border bg-muted/30"><svg viewBox="0 0 320 180" className="h-36 w-full" role="img" aria-label="Sample video"><rect x="0" y="0" width="320" height="180" fill="hsl(var(--muted))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="hsl(var(--muted-foreground))" opacity="0.3" /><circle cx="160" cy="90" r="30" fill="hsl(var(--muted-foreground))" opacity="0.5" /><polygon points="150,72 150,108 180,90" fill="hsl(var(--background))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="none" stroke="hsl(var(--border))" strokeWidth="2" /></svg></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.autoplay} onChange={e => set({ autoplay: e.target.checked })} /> Autoplay</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.loop} onChange={e => set({ loop: e.target.checked })} /> Loop</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.controls ?? true} onChange={e => set({ controls: e.target.checked })} /> Controls</label></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showWatchedButton ?? true} onChange={e => set({ showWatchedButton: e.target.checked })} /> Watched btn</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showSkipButton ?? true} onChange={e => set({ showSkipButton: e.target.checked })} /> Skip btn</label></div><div className="grid grid-cols-2 gap-2"><div className="space-y-1"><Label>Watched label</Label><Input value={cfg.watchedLabel || ''} onChange={e => set({ watchedLabel: e.target.value })} placeholder="I watched it" /></div><div className="space-y-1"><Label>Skip label</Label><Input value={cfg.skipLabel || ''} onChange={e => set({ skipLabel: e.target.value })} placeholder="Skip" /></div></div></div>
 }
 export default VideoJourneyConfig

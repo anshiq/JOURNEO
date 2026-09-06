@@ -70,7 +70,9 @@ function Preview({ type, config }: { type: string; config: any }) {
     case 'image':
       return cfg.src ? <img src={cfg.src} alt={cfg.alt || ''} className="w-full h-16 object-cover rounded" /> : <div className="text-xs text-red-500">no image</div>
     case 'video':
-      return <div className="text-xs text-slate-500">Video</div>
+      if (cfg.src) return <video src={cfg.src} muted preload="metadata" className="w-full h-16 object-cover rounded bg-black" />
+      if (cfg.url) return <div className="flex items-center gap-1 text-xs text-slate-500"><Video size={12} /> YouTube</div>
+      return <div className="text-xs text-red-500">no video</div>
     case 'button':
       return <div className="text-xs text-slate-700">{cfg.label || 'Button'}</div>
     case 'input':

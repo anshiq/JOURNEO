@@ -9,5 +9,7 @@ export interface StyleConfigProps {
   style: NodeStyle
   onChange: (key: keyof NodeStyle, value: any) => void
   theme: ThemeConfig
+  config?: any
+  onConfigChange?: (next: any) => void
 }
 export type StyleConfigComponent = React.FC<StyleConfigProps>

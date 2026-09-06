@@ -16,6 +16,24 @@ services:
       timeout: 2s
       retries: 10
 
+  localstack:
+    image: localstack/localstack:3.8
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3
+      AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+    volumes:
+      - ./localstack-init:/etc/localstack/init/ready.d:ro
+      - localstack-data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4566/_localstack/health | grep -q '\"s3\":' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   journey-service:
     build:
       context: ../services/journey-service
@@ -30,9 +48,20 @@ services:
       CONNECTORS_SERVICE_URL: http://platform-connectors-service:8083
       AI_SERVICE_URL: http://ai-service:8084
       INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-journeo-internal-token-dev}
+      AWS_ENDPOINT_URL: http://localstack:4566
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+      S3_BUCKET: ${S3_BUCKET:-journey-files}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:4566}
+      S3_PRESIGN_EXPIRY_SECONDS: ${S3_PRESIGN_EXPIRY_SECONDS:-600}
+      S3_MAX_IMAGE_MB: ${S3_MAX_IMAGE_MB:-25}
+      S3_MAX_VIDEO_MB: ${S3_MAX_VIDEO_MB:-200}
     depends_on:
       postgres:
         condition: service_healthy
+      localstack:
+        condition: service_started
     restart: unless-stopped
 
   analytics-service:
@@ -109,3 +138,4 @@ services:
 
 volumes:
   pgdata:
+  localstack-data:

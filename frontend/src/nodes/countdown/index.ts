@@ -10,7 +10,7 @@ export const countdownDefinition: NodeDefinition<z.infer<typeof countdownSchema>
   icon: 'Clock',
   accent: 'border-l-orange-500',
   schema: countdownSchema,
-  defaultConfig: { endTime: new Date(Date.now()+86400000).toISOString(), label: 'Offer ends in', size: 'md' },
+  defaultConfig: { endTime: new Date(Date.now()+86400000).toISOString(), label: 'Offer ends in', size: 'md', showLabel: true, showExpiredMessage: true },
   handles: { inputs: 1, outputs: ['default'] },
   Device: CountdownDevice,
   JourneyConfig: CountdownJourneyConfig,

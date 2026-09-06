@@ -1,18 +1,6 @@
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { imageSchema } from './schema'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
-import { Button } from '@/components/ui/Button'
 import type { JourneyConfigProps } from '../_core/config'
-import type { z } from 'zod'
-type Config = z.infer<typeof imageSchema>
-export const ImageJourneyConfig: React.FC<JourneyConfigProps<Config>> = ({ config, onChange }) => {
-  const form = useForm<any>({ resolver: zodResolver(imageSchema as any), defaultValues: config })
-  const v = form.watch()
-  React.useEffect(() => { if (config) form.reset(config) }, [JSON.stringify(config)])
-  React.useEffect(() => { onChange(form.getValues()) }, [JSON.stringify(v)])
-  return <div className="space-y-3"><div className="space-y-1"><Label>Image URL</Label><Input {...form.register('src')} placeholder="https://..." /></div><div className="space-y-1"><Label>Alt text</Label><Input {...form.register('alt')} placeholder="Describe image" /></div><div className="space-y-1"><Label>Aspect ratio</Label><Input {...form.register('aspectRatio')} placeholder="16/9" /></div>{form.watch('src') && <img src={form.watch('src')} alt="" className="h-20 w-full object-cover rounded border" />}<Button type="button" variant="outline" size="sm" onClick={() => onChange({ src: '', alt: '' } as any)}>Reset</Button></div>
+export const ImageJourneyConfig: React.FC<JourneyConfigProps> = () => {
+  return <div className="space-y-2"><div className="overflow-hidden rounded-md border bg-muted/30"><svg viewBox="0 0 320 180" className="h-36 w-full" role="img" aria-label="Sample image"><rect x="0" y="0" width="320" height="180" fill="hsl(var(--muted))" /><circle cx="248" cy="48" r="22" fill="hsl(var(--muted-foreground))" opacity="0.35" /><polygon points="0,180 110,70 190,180" fill="hsl(var(--muted-foreground))" opacity="0.3" /><polygon points="110,180 210,50 320,180" fill="hsl(var(--muted-foreground))" opacity="0.45" /><rect x="0" y="0" width="320" height="180" fill="none" stroke="hsl(var(--border))" strokeWidth="2" /></svg></div><p className="text-[11px] text-muted-foreground">Image source and details are managed in Styles.</p></div>
 }
 export default ImageJourneyConfig

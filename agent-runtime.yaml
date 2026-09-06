@@ -8,7 +8,7 @@ apps:
   backend:
     type: generic
     workdir: /home/nixos/Desktop/resume/ai_native/project_vibe_coded
-    command: ["docker", "compose", "-f", "infra/docker-compose.yml", "up", "-d", "postgres", "journey-service", "analytics-service", "platform-connectors-service", "ai-service"]
+    command: ["docker", "compose", "-f", "infra/docker-compose.yml", "up", "-d", "postgres", "localstack", "journey-service", "analytics-service", "platform-connectors-service", "ai-service"]
     readiness:
       - 'database system is ready to accept connections'
       - 'Started .* in .* seconds'

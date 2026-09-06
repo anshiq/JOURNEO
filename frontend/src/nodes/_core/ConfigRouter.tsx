@@ -8,9 +8,9 @@ export function JourneyConfigRouter({ type, config, onChange, errors }: { type: 
   if (!Cmp) return <div className="text-xs text-muted-foreground">No config for {type}</div>
   return <Cmp config={config} onChange={onChange} errors={errors} />
 }
-export function StyleConfigRouter({ type, style, onChange, theme }: { type: string; style: NodeStyle; onChange: (k: keyof NodeStyle, v: any) => void; theme: ThemeConfig }) {
+export function StyleConfigRouter({ type, style, onChange, theme, config, onConfigChange }: { type: string; style: NodeStyle; onChange: (k: keyof NodeStyle, v: any) => void; theme: ThemeConfig; config?: any; onConfigChange?: (next: any) => void }) {
   const def = getDefinition(type)
   const Cmp = def?.StyleConfig
   if (!Cmp) return null
-  return <Cmp style={style} onChange={onChange} theme={theme} />
+  return <Cmp style={style} onChange={onChange} theme={theme} config={config} onConfigChange={onConfigChange} />
 }

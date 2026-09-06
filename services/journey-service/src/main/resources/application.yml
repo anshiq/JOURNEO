@@ -17,3 +17,14 @@ analytics-service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8082}
 connectors-service-url: ${CONNECTORS_SERVICE_URL:http://localhost:8083}
 ai-service-url: ${AI_SERVICE_URL:http://localhost:8084}
 internal-service-token: ${INTERNAL_SERVICE_TOKEN:journeo-internal-token-dev}
+aws:
+  endpoint-url: ${AWS_ENDPOINT_URL:http://localhost:4566}
+  region: ${AWS_REGION:us-east-1}
+  access-key-id: ${AWS_ACCESS_KEY_ID:test}
+  secret-access-key: ${AWS_SECRET_ACCESS_KEY:test}
+s3:
+  bucket: ${S3_BUCKET:journey-files}
+  public-endpoint: ${S3_PUBLIC_ENDPOINT:http://localhost:4566}
+  presign-expiry-seconds: ${S3_PRESIGN_EXPIRY_SECONDS:600}
+  max-image-mb: ${S3_MAX_IMAGE_MB:25}
+  max-video-mb: ${S3_MAX_VIDEO_MB:200}

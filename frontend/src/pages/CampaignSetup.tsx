@@ -835,6 +835,12 @@ export default function CampaignSetup() {
     bus.emit('node:update', { nodeId: selectedNodeId, config: {}, style: { [key]: value } as any })
   }
 
+  const updateNodeConfig = (next: any) => {
+    if (!selectedNodeId) return
+    setCampaignNodes(prev => prev.map(n => n.id === selectedNodeId ? { ...n, config: next } : n))
+    bus.emit('node:update', { nodeId: selectedNodeId, config: next })
+  }
+
   const refreshJourneys = async () => {
     if (!id) return
     const response = await journeyApi.get(`/api/campaigns/${id}/journeys`)
@@ -998,7 +1004,7 @@ export default function CampaignSetup() {
     if (!journeys[0] || campaignNodes.length === 0 || !hasPersistedRef.current) { hasPersistedRef.current = true; return }
     const t = setTimeout(() => { persistStyledGraph().catch(() => undefined) }, 800)
     return () => clearTimeout(t)
-  }, [theme, nodeStyles, nodeOverrides, persistStyledGraph])
+  }, [theme, nodeStyles, nodeOverrides, campaignNodes, persistStyledGraph])
   useEffect(() => { if (journeys.length > 0) hasPersistedRef.current = false }, [journeys.length])
 
   const selectedNode = selectedNodeId ? campaignNodes.find(n => n.id === selectedNodeId) : null
@@ -1215,7 +1221,7 @@ export default function CampaignSetup() {
                             <h3 className="text-xs font-semibold capitalize">{selectedNode.type.replace(/_/g,' ')}</h3>
                             <Badge variant="outline" className="font-mono text-[10px]">{selectedNode.id.slice(0,6)}</Badge>
                           </div>
-                          <StyleConfigRouter type={selectedNode.type} style={nodeStyles[selectedNode.id] || {}} onChange={(k,v)=> updateNodeStyle(k,v)} theme={theme} />
+                          <StyleConfigRouter type={selectedNode.type} style={nodeStyles[selectedNode.id] || {}} onChange={(k,v)=> updateNodeStyle(k,v)} theme={theme} config={selectedNode.config} onConfigChange={updateNodeConfig} />
                           <Button variant="outline" size="sm" onClick={() => { setNodeOverrides(prev => { const n={...prev}; delete n[selectedNode.id]; return n}); setNodeStyles(prev => { const n={...prev}; delete n[selectedNode.id]; return n}) }} className="w-full gap-2">Reset node style</Button>
                           <Button variant="ghost" size="sm" onClick={() => { setSelectedNodeId(null); bus.emit('node:select', { nodeId: null, source: 'toolbar' }) }} className="w-full">Close</Button>
                         </div>
