@@ -77,7 +77,7 @@ services:
       - key: S3_MAX_VIDEO_MB
         value: "200"
       - key: DEMO_DATA_SEED
-        value: "false"
+        value: "true"
   - type: web
     name: journeo-analytics-service
     plan: free
