@@ -29,12 +29,12 @@ services:
         value: "15"
       - key: INTERNAL_SERVICE_TOKEN
         value: OBXpyf2f1fid9y1Y836L3QNoL-p9049yQdyiRsSq9TxSIEWuALTEc56nz4KwP44I
-      - key: SELF_PING_URL
-        value: https://journeo-ai-service.onrender.com
-      - key: SELF_PING_ENABLED
+      - key: KEEPALIVE_URLS
+        value: https://journeo-ai-service.onrender.com,https://journeo-journey-service.onrender.com,https://journeo-analytics-service.onrender.com,https://journeo-platform-connectors-service.onrender.com,https://journeo-frontend.onrender.com
+      - key: KEEPALIVE_ENABLED
         value: "true"
-      - key: SELF_PING_INTERVAL_MINUTES
-        value: "4"
+      - key: KEEPALIVE_INTERVAL_MINUTES
+        value: "5"
   - type: web
     name: journeo-journey-service
     plan: free

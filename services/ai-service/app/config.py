@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     guardrail_mode: str = "flag"
     anomaly_scan_interval_minutes: int = 15
     internal_service_token: str = "journeo-internal-token-dev"
-    self_ping_url: str = ""
-    self_ping_enabled: bool = True
-    self_ping_interval_minutes: int = 4
+    keepalive_urls: str = ""
+    keepalive_enabled: bool = True
+    keepalive_interval_minutes: int = 5
     class Config:
         env_file = ".env"
         extra = "allow"

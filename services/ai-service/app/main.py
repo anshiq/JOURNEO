@@ -53,28 +53,21 @@ async def startup():
             except: pass
         sched=BackgroundScheduler(daemon=True)
         sched.add_job(job, 'interval', minutes=int(settings.anomaly_scan_interval_minutes))
-        def self_ping_job():
-            raw=(settings.self_ping_url or "").strip()
-            if not settings.self_ping_enabled or not raw:
+        def keepalive_job():
+            raw=(settings.keepalive_urls or "").strip()
+            if not settings.keepalive_enabled or not raw:
                 return
-            try:
-                urls=[u.strip() for u in raw.split(",") if u.strip()]
-                targets=[]
-                for u in urls:
-                    targets.append(u)
-                    targets.append(u.rstrip("/") + "/health")
-                with httpx.Client(timeout=20, follow_redirects=True) as client:
-                    for target in targets:
-                        try:
-                            resp=client.get(target)
-                            print(f"self ping {target} -> {resp.status_code}")
-                        except Exception as e:
-                            print(f"self ping {target} failed {e}")
-            except Exception as e:
-                print(f"self ping failed {e}")
-        if settings.self_ping_enabled and (settings.self_ping_url or "").strip():
-            sched.add_job(self_ping_job, 'interval', minutes=int(settings.self_ping_interval_minutes))
-            print(f"Self ping scheduler started every {settings.self_ping_interval_minutes} minutes")
+            targets=[u.strip().rstrip("/") for u in raw.split(",") if u.strip()]
+            with httpx.Client(timeout=20, follow_redirects=True) as client:
+                for target in targets:
+                    try:
+                        resp=client.get(target)
+                        print(f"keepalive ping {target} -> {resp.status_code}")
+                    except Exception as e:
+                        print(f"keepalive ping {target} failed {e}")
+        if settings.keepalive_enabled and (settings.keepalive_urls or "").strip():
+            sched.add_job(keepalive_job, 'interval', minutes=int(settings.keepalive_interval_minutes))
+            print(f"Keepalive scheduler started every {settings.keepalive_interval_minutes} minutes for {settings.keepalive_urls}")
         sched.start()
         print("Anomaly scheduler started")
     except Exception as e:
