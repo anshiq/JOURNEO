@@ -76,14 +76,14 @@ export default function FloatingDevicePreview({ start, viewportId = DEFAULT_VIEW
             </optgroup>
           ))}
         </select>
-        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => stepZoom(-0.05)} aria-label="Zoom out">
+        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onPointerDown={e => e.stopPropagation()} onClick={() => stepZoom(-0.05)} aria-label="Zoom out">
           <ZoomOut className="h-3.5 w-3.5" />
         </button>
         <span className="w-8 shrink-0 text-center font-mono text-[10px] text-muted-foreground">{Math.round(zoom * 100)}%</span>
-        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => stepZoom(0.05)} aria-label="Zoom in">
+        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onPointerDown={e => e.stopPropagation()} onClick={() => stepZoom(0.05)} aria-label="Zoom in">
           <ZoomIn className="h-3.5 w-3.5" />
         </button>
-        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onClick={() => setMin(true)} aria-label="Minimize preview">
+        <button type="button" className="shrink-0 text-muted-foreground hover:text-foreground" onPointerDown={e => e.stopPropagation()} onClick={() => setMin(true)} aria-label="Minimize preview">
           <Minus className="h-3.5 w-3.5" />
         </button>
       </div>

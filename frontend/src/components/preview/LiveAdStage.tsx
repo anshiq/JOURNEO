@@ -48,7 +48,7 @@ function FramedScreen({ viewportId, device, children, zoom: fixedZoom }: { viewp
     return () => ro.disconnect()
   }, [name, fixedZoom, outer.w, outer.h])
   return (
-    <div ref={wrapRef} className="flex h-full w-full items-center justify-center overflow-hidden rounded-none border border-border bg-foreground p-2 shadow-overlay">
+    <div ref={wrapRef} className="flex h-full w-full items-center justify-center overflow-hidden rounded-none border border-border bg-muted p-2 shadow-overlay">
       {name === 'macbook-14' ? (
         <div style={{ width: outer.w * zoom, height: outer.h * zoom, flexShrink: 0 }}>
           <div style={{ width: outer.w, height: outer.h, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>

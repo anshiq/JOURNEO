@@ -86,20 +86,20 @@ function StepSidebarHeader({ step, stepsList, setStep }: { step: number; stepsLi
             className={cn(
               'group flex w-full items-center gap-2 rounded-none border p-2 text-left transition-all',
               isActive && 'border-primary/50 bg-primary text-primary-foreground shadow-none',
-              !isActive && isComplete && 'border-primary/20 bg-primary/5 text-foreground hover:bg-primary/10',
-              !isActive && !isComplete && 'border-transparent bg-transparent text-muted-foreground hover:bg-muted',
+              !isActive && isComplete && 'border-sidebar-accent/30 bg-sidebar-border/40 text-sidebar-foreground hover:bg-sidebar-border',
+              !isActive && !isComplete && 'border-transparent bg-transparent text-sidebar-foreground/60 hover:bg-sidebar-border hover:text-sidebar-foreground',
             )}
           >
             <div className={cn(
               'flex h-7 w-7 shrink-0 items-center justify-center rounded-none text-xs font-semibold transition',
               isActive && 'bg-primary-foreground/20 text-primary-foreground',
-              !isActive && isComplete && 'bg-primary/15 text-primary',
+              !isActive && isComplete && 'bg-muted text-primary',
               !isActive && !isComplete && 'bg-muted text-muted-foreground',
             )}>
               {isComplete ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
             </div>
             <div className="min-w-0 flex-1">
-              <div className={cn('text-xs font-semibold', isActive ? 'text-primary-foreground' : 'text-foreground')}>
+              <div className={cn('text-xs font-semibold', isActive ? 'text-primary-foreground' : 'text-sidebar-foreground')}>
                 {s.title}
               </div>
             </div>
