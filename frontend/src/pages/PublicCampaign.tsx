@@ -9,7 +9,7 @@ function Notice({ title, body }: { title: string; body?: string }) {
   return (
     <main className="mx-auto max-w-xl px-6 py-24 text-center">
       <h1 className="text-2xl font-bold">{title}</h1>
-      {body && <p className="mt-3 text-slate-600">{body}</p>}
+      {body && <p className="mt-3 text-muted-foreground">{body}</p>}
     </main>
   )
 }
@@ -59,9 +59,9 @@ function DevPreview({ token }: { token: string }) {
   return (
     <main className="fixed inset-0 flex flex-col bg-white">
       <div className="flex min-h-0 flex-1 flex-col p-3">
-        <div className="mb-2 flex shrink-0 items-center justify-center gap-2 text-center font-mono text-[10px] tracking-widest text-amber-600">
+        <div className="mb-2 flex shrink-0 items-center justify-center gap-2 text-center font-mono text-[10px] tracking-widest text-muted-foreground">
           <span>DEV PREVIEW · /d/{token.slice(0, 8)} · noindex · {DEVICE_VIEWPORTS[viewportId].name}</span>
-          <select value={viewportId} onChange={e => setViewportId(e.target.value as any)} className="rounded border bg-background px-1 py-0.5 font-sans text-[10px] text-foreground">
+          <select value={viewportId} onChange={e => setViewportId(e.target.value as any)} className="rounded-none border bg-background px-1 py-0.5 font-sans text-[10px] text-foreground">
             {Object.entries(DEVICE_VIEWPORTS).map(([vid, v]) => <option key={vid} value={vid}>{v.name}</option>)}
           </select>
         </div>

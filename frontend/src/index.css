@@ -1,69 +1,92 @@
+@import '@fontsource-variable/bodoni-moda';
+@import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+@import '@fontsource-variable/jost';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 243 75% 59%;
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 40 12% 96%;
+    --secondary-foreground: 0 0% 10%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 40 12% 96%;
+    --muted-foreground: 0 0% 43%;
 
-    --accent: 220 14% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 0 0% 0%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 100% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 0 0% 10%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 0 100% 45%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 243 75% 59%;
+    --border: 0 0% 88%;
+    --border-strong: 0 0% 58%;
+    --input: 0 0% 58%;
+    --ring: 0 0% 0%;
 
-    --sidebar: 222 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-accent: 243 75% 59%;
-    --sidebar-border: 217 33% 17%;
+    --rouge: 0 100% 45%;
 
-    --radius: 0.625rem;
+    --sidebar: 0 0% 0%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-accent: 0 100% 45%;
+    --sidebar-border: 0 0% 20%;
+
+    --radius: 0px;
+
+    --font-display: 'Bodoni Moda Variable', Didot, 'Bodoni MT', Georgia, serif;
+    --font-sans: 'Jost Variable', Futura, 'Century Gothic', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --shadow-overlay: 0 8px 32px -8px rgb(0 0 0 / 0.18);
+    --ease-editorial: cubic-bezier(0.2, 0, 0, 1);
   }
 
-  * {
-    @apply border-border;
-  }
-
-  html,
-  body,
-  #root {
-    height: 100%;
-  }
+  * { @apply border-border; }
+  html, body, #root { height: 100%; }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-family: var(--font-sans);
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--foreground));
+    outline-offset: 2px;
   }
 }
 
 @layer utilities {
+  .text-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 11px; line-height: 1.2; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .rule { @apply h-px w-full bg-border; }
+  .rule-strong { @apply h-px w-full bg-foreground; }
   .scrollbar-thin {
     scrollbar-width: thin;
   }
@@ -72,10 +95,55 @@
     height: 6px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--border));
-    border-radius: 9999px;
+    background-color: hsl(var(--border-strong));
   }
   .scrollbar-thin::-webkit-scrollbar-track {
     background-color: transparent;
+  }
+}
+
+.react-flow__edge-path {
+  stroke: hsl(var(--foreground));
+  stroke-width: 1.75;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: hsl(var(--rouge));
+  stroke-width: 2.5;
+}
+.react-flow__handle {
+  background: hsl(var(--foreground));
+  border: 2px solid hsl(var(--background));
+  width: 10px;
+  height: 10px;
+}
+.react-flow__background {
+  background-color: hsl(var(--background));
+}
+.react-flow__minimap {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+}
+.react-flow__controls {
+  border: 1px solid hsl(var(--border));
+  box-shadow: none;
+}
+.react-flow__controls-button {
+  background: hsl(var(--background));
+  border-bottom: 1px solid hsl(var(--border));
+  fill: hsl(var(--foreground));
+}
+.react-flow__controls-button:hover {
+  background: hsl(var(--secondary));
+}
+.react-flow__node-journeyNode.selected .journeo-node-frame {
+  outline: 2px solid hsl(var(--foreground));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0ms;
+    animation-iteration-count: 1;
+    transition-duration: 0ms;
   }
 }

@@ -45,7 +45,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ value, onChange, acc
   if (value) {
     return (
       <div className={cn('space-y-2', className)}>
-        <div className="relative overflow-hidden rounded-md border bg-muted/30">
+        <div className="relative overflow-hidden rounded-none border bg-muted/30">
           {isVideoValue ? (
             <video src={value} controls className="h-28 w-full bg-black object-contain" />
           ) : (
@@ -81,7 +81,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ value, onChange, acc
         onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files?.[0]) }}
         disabled={progress !== null}
         className={cn(
-          'flex w-full flex-col items-center justify-center gap-1.5 rounded-md border border-dashed px-3 py-5 text-center transition-colors',
+          'flex w-full flex-col items-center justify-center gap-1.5 rounded-none border border-dashed px-3 py-5 text-center transition-colors',
           dragOver ? 'border-primary bg-primary/5' : 'border-input bg-muted/30 hover:border-primary/50 hover:bg-muted/50'
         )}
       >

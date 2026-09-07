@@ -1,23 +1,41 @@
 import { useState } from 'react'
 import { journeyApi } from '../lib/api'
+import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
+import { Label } from '../components/ui/Label'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
+import { Separator } from '../components/ui/Separator'
+
 export default function Trace(){
   const [rid,setRid]=useState('')
   const [data,setData]=useState<any>(null)
   const fetch=async()=>{ const r=await journeyApi.get(`/api/trace/${rid}`); setData(r.data)}
   return <div>
-    <h1 className="text-2xl font-bold">Trace Viewer (R10)</h1>
-    <div className="flex gap-2 mt-4"><input value={rid} onChange={e=>setRid(e.target.value)} placeholder="Paste X-Request-Id" className="border px-3 py-2 rounded flex-1"/><button onClick={fetch} className="bg-blue-600 text-white px-4 py-2 rounded">Fetch</button></div>
-    {data && <div className="bg-white border rounded p-4 mt-6">
-      <div className="font-mono text-xs">Request: {data.requestId}</div>
-      <div className="mt-3 space-y-2">
-        {(data.spans||[]).map((s:any,i:number)=><div key={i} className="border-l-4 pl-3 py-1" style={{borderColor: s.service==='journey-service'?'#3b82f6': s.service==='ai-service'?'#10b981': s.service==='analytics-service'?'#f59e0b':'#ef4444'}}>
-          <div className="text-sm font-semibold">{s.service} <span className="font-normal opacity-60">{s.method} {s.path} → {s.status} ({s.durationMs}ms)</span></div>
-          <div className="text-xs opacity-60">{s.createdAt}</div>
-          {s.factsJson && <pre className="text-xs bg-slate-50 p-1 mt-1">{s.factsJson.slice(0,300)}</pre>}
-        </div>)}
-        {(data.spans||[]).length===0&&<div className="text-sm opacity-60">No spans found. Try running a simulation and copying its requestId.</div>}
+    <p className="text-eyebrow text-muted-foreground">Observability</p>
+    <h1 className="font-display text-display-xl mt-2">Trace Viewer</h1>
+    <div className="rule mt-6" />
+    <div className="mt-6 flex max-w-xl items-end gap-2">
+      <div className="flex-1 space-y-1.5">
+        <Label htmlFor="trace-id">Request ID</Label>
+        <Input id="trace-id" value={rid} onChange={e=>setRid(e.target.value)} placeholder="Paste X-Request-Id" className="font-mono text-mono-xs" />
       </div>
-    </div>}
-    <div className="mt-6 text-xs opacity-60">Each service emits one canonical JSON line per request (Stripe style). journey-service fans out to /internal/logs on all services and merges waterfall.</div>
+      <Button onClick={fetch}>Fetch</Button>
+    </div>
+    {data && <Card className="mt-6">
+      <CardHeader><CardTitle>Request trace</CardTitle></CardHeader>
+      <CardContent>
+        <div className="font-mono text-mono-xs text-muted-foreground">Request: {data.requestId}</div>
+        <div className="mt-3">
+          {(data.spans||[]).map((s:any,i:number)=><div key={i} className="border-l-2 border-foreground py-2 pl-4">
+            <div className="text-sm font-medium">{s.service} <span className="font-normal text-muted-foreground">{s.method} {s.path} → {s.status} ({s.durationMs}ms)</span></div>
+            <div className="font-mono text-mono-xs text-muted-foreground">{s.createdAt}</div>
+            {s.factsJson && <pre className="mt-1 border border-border bg-secondary p-2 font-mono text-mono-xs text-muted-foreground">{s.factsJson.slice(0,300)}</pre>}
+          </div>)}
+          {(data.spans||[]).length===0&&<div className="text-sm text-muted-foreground">No spans found. Try running a simulation and copying its requestId.</div>}
+        </div>
+      </CardContent>
+    </Card>}
+    <Separator className="my-8" />
+    <div className="text-xs text-muted-foreground">Each service emits one canonical JSON line per request. journey-service fans out to /internal/logs on all services and merges waterfall.</div>
   </div>
 }

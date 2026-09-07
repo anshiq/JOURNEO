@@ -28,6 +28,10 @@ export interface JourneyGraph {
 
 export const DEFAULT_THEME: ThemeConfig = { primary: '#4f46e5', accent: '#f97316', surface: '#ffffff', foreground: '#111827', font: 'Inter', radius: 16, cta: 'Explore the collection' }
 
+export const EDITORIAL_THEME: ThemeConfig = { primary: '#000000', accent: '#E60000', surface: '#FFFFFF', foreground: '#111111', font: 'Bodoni Moda', radius: 0, cta: 'Explore the collection' }
+
+export const THEME_PRESETS: Record<string, ThemeConfig> = { Classic: { ...DEFAULT_THEME }, Editorial: { ...EDITORIAL_THEME } }
+
 export class GraphParseError extends Error {}
 
 export function emptyGraph(): JourneyGraph {

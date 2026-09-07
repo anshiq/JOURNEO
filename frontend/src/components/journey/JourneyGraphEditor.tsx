@@ -14,7 +14,10 @@ import { Card } from '../ui/Card'
 import { Input } from '../ui/Input'
 import { Badge } from '../ui/Badge'
 import { Separator } from '../ui/Separator'
-import { ArrowRight, ChevronDown, HelpCircle, Link2, Palette, Plus, Trash2 } from 'lucide-react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/Accordion'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip'
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command'
+import { ArrowRight, HelpCircle, Link2, Palette, Plus, Search, Trash2 } from 'lucide-react'
 
 export const NODE_DRAG_MIME = 'application/x-journey-node-type'
 
@@ -84,8 +87,8 @@ function EdgesList({
 }) {
   if (edges.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-center">
-        <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+      <div className="rounded-none border border-dashed bg-muted/30 p-4 text-center">
+        <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-none bg-muted text-muted-foreground">
           <Link2 className="h-3.5 w-3.5" />
         </div>
         <p className="text-xs font-medium text-foreground">No connections yet</p>
@@ -105,8 +108,8 @@ function EdgesList({
           <div
             key={e.id}
             className={cn(
-              'group flex items-center gap-2 rounded-md border bg-card px-2 py-1.5 text-xs transition-colors',
-              isSelected ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border/60 hover:border-primary/30 hover:bg-primary/5',
+              'group flex items-center gap-2 rounded-none border bg-card px-2 py-1.5 text-xs transition-colors',
+              isSelected ? 'border-foreground ring-1 ring-foreground/20' : 'border-border/60 hover:border-foreground hover:bg-secondary',
             )}
           >
             <button
@@ -140,27 +143,25 @@ function EdgesList({
   )
 }
 
-function ConnectionsDropdown({ edges, nodes, selectedEdgeId, onSelect, onDelete }: { edges: Edge[]; nodes: Node[]; selectedEdgeId: string | null; onSelect: (id: string) => void; onDelete: (id: string) => void }) {
-  const [open, setOpen] = useState(false)
+function ConnectionsPanel({ edges, nodes, selectedEdgeId, onSelect, onDelete }: { edges: Edge[]; nodes: Node[]; selectedEdgeId: string | null; onSelect: (id: string) => void; onDelete: (id: string) => void }) {
   return (
-    <div className="rounded-lg border border-border/60 bg-card">
-      <button type="button" onClick={() => setOpen(o => !o)} className="flex w-full items-center justify-between px-3 py-2 text-left">
-        <span className="flex items-center gap-2 text-xs font-semibold">
-          <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
-          Connections
-          <Badge variant="muted" className="font-mono text-[10px]">{edges.length}</Badge>
-        </span>
-        <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? '' : '-rotate-90'}`} />
-      </button>
-      {open && (
-        <div className="border-t border-border/60 p-2">
+    <Accordion type="single" collapsible defaultValue="connections">
+      <AccordionItem value="connections" className="rounded-none border border-border/60 bg-card px-3">
+        <AccordionTrigger>
+          <span className="flex items-center gap-2 text-xs font-semibold normal-case tracking-normal">
+            <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
+            Connections
+            <Badge variant="muted" className="font-mono text-[10px]">{edges.length}</Badge>
+          </span>
+        </AccordionTrigger>
+        <AccordionContent>
           <EdgesList edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={onSelect} onDelete={onDelete} />
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Tip: select an edge and press <kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">Delete</kbd> to remove it.
+            Tip: select an edge and press <kbd className="rounded-none border bg-muted px-1 py-0.5 font-mono text-[10px]">Delete</kbd> to remove it.
           </p>
-        </div>
-      )}
-    </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   )
 }
 
@@ -172,6 +173,8 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
   const highlightTimerRef = useRef<number | null>(null)
   const [validation, setValidation] = useState<any[]>([])
   const [paletteSearch, setPaletteSearch] = useState('')
+  const [cmdOpen, setCmdOpen] = useState(false)
+  const [cmdSearch, setCmdSearch] = useState('')
   const rfInstance = useRef<ReactFlowInstance | null>(null)
   const hasFitInitial = useRef(false)
 
@@ -366,10 +369,35 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
     bus.emit('node:update', { nodeId: selectedNodeId, config: next })
   }, [readOnly, selectedNodeId, graph, setNodes])
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        if (!readOnly) setCmdOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [readOnly])
+
   return (
     <div className="flex h-full flex-col gap-2">
+      <CommandDialog open={cmdOpen} onOpenChange={setCmdOpen}>
+        <CommandInput value={cmdSearch} onValueChange={setCmdSearch} placeholder="Search node types..." />
+        <CommandList>
+          <CommandEmpty>No node type found.</CommandEmpty>
+          <CommandGroup heading="Node types">
+            {allNodeTypes.filter(t => !cmdSearch || t.toLowerCase().includes(cmdSearch.toLowerCase())).map(t => (
+              <CommandItem key={t} value={t} onSelect={() => { addNode(t as any); setCmdOpen(false); setCmdSearch('') }}>
+                <span className="truncate">{t.replace(/_/g, ' ')}</span>
+                <span className="ml-auto font-mono text-[10px] text-muted-foreground">{nodeInfo[t]}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
       {validation.length > 0 && (
-        <div className="flex items-start gap-1.5 rounded-md border border-destructive/30 bg-destructive/5 px-2 py-1.5 text-xs text-destructive">
+        <div className="flex items-start gap-1.5 rounded-none border border-destructive/30 bg-destructive/5 px-2 py-1.5 text-xs text-destructive">
           <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <div className="flex flex-col gap-0.5">
             {validation.slice(0, 3).map((e, i) => (
@@ -388,6 +416,17 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
           </div>
           <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
             <Input value={paletteSearch} onChange={e => setPaletteSearch(e.target.value)} placeholder="Search..." className="h-7 mb-2 text-xs" />
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => setCmdOpen(true)}
+                className="mb-2 flex w-full items-center gap-1.5 border border-border/60 bg-background px-1.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              >
+                <Search className="h-3 w-3" />
+                <span className="flex-1 text-left">Search nodes…</span>
+                <kbd className="font-mono text-[10px]">⌘K</kbd>
+              </button>
+            )}
             {allNodeTypes.filter(t => !paletteSearch || t.toLowerCase().includes(paletteSearch.toLowerCase())).map(t => (
               <div
                 key={t}
@@ -396,7 +435,7 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
                 onDragStart={e => { e.dataTransfer.setData(NODE_DRAG_MIME, t); e.dataTransfer.effectAllowed = 'move' }}
                 onDoubleClick={() => addNode(t as any)}
                 title={nodeInfo[t] || 'Drag to canvas · double-click to add'}
-                className="group mb-0.5 flex cursor-grab items-center justify-between rounded-md border border-border/60 bg-background px-1.5 py-1 text-[11px] text-foreground/80 transition-colors hover:border-primary/40 hover:bg-primary/5 active:cursor-grabbing"
+                className="group mb-0.5 flex cursor-grab items-center justify-between rounded-none border border-border/60 bg-background px-1.5 py-1 text-[11px] text-foreground/80 transition-colors hover:border-foreground hover:bg-secondary active:cursor-grabbing"
               >
                 <span className="truncate">{t.replace(/_/g, ' ')}</span>
                 <Plus className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-60" />
@@ -414,7 +453,7 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
                 animated: e.id === selectedEdgeId,
                 style: {
                   strokeWidth: e.id === selectedEdgeId ? 2.5 : 1.75,
-                  stroke: e.id === selectedEdgeId ? 'hsl(var(--primary))' : 'hsl(215 16% 47%)',
+                  stroke: e.id === selectedEdgeId ? 'hsl(var(--rouge))' : 'hsl(var(--foreground))',
                 },
               }))}
               nodeTypes={reactFlowNodeTypes}
@@ -437,29 +476,39 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
             </ReactFlow>
             {selectedEdgeId && (
               <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2">
-                <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 px-2 py-1 shadow-elevated backdrop-blur">
+                <div className="pointer-events-auto flex items-center gap-2 rounded-none border border-primary/30 bg-background/95 px-2 py-1 shadow-overlay backdrop-blur">
                   <EdgeSummary edgeId={selectedEdgeId} edges={edges} nodes={nodes} />
                   <span className="h-4 w-px bg-border" />
                   {!readOnly && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="h-7 gap-1 rounded-full px-3 text-xs"
-                      onClick={() => deleteEdge(selectedEdgeId)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Delete edge
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="h-7 gap-1 rounded-none px-3 text-xs"
+                          onClick={() => deleteEdge(selectedEdgeId)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete edge
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Permanently remove this connection</TooltipContent>
+                    </Tooltip>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 rounded-full px-2 text-xs"
-                    onClick={() => setSelectedEdgeId(null)}
-                    aria-label="Deselect edge"
-                  >
-                    ✕
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 rounded-none px-2 text-xs"
+                        onClick={() => setSelectedEdgeId(null)}
+                        aria-label="Deselect edge"
+                      >
+                        ✕
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Clear edge selection</TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
             )}
@@ -479,7 +528,7 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
                     <Button
                       variant="destructive"
                       size="sm"
-                      className="h-6 gap-1 rounded-full px-2 text-[10px]"
+                      className="h-6 gap-1 rounded-none px-2 text-[10px]"
                       onClick={() => deleteNode(selectedNode.id)}
                       aria-label="Delete node"
                     >
@@ -498,8 +547,8 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
                 onChange={onNodeConfigChange}
               />
             ) : (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/30 px-4 py-10 text-center">
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div className="flex flex-col items-center justify-center rounded-none border border-dashed bg-muted/30 px-4 py-10 text-center">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-none bg-primary/10 text-primary">
                   <Palette className="h-4 w-4" />
                 </div>
                 <p className="text-sm font-medium text-foreground">No node selected</p>
@@ -507,7 +556,7 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
               </div>
             )}
             <Separator className="my-4" />
-            <ConnectionsDropdown edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={setSelectedEdgeId} onDelete={deleteEdge} />
+            <ConnectionsPanel edges={edges} nodes={nodes} selectedEdgeId={selectedEdgeId} onSelect={setSelectedEdgeId} onDelete={deleteEdge} />
           </div>
         </Card>
       </div>

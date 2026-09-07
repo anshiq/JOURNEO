@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     container: {
@@ -11,10 +10,12 @@ export default {
     extend: {
       colors: {
         border: 'hsl(var(--border))',
+        'border-strong': 'hsl(var(--border-strong))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        rouge: 'hsl(var(--rouge))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -60,12 +61,27 @@ export default {
       },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'var(--radius)',
+        sm: 'var(--radius)',
       },
       boxShadow: {
-        soft: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
-        elevated: '0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05)',
+        overlay: 'var(--shadow-overlay)',
+      },
+      fontFamily: {
+        display: ['var(--font-display)'],
+        sans: ['var(--font-sans)'],
+        mono: ['var(--font-mono)'],
+      },
+      fontSize: {
+        'display-xl': ['72px', { lineHeight: '0.95', letterSpacing: '-0.02em' }],
+        'display-lg': ['48px', { lineHeight: '1', letterSpacing: '-0.015em' }],
+        'display-md': ['32px', { lineHeight: '1.1', letterSpacing: '-0.01em' }],
+        eyebrow: ['11px', { lineHeight: '1.2', letterSpacing: '0.18em' }],
+        'body-sm': ['12px', { lineHeight: '1.5', letterSpacing: '0.01em' }],
+        'mono-xs': ['11px', { lineHeight: '1.4', letterSpacing: '0.02em' }],
+      },
+      letterSpacing: {
+        eyebrow: '0.18em',
       },
       keyframes: {
         'accordion-down': {
@@ -80,15 +96,17 @@ export default {
           from: { opacity: '0', transform: 'translateY(4px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
-        shimmer: {
-          '100%': { transform: 'translateX(100%)' },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-in': 'fade-in 0.25s ease-out',
-        shimmer: 'shimmer 1.5s infinite',
+        'fade-in': 'fade-in 0.2s cubic-bezier(0.2, 0, 0, 1)',
+      },
+      transitionTimingFunction: {
+        editorial: 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+      transitionDuration: {
+        120: '120ms',
       },
     },
   },

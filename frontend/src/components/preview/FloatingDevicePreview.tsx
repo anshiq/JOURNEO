@@ -48,13 +48,13 @@ export default function FloatingDevicePreview({ start, viewportId = DEFAULT_VIEW
   const groups = ['Phones', 'Foldables', 'Tablets', 'Laptops', 'Desktops']
   if (min) {
     return (
-      <button type="button" onClick={() => setMin(false)} className="fixed bottom-5 right-5 z-[100] flex items-center gap-2 rounded-full border bg-background px-4 py-2 text-xs font-medium shadow-xl hover:bg-muted">
+      <button type="button" onClick={() => setMin(false)} className="fixed bottom-5 right-5 z-[100] flex items-center gap-2 rounded-none border border-border bg-background px-4 py-2 text-xs font-medium shadow-overlay hover:bg-muted">
         <Smartphone className="h-4 w-4" /> Preview
       </button>
     )
   }
   return (
-    <div ref={cardRef} className="fixed z-[100] flex flex-col overflow-hidden rounded-xl border bg-background shadow-2xl" style={{ left: pos.x, top: pos.y }}>
+    <div ref={cardRef} className="fixed z-[100] flex flex-col overflow-hidden rounded-none border border-border bg-background shadow-overlay" style={{ left: pos.x, top: pos.y }}>
       <div className="flex shrink-0 cursor-grab touch-none items-center gap-1.5 border-b bg-muted/40 px-2 py-1.5 active:cursor-grabbing" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerCancel={endDrag}>
         <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <select
@@ -67,7 +67,7 @@ export default function FloatingDevicePreview({ start, viewportId = DEFAULT_VIEW
             setZoom(fitZoom(found.name))
           }}
           onPointerDown={e => e.stopPropagation()}
-          className="h-6 min-w-0 flex-1 cursor-pointer rounded border bg-background px-1 text-[11px] font-medium"
+          className="h-6 min-w-0 flex-1 cursor-pointer rounded-none border bg-background px-1 text-[11px] font-medium"
           aria-label="Preview device"
         >
           {groups.map(g => (

@@ -12,7 +12,7 @@ import { bus, useEvent } from '../lib/eventBus'
 import { DEVICE_VIEWPORTS, isViewportId } from '../lib/viewports'
 import { devLinkFor } from '../lib/devLink'
 import { useCampaignJourney } from '../hooks/useCampaignJourney'
-import { hasContent, effectiveTheme } from '../lib/journeyGraph'
+import { hasContent, effectiveTheme, THEME_PRESETS } from '../lib/journeyGraph'
 import {
   ArrowLeft,
   ArrowRight,
@@ -68,7 +68,8 @@ const steps = [
 ] as const
 
 function StatusPill({ kind, children }: { kind: 'success' | 'warning' | 'info' | 'muted'; children: React.ReactNode }) {
-  return <Badge variant={kind}>{children}</Badge>
+  const variant = kind === 'success' ? 'default' : kind === 'warning' ? 'outline' : kind === 'info' ? 'secondary' : 'muted'
+  return <Badge variant={variant}>{children}</Badge>
 }
 
 function StepSidebarHeader({ step, stepsList, setStep }: { step: number; stepsList: typeof steps; setStep: (n: number) => void }) {
@@ -83,14 +84,14 @@ function StepSidebarHeader({ step, stepsList, setStep }: { step: number; stepsLi
             key={s.id}
             onClick={() => setStep(index)}
             className={cn(
-              'group flex w-full items-center gap-2 rounded-md border p-2 text-left transition-all',
-              isActive && 'border-primary/50 bg-primary text-primary-foreground shadow-sm',
+              'group flex w-full items-center gap-2 rounded-none border p-2 text-left transition-all',
+              isActive && 'border-primary/50 bg-primary text-primary-foreground shadow-none',
               !isActive && isComplete && 'border-primary/20 bg-primary/5 text-foreground hover:bg-primary/10',
               !isActive && !isComplete && 'border-transparent bg-transparent text-muted-foreground hover:bg-muted',
             )}
           >
             <div className={cn(
-              'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold transition',
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-none text-xs font-semibold transition',
               isActive && 'bg-primary-foreground/20 text-primary-foreground',
               !isActive && isComplete && 'bg-primary/15 text-primary',
               !isActive && !isComplete && 'bg-muted text-muted-foreground',
@@ -144,20 +145,20 @@ function CollapsedStepRail({
               title={`${s.title} · ${s.subtitle}`}
               aria-label={s.title}
               className={cn(
-                'group relative flex h-8 w-8 items-center justify-center self-center rounded-md transition-all',
-                isActive && 'bg-primary text-primary-foreground shadow-sm',
+                'group relative flex h-8 w-8 items-center justify-center self-center rounded-none transition-all',
+                isActive && 'bg-primary text-primary-foreground shadow-none',
                 !isActive && isComplete && 'bg-primary/15 text-primary hover:bg-primary/25',
                 !isActive && !isComplete && 'text-sidebar-foreground/60 hover:bg-sidebar-border hover:text-sidebar-foreground',
               )}
             >
               {isComplete ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
-              {isActive && <span className="absolute right-0.5 top-0.5 h-1 w-1 animate-pulse rounded-full bg-primary-foreground" />}
+              {isActive && <span className="absolute right-0.5 top-0.5 h-1 w-1 animate-pulse rounded-none bg-primary-foreground" />}
             </button>
           )
         })}
       </nav>
       <div className="flex flex-col items-center gap-1 border-t border-sidebar-border py-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-full border border-sidebar-border">
+        <div className="flex h-7 w-7 items-center justify-center rounded-none border border-sidebar-border">
           <span className="font-mono text-[9px] text-sidebar-foreground/80">{progressPct}%</span>
         </div>
       </div>
@@ -211,7 +212,7 @@ function ExpandedSidebar({
           <span>Workspace progress</span>
           <span className="font-mono text-sidebar-foreground">{progressPct}%</span>
         </div>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sidebar-border">
+        <div className="mt-2 h-1.5 overflow-hidden rounded-none bg-sidebar-border">
           <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
@@ -401,6 +402,11 @@ export default function CampaignSetup() {
   const updateTheme = (key: keyof Theme, value: string | number) => {
     journey.applyGraph({ ...journey.graph, theme: { ...journey.graph.theme, [key]: value } })
   }
+  const applyPreset = (name: string) => {
+    const preset = THEME_PRESETS[name]
+    if (!preset) return
+    journey.applyGraph({ ...journey.graph, theme: { ...preset, cta: journey.graph.theme.cta || preset.cta } })
+  }
 
   const saveDetails = async () => {
     if (!name.trim()) return
@@ -513,7 +519,7 @@ export default function CampaignSetup() {
         {/* Header */}
         <header className="flex shrink-0 items-center justify-between gap-2 border-b bg-background px-3 py-1.5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-none bg-primary/10 text-primary">
               <StepIcon className="h-4 w-4" />
             </div>
             <div>
@@ -533,7 +539,7 @@ export default function CampaignSetup() {
                 DEV · /d/{campaign.devToken.slice(0,8)}
                 <button onClick={copyDevLink} className="ml-1 rounded p-0.5 hover:bg-muted"><Copy className="h-3 w-3" /></button>
                 <button onClick={rotateDevLink} className="ml-0.5 rounded p-0.5 hover:bg-muted" title="Rotate dev link"><RotateCcw className="h-3 w-3" /></button>
-                {devCopied && <span className="text-emerald-600">Copied</span>}
+                {devCopied && <span className="text-foreground">Copied</span>}
               </Badge>
             )}
             <Badge variant="muted" className="hidden font-mono text-[10px] sm:inline-flex">
@@ -564,7 +570,7 @@ export default function CampaignSetup() {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <div className="flex min-h-0 flex-1 flex-col animate-fade-in overflow-hidden">
             {step === 0 && (
-              <Card className="border-border/60 shadow-soft">
+              <Card className="border-border/60">
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <StatusPill kind="info">Step 1</StatusPill>
@@ -643,7 +649,7 @@ export default function CampaignSetup() {
 
             {step === 1 && (
               <div className="flex h-full min-h-0 flex-col gap-2">
-                <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-background shadow-soft">
+                <div className="min-h-0 flex-1 overflow-hidden rounded-none border bg-background">
                   <JourneyGraphEditor
                     graph={journey.graph}
                     onGraphChange={journey.applyGraph}
@@ -683,10 +689,10 @@ export default function CampaignSetup() {
 
             {step === 2 && (
               <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:overflow-hidden">
-                  <Card className="flex min-h-[420px] flex-col overflow-hidden bg-card shadow-sm lg:min-h-0">
+                  <Card className="flex min-h-[420px] flex-col overflow-hidden bg-card shadow-none lg:min-h-0">
                     <div className="flex shrink-0 items-center gap-2 border-b bg-muted/20 px-3 py-1.5">
                       <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
-                      <select value={expDevice} onChange={e => setExpDevice(e.target.value as FrameDevice)} className="h-7 min-w-0 flex-1 rounded-md border bg-background px-1.5 text-xs font-medium" aria-label="Preview device">
+                      <select value={expDevice} onChange={e => setExpDevice(e.target.value as FrameDevice)} className="h-7 min-w-0 flex-1 rounded-none border bg-background px-1.5 text-xs font-medium" aria-label="Preview device">
                         {DEVICE_GROUPS.map(g => (
                           <optgroup key={g} label={g}>
                             {DEVICE_CHOICES.filter(c => c.group === g).map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
@@ -700,9 +706,9 @@ export default function CampaignSetup() {
                           <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={journey.graph.nodes.find(n => n.type === 'ask_ai')?.config ?? null} />
                         </div>
                       ) : (
-                        <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg border border-dashed bg-muted/20">
+                        <div className="flex h-full min-h-[320px] items-center justify-center rounded-none border border-dashed bg-muted/20">
                           <div className="max-w-sm text-center p-6">
-                            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-background border shadow-sm">
+                            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-none bg-background border shadow-none">
                               <Eye className="h-5 w-5 text-muted-foreground" />
                             </div>
                             <h3 className="text-sm font-semibold">Save a journey first</h3>
@@ -713,11 +719,11 @@ export default function CampaignSetup() {
                     </div>
                   </Card>
 
-                  <Card className="flex min-h-0 flex-col overflow-hidden shadow-sm">
+                  <Card className="flex min-h-0 flex-col overflow-hidden shadow-none">
                     <div className="flex items-center gap-2 border-b bg-muted/20 px-3 py-2 shrink-0">
                       <Palette className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className="text-xs font-medium">Active node</span>
-                      <select aria-label="Active node" value={selectedNodeId || ''} onChange={e => { const v = e.target.value || null; setSelectedNodeId(v); bus.emit('node:select', { nodeId: v, source: 'toolbar' }) }} className="flex-1 rounded-md border bg-background px-2 py-1 text-xs">
+                      <select aria-label="Active node" value={selectedNodeId || ''} onChange={e => { const v = e.target.value || null; setSelectedNodeId(v); bus.emit('node:select', { nodeId: v, source: 'toolbar' }) }} className="flex-1 rounded-none border bg-background px-2 py-1 text-xs">
                         <option value="">Global theme</option>
                         {styleableNodes.map(n => (
                           <option key={n.id} value={n.id}>{n.type.replace(/_/g, ' ')} · {n.id.slice(0,4)}</option>
@@ -737,7 +743,7 @@ export default function CampaignSetup() {
                           <Button variant="ghost" size="sm" onClick={() => { setSelectedNodeId(null); bus.emit('node:select', { nodeId: null, source: 'toolbar' }) }} className="w-full">Close</Button>
                         </div>
                       ) : (
-                        <GlobalThemeEditor theme={journey.graph.theme} updateTheme={updateTheme} />
+                        <GlobalThemeEditor theme={journey.graph.theme} updateTheme={updateTheme} applyPreset={applyPreset} />
                       )}
                     </div>
                     <div className="border-t p-2 bg-muted/10 flex items-center gap-2">
@@ -750,7 +756,7 @@ export default function CampaignSetup() {
 
             {step === 3 && (
               <div className="space-y-2">
-                <Card className="border-border/60 shadow-soft">
+                <Card className="border-border/60">
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <StatusPill kind="info">Step 4</StatusPill>
@@ -786,7 +792,7 @@ export default function CampaignSetup() {
                         title="PDF document"
                         description="Upload a campaign PDF to chunk into the retrieval index."
                         footer={
-                          <label className="flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed bg-muted/40 px-2 text-xs text-muted-foreground transition hover:border-primary/40 hover:bg-primary/5">
+                          <label className="flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-none border border-dashed bg-muted/40 px-2 text-xs text-muted-foreground transition hover:border-primary/40 hover:bg-primary/5">
                             <Upload className="h-3 w-3" />
                             <span>Choose PDF file</span>
                             <input
@@ -842,7 +848,7 @@ export default function CampaignSetup() {
 
             {step === 4 && (
               <div className="space-y-2">
-                <Card className="border-border/60 shadow-soft">
+                <Card className="border-border/60">
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <StatusPill kind="success">Final step</StatusPill>
@@ -854,12 +860,12 @@ export default function CampaignSetup() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    <div className="rounded-lg border bg-muted/30 p-3">
+                    <div className="rounded-none border bg-muted/30 p-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className={cn(
-                            'flex h-8 w-8 items-center justify-center rounded-lg',
-                            journey.journeyId ? 'bg-amber-500/15 text-amber-700' : 'bg-muted text-muted-foreground',
+                            'flex h-8 w-8 items-center justify-center rounded-none',
+                            journey.journeyId ? 'bg-secondary text-foreground' : 'bg-muted text-muted-foreground',
                           )}>
                             <Layers className="h-3.5 w-3.5" />
                           </div>
@@ -892,13 +898,13 @@ export default function CampaignSetup() {
                   </CardContent>
                 </Card>
 
-                <Card className="overflow-hidden border-0 bg-foreground text-background shadow-elevated">
+                <Card className="overflow-hidden border-0 bg-foreground text-background shadow-overlay">
                   <div className="relative">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-rouge/20" />
                     <CardHeader>
                       <div className="flex items-center gap-2">
                         <StatusPill kind={isPublished ? "success" : "warning"}>
-                          <span className="mr-1.5 inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                          <span className="mr-1.5 inline-flex h-1.5 w-1.5 animate-pulse rounded-none bg-rouge" />
                           {isPublished ? "Live" : "DEV preview"}
                         </StatusPill>
                         <span className="text-xs text-background/60">{isPublished ? "Product link" : "DEV preview link"}</span>
@@ -909,7 +915,7 @@ export default function CampaignSetup() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                      <div className="flex items-center gap-1.5 rounded-lg border border-background/15 bg-background/10 p-1.5">
+                      <div className="flex items-center gap-1.5 rounded-none border border-background/15 bg-background/10 p-1.5">
                         <Link2 className="ml-1.5 h-3.5 w-3.5 shrink-0 text-background/60" />
                         <code className="flex-1 truncate font-mono text-xs text-background/90">{shareLink}</code>
                         <Button
@@ -924,14 +930,14 @@ export default function CampaignSetup() {
                           href={shareLink}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-background/80 transition-colors hover:bg-background/15 hover:text-background"
+                          className="inline-flex h-7 items-center gap-1.5 rounded-none px-2 text-xs font-medium text-background/80 transition-colors hover:bg-background/15 hover:text-background"
                         >
                           <ExternalLink className="h-3 w-3" />
                           Open
                         </a>
                       </div>
                       {isPublished && devLink && (
-                        <div className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 p-1.5">
+                        <div className="flex items-center gap-1.5 rounded-none border border-white/10 bg-white/5 p-1.5">
                           <span className="ml-1.5 text-[10px] font-mono text-white/60">DEV</span>
                           <code className="flex-1 truncate font-mono text-[11px] text-white/70">{devLink}</code>
                           <Button variant="ghost" size="sm" onClick={copyDevLink} className="h-6 shrink-0 text-white/70 hover:bg-white/10 hover:text-white text-xs">{devCopied ? "Copied" : "Copy DEV"}</Button>
@@ -956,9 +962,9 @@ function KnowledgeCard({
   icon, title, description, footer,
 }: { icon: React.ReactNode; title: string; description: string; footer: React.ReactNode }) {
   return (
-    <div className="flex flex-col rounded-lg border bg-card p-2.5 shadow-soft">
+    <div className="flex flex-col rounded-none border bg-card p-2.5">
       <div className="flex items-center gap-1.5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">{icon}</div>
+        <div className="flex h-7 w-7 items-center justify-center rounded-none bg-primary/10 text-primary">{icon}</div>
         <h3 className="text-sm font-semibold">{title}</h3>
       </div>
       <p className="mt-1.5 flex-1 text-xs text-muted-foreground">{description}</p>
@@ -970,7 +976,7 @@ function KnowledgeCard({
 function KnowledgeStatusBanner({ status }: { status: { kind: 'loading' | 'success' | 'error'; message: string } }) {
   const tone =
     status.kind === 'success'
-      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700'
+      ? 'border-border-strong bg-secondary text-foreground'
       : status.kind === 'error'
         ? 'border-destructive/30 bg-destructive/10 text-destructive'
         : 'border-primary/30 bg-primary/10 text-primary'
@@ -979,7 +985,7 @@ function KnowledgeStatusBanner({ status }: { status: { kind: 'loading' | 'succes
     : status.kind === 'error' ? <HelpCircle className="h-4 w-4" />
     : <Circle className="h-4 w-4 animate-pulse" />
   return (
-    <div className={cn('flex items-start gap-1.5 rounded-md border px-2 py-1.5 text-xs', tone)}>
+    <div className={cn('flex items-start gap-1.5 rounded-none border px-2 py-1.5 text-xs', tone)}>
       <span className="mt-0.5">{icon}</span>
       <span>{status.message}</span>
     </div>
@@ -989,12 +995,12 @@ function KnowledgeStatusBanner({ status }: { status: { kind: 'loading' | 'succes
 function PublishStatusBanner({ status }: { status: { kind: 'success' | 'error' | 'info'; message: string } }) {
   const tone =
     status.kind === 'success'
-      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700'
+      ? 'border-border-strong bg-secondary text-foreground'
       : status.kind === 'error'
         ? 'border-destructive/30 bg-destructive/10 text-destructive'
         : 'border-primary/30 bg-primary/10 text-primary'
   return (
-    <div className={cn('flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs', tone)}>
+    <div className={cn('flex items-center gap-1.5 rounded-none border px-2 py-1 text-xs', tone)}>
       {status.kind === 'success' && <CheckCircle2 className="h-4 w-4" />}
       {status.kind === 'error' && <HelpCircle className="h-4 w-4" />}
       {status.kind === 'info' && <Circle className="h-4 w-4 animate-pulse" />}
@@ -1013,7 +1019,7 @@ function ColorField({
         <span className="font-mono text-[10px] text-muted-foreground">{value}</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="relative h-9 w-12 shrink-0 overflow-hidden rounded-md border">
+        <div className="relative h-9 w-12 shrink-0 overflow-hidden rounded-none border">
           <input
             type="color"
             value={value}
@@ -1033,17 +1039,37 @@ function ColorField({
   )
 }
 
-function GlobalThemeEditor({ theme, updateTheme }: { theme: Theme; updateTheme: (k: keyof Theme, v: string | number) => void }) {
+function GlobalThemeEditor({ theme, updateTheme, applyPreset }: { theme: Theme; updateTheme: (k: keyof Theme, v: string | number) => void; applyPreset: (name: string) => void }) {
+  const activePreset = Object.entries(THEME_PRESETS).find(([, p]) => p.primary === theme.primary && p.accent === theme.accent && p.surface === theme.surface && p.foreground === theme.foreground && p.font === theme.font && p.radius === theme.radius)?.[0] || 'Custom'
   return (
     <div>
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <div className="flex h-10 w-10 items-center justify-center rounded-none bg-primary/10 text-primary">
           <Palette className="h-4 w-4" />
         </div>
         <div>
           <h3 className="text-sm font-semibold">Global theme</h3>
           <p className="text-xs text-muted-foreground">Default style applied to every node.</p>
         </div>
+      </div>
+
+      <div className="mt-4 space-y-1.5">
+        <span className="text-[11px] font-medium text-muted-foreground">Preset</span>
+        <div className="flex gap-2">
+          {Object.keys(THEME_PRESETS).map(name => (
+            <Button
+              key={name}
+              type="button"
+              variant={activePreset === name ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => applyPreset(name)}
+            >
+              {name}
+            </Button>
+          ))}
+          {activePreset === 'Custom' && <Badge variant="outline">Custom</Badge>}
+        </div>
+        <p className="text-[10px] text-muted-foreground">Editorial applies a monochrome Didone system with a single red accent.</p>
       </div>
 
       <Separator className="my-5" />
@@ -1067,8 +1093,9 @@ function GlobalThemeEditor({ theme, updateTheme }: { theme: Theme; updateTheme: 
         <Slider
           min={0}
           max={32}
-          value={theme.radius}
-          onChange={e => updateTheme('radius', Number(e.target.value))}
+          step={1}
+          value={[theme.radius]}
+          onValueChange={([v]) => updateTheme('radius', v)}
         />
       </div>
 
@@ -1083,7 +1110,7 @@ function GlobalThemeEditor({ theme, updateTheme }: { theme: Theme; updateTheme: 
         />
       </div>
 
-      <div className="mt-5 rounded-lg border bg-muted/30 p-3">
+      <div className="mt-5 rounded-none border bg-muted/30 p-3">
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Preview</p>
         <div
           className="flex items-center justify-center p-6 text-center"

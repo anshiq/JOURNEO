@@ -5,6 +5,8 @@ import JourneyGraphEditor from '../components/journey/JourneyGraphEditor'
 import LiveAdStage from '../components/preview/LiveAdStage'
 import { journeyApi } from '../lib/api'
 import { serializeGraph } from '../lib/journeyGraph'
+import { Button } from '../components/ui/Button'
+import { Alert, AlertDescription } from '../components/ui/Alert'
 
 export { NODE_DRAG_MIME } from '../components/journey/JourneyGraphEditor'
 
@@ -44,27 +46,32 @@ export default function JourneyCanvas() {
   }
 
   return (
-    <div className="h-[calc(100vh-120px)] flex flex-col">
-      <div className="flex gap-2 mb-3 flex-wrap items-center">
-        <span className="text-xs text-slate-500">Drag nodes from the palette onto the canvas.</span>
-        <button onClick={handleSave} disabled={journey.saveState === 'saving'} className="bg-blue-600 text-white px-4 py-1 rounded text-sm disabled:opacity-50">
+    <div className="flex h-[calc(100vh-120px)] flex-col">
+      <p className="text-eyebrow text-muted-foreground">Canvas</p>
+      <h1 className="font-display text-display-md mt-1">Journey Canvas</h1>
+      <div className="mb-3 mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-foreground">Drag nodes from the palette onto the canvas.</span>
+        <Button size="sm" onClick={handleSave} disabled={journey.saveState === 'saving'}>
           {journey.saveState === 'saving' ? 'Saving…' : 'Save'}
-        </button>
-        <button onClick={handleValidate} className="border px-4 py-1 rounded text-sm">Validate</button>
-        <button onClick={handlePublish} disabled={journey.saveState === 'saving'} className="bg-green-600 text-white px-4 py-1 rounded text-sm disabled:opacity-50">Publish</button>
-        <button onClick={() => setShowDevice(s => !s)} className="border px-4 py-1 rounded text-sm">
+        </Button>
+        <Button size="sm" variant="outline" onClick={handleValidate}>Validate</Button>
+        <Button size="sm" variant="editorial" onClick={handlePublish} disabled={journey.saveState === 'saving'}>Publish</Button>
+        <Button size="sm" variant="ghost" onClick={() => setShowDevice(s => !s)}>
           {showDevice ? 'Hide device preview' : 'Test on device'}
-        </button>
-        {journey.saveState === 'error' && journey.error && <span className="text-xs text-red-600">{journey.error}</span>}
-        {publishStatus && <span className="text-xs text-slate-600">{publishStatus}</span>}
+        </Button>
+        {journey.saveState === 'error' && journey.error && <span className="text-xs text-rouge">{journey.error}</span>}
+        {publishStatus && <span className="text-xs text-muted-foreground">{publishStatus}</span>}
         {validateResult && (
-          <span className="text-xs text-slate-600">
+          <span className="text-xs text-muted-foreground">
             {validateResult.valid ? 'Valid' : (validateResult.errors || []).map((e: any) => e.message).join(', ')}
           </span>
         )}
       </div>
-      <div className="flex-1 flex gap-4 min-h-0">
-        <div className="flex-1 min-h-0">
+      {validateResult && !validateResult.valid && <Alert variant="destructive" className="mb-3">
+        <AlertDescription>{(validateResult.errors || []).map((e: any) => e.message).join(', ')}</AlertDescription>
+      </Alert>}
+      <div className="flex min-h-0 flex-1 gap-4">
+        <div className="min-h-0 flex-1">
           <JourneyGraphEditor
             graph={journey.graph}
             onGraphChange={journey.applyGraph}
@@ -73,13 +80,13 @@ export default function JourneyCanvas() {
           />
         </div>
         {showDevice && (
-          <div className="w-[380px] shrink-0 border rounded bg-white p-2">
+          <div className="w-[380px] shrink-0 border border-border bg-background p-2">
             {journey.journeyId ? (
               <div className="h-[560px]">
                 <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId }} framed studio />
               </div>
             ) : (
-              <div className="text-xs opacity-60 mt-2">Save the journey first to test it on device.</div>
+              <div className="mt-2 text-xs text-muted-foreground">Save the journey first to test it on device.</div>
             )}
           </div>
         )}

@@ -1,6 +1,8 @@
 import { styleSchema, type NodeStyle } from './types'
 import type { ThemeConfig } from './types'
 export const defaultTheme: ThemeConfig = { primary: '#4f46e5', accent: '#f97316', surface: '#ffffff', foreground: '#111827', font: 'Inter', radius: 16, cta: 'Continue' }
+export const editorialTheme: ThemeConfig = { primary: '#000000', accent: '#E60000', surface: '#FFFFFF', foreground: '#111111', font: 'Bodoni Moda', radius: 0, cta: 'Continue' }
+export const themePresets: Record<string, ThemeConfig> = { Classic: { ...defaultTheme }, Editorial: { ...editorialTheme } }
 export function getTheme(config: any): ThemeConfig {
   return config?.theme || defaultTheme
 }

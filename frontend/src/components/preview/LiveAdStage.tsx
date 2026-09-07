@@ -48,7 +48,7 @@ function FramedScreen({ viewportId, device, children, zoom: fixedZoom }: { viewp
     return () => ro.disconnect()
   }, [name, fixedZoom, outer.w, outer.h])
   return (
-    <div ref={wrapRef} className="flex h-full w-full items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-muted/40 p-2 shadow-[0_20px_50px_rgba(15,23,42,0.25)]">
+    <div ref={wrapRef} className="flex h-full w-full items-center justify-center overflow-hidden rounded-none border border-border bg-foreground p-2 shadow-overlay">
       {name === 'macbook-14' ? (
         <div style={{ width: outer.w * zoom, height: outer.h * zoom, flexShrink: 0 }}>
           <div style={{ width: outer.w, height: outer.h, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
@@ -64,13 +64,13 @@ function FramedScreen({ viewportId, device, children, zoom: fixedZoom }: { viewp
           </div>
         </div>
       ) : name === undefined || name === 'desktop-1440' ? (
-        <div className="overflow-hidden rounded-lg border bg-white shadow-xl" style={{ width: outer.w * zoom, height: outer.h * zoom, flexShrink: 0 }}>
+        <div className="overflow-hidden rounded-none border bg-white shadow-overlay" style={{ width: outer.w * zoom, height: outer.h * zoom, flexShrink: 0 }}>
           <div style={{ width: outer.w, height: outer.h, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
             <div className="flex h-10 items-center gap-1.5 border-b bg-muted/60 px-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-              <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-              <span className="ml-2 h-6 flex-1 rounded-md bg-background" />
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
+              <span className="ml-2 h-6 flex-1 rounded-none bg-background" />
             </div>
             <div style={{ width: DESK_SCREEN.w, height: DESK_SCREEN.h }}>
               {children}
@@ -207,13 +207,13 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
         <div className="py-16 text-center">
           <p className="text-sm font-medium">Experience unavailable</p>
           <p className="mt-1 text-xs text-muted-foreground">{state.message}</p>
-          <button onClick={() => client.restart()} className="mt-4 rounded-lg px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary, borderRadius: theme.radius }}>Retry</button>
+          <button onClick={() => client.restart()} className="mt-4 rounded-none px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary, borderRadius: theme.radius }}>Retry</button>
         </div>
       ) : state.status === 'ended' ? (
         <div className="py-16 text-center">
           <p className="text-sm font-medium">Journey complete</p>
           <p className="mt-1 font-mono text-[10px] text-muted-foreground">{state.sessionId.slice(0, 8)}</p>
-          <button onClick={() => client.restart()} className="mt-4 rounded-lg px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary, borderRadius: theme.radius }}>Restart</button>
+          <button onClick={() => client.restart()} className="mt-4 rounded-none px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary, borderRadius: theme.radius }}>Restart</button>
         </div>
       ) : patchedNode ? (
         <LiveCard client={client} node={patchedNode} theme={theme} cardPadding={layout.cardPadding} studio={studio} isSelected={selectedId === patchedNode.id} isFlashing={flashingId === patchedNode.id} onSelect={() => bus.emit('node:select', { nodeId: selectedId === patchedNode.id ? null : patchedNode.id, source: 'device' })} />
@@ -226,7 +226,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
         <div className="flex min-h-full w-full justify-center" style={{ padding: layout.stagePadding }}>
           {content}
         </div>
-        {askAiResolved && <AskAiOverlay client={client} config={askAiResolved} sessionStatus={state.status} />}
+        {askAiResolved && <AskAiOverlay client={client} config={askAiResolved} sessionStatus={state.status} theme={theme} />}
       </div>
     )
   }
@@ -237,7 +237,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
           <div className="flex min-h-full w-full justify-center" style={{ padding: layout.stagePadding }}>
             {content}
           </div>
-          {askAiResolved && <AskAiOverlay client={client} config={askAiResolved} sessionStatus={state.status} />}
+          {askAiResolved && <AskAiOverlay client={client} config={askAiResolved} sessionStatus={state.status} theme={theme} />}
         </div>
       </FramedScreen>
     </div>
@@ -265,7 +265,7 @@ function LiveCard({ client, node, theme, cardPadding, studio, isSelected, isFlas
   }
   return (
     <div className="relative" style={{ ['--theme-primary' as any]: theme.primary } as React.CSSProperties} onClick={studio ? (e => { e.stopPropagation(); onSelect?.() }) : undefined}>
-      {studio && isSelected && <div className="absolute -top-2 left-1/2 z-30 -translate-x-1/2 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] text-white">Selected</div>}
+      {studio && isSelected && <div className="absolute -top-2 left-1/2 z-30 -translate-x-1/2 rounded-none bg-foreground px-2 py-0.5 text-[10px] text-background">Selected</div>}
       <div style={card} className="overflow-hidden">
         <Device config={node.config || {}} style={getNodeStyle(node.config)} theme={theme} isActive isFlashing={studio && isFlashing} onAdvance={(handle?: string) => client.sendChoice(handle)} onSelect={studio && onSelect ? onSelect : undefined} />
       </div>

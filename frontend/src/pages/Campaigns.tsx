@@ -4,10 +4,18 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { devLinkFor } from '../lib/devLink'
 import { bus } from '../lib/eventBus'
+import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
+import { Badge } from '../components/ui/Badge'
+import { Separator } from '../components/ui/Separator'
+import { Skeleton } from '../components/ui/Skeleton'
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/Alert'
+import { toast } from 'sonner'
+
 export default function Campaigns(){
   const navigate=useNavigate()
   const qc=useQueryClient()
-  const {data}=useQuery({queryKey:['campaigns'], queryFn: async()=> (await journeyApi.get('/api/campaigns')).data})
+  const {data, isLoading}=useQuery({queryKey:['campaigns'], queryFn: async()=> (await journeyApi.get('/api/campaigns')).data})
   const [name,setName]=useState('')
   const [createdDevLink,setCreatedDevLink]=useState<string|null>(null)
   const [copied,setCopied]=useState(false)
@@ -18,18 +26,43 @@ export default function Campaigns(){
     bus.emit('campaign:created', { campaignId:campaign.id, devToken:campaign.devToken, devLink:link })
     navigate(`/campaigns/${campaign.id}/setup`)
   }})
-  const copy=()=>{ if(createdDevLink){ navigator.clipboard?.writeText(createdDevLink); setCopied(true); setTimeout(()=>setCopied(false),1500)} }
+  const copy=()=>{ if(createdDevLink){ navigator.clipboard?.writeText(createdDevLink); setCopied(true); toast.success('Dev link copied'); setTimeout(()=>setCopied(false),1500)} }
   return <div>
-    <h1 className="text-2xl font-bold">Campaigns</h1>
-    <div className="mt-4 flex gap-2"><input value={name} onChange={e=>setName(e.target.value)} placeholder="New campaign name" className="border px-3 py-2 rounded flex-1" /><button disabled={!name.trim() || mut.isPending} onClick={()=>mut.mutate()} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">{mut.isPending?'Creating…':'Create campaign'}</button></div>
-    {createdDevLink && <div className="mt-3 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs"><span className="font-mono">DEV {createdDevLink}</span><button onClick={copy} className="rounded bg-white px-2 py-1 border text-xs">{copied?'Copied':'Copy'}</button><a href={createdDevLink} target="_blank" rel="noreferrer" className="text-blue-600 underline">Open</a></div>}
-    <div className="grid grid-cols-3 gap-4 mt-6">
-      {(data||[]).map((c:any)=><Link key={c.id} to={`/campaigns/${c.id}`} className="border rounded p-4 bg-white hover:shadow">
-        <div className="font-semibold">{c.name}</div><div className="text-sm opacity-60">{c.id}</div><div className="text-xs mt-2">Status: {c.status}</div>
-        {c.devToken && <div className="mt-1 text-[10px] font-mono opacity-50">DEV /d/{c.devToken.slice(0,8)}</div>}
-        <div className="mt-3 flex gap-2 text-xs"><span className="bg-blue-50 px-2 py-1 rounded">Journey</span><span className="bg-green-50 px-2 py-1 rounded">Analytics</span></div>
-      </Link>)}
+    <p className="text-eyebrow text-muted-foreground">Index</p>
+    <h1 className="font-display text-display-xl mt-2">Campaigns</h1>
+    <div className="rule mt-6" />
+    <div className="mt-6 flex gap-2">
+      <Input value={name} onChange={e=>setName(e.target.value)} placeholder="New campaign name" className="flex-1" aria-label="New campaign name" />
+      <Button disabled={!name.trim() || mut.isPending} onClick={()=>mut.mutate()}>{mut.isPending?'Creating…':'Create campaign'}</Button>
     </div>
-    {(!data||data.length===0)&&<div className="mt-8 text-center opacity-60">No campaigns yet. Create one, or run docker-compose with seeded data.</div>}
+    {createdDevLink && <Alert className="mt-4">
+      <AlertTitle>Dev link ready</AlertTitle>
+      <AlertDescription>
+        <span className="font-mono text-mono-xs">DEV {createdDevLink}</span>
+        <span className="mt-2 flex gap-2">
+          <Button variant="outline" size="sm" onClick={copy}>{copied?'Copied':'Copy'}</Button>
+          <Button variant="link" size="sm" asChild><a href={createdDevLink} target="_blank" rel="noreferrer">Open</a></Button>
+        </span>
+      </AlertDescription>
+    </Alert>}
+    <div className="mt-8">
+      {isLoading && <div className="space-y-3">{[0,1,2].map(i=><Skeleton key={i} className="h-20 w-full" />)}</div>}
+      {!isLoading && (data||[]).map((c:any)=><div key={c.id}>
+        <Link to={`/campaigns/${c.id}`} className="group flex items-baseline justify-between gap-6 py-6">
+          <div className="min-w-0">
+            <div className="font-display text-display-md truncate group-hover:underline group-hover:underline-offset-4">{c.name}</div>
+            <div className="mt-1 font-mono text-mono-xs text-muted-foreground">{c.id}</div>
+            {c.devToken && <div className="mt-1 font-mono text-mono-xs text-muted-foreground">DEV /d/{c.devToken.slice(0,8)}</div>}
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            <Badge variant="outline">{c.status}</Badge>
+            <span className="text-eyebrow text-muted-foreground">Journey</span>
+            <span className="text-eyebrow text-muted-foreground">Analytics</span>
+          </div>
+        </Link>
+        <Separator />
+      </div>)}
+    </div>
+    {(!isLoading && (!data||data.length===0))&&<div className="mt-8 text-center text-sm text-muted-foreground">No campaigns yet. Create one, or run docker-compose with seeded data.</div>}
   </div>
 }
