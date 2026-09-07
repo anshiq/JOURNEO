@@ -23,7 +23,6 @@ export default function CampaignDetail(){
     {isPublished && <div className="mt-2 flex items-center gap-2 text-xs"><span className="rounded bg-emerald-100 px-2 py-1 font-mono">LIVE · /c/{id} · {productLink}</span><button onClick={copyProduct} className="border px-2 py-1 rounded bg-white">Copy product link</button><a href={productLink} target="_blank" rel="noreferrer" className="border px-2 py-1 rounded bg-emerald-600 text-white">Open product link</a></div>}
     <div className="flex gap-4 mt-4">
       <Link to={`/campaigns/${id}/setup`} className="bg-slate-900 text-white px-4 py-2 rounded">Campaign workspace</Link>
-      <Link to={`/campaigns/${id}/journey`} className="bg-blue-600 text-white px-4 py-2 rounded">Open Journey Canvas</Link>
       <Link to={`/campaigns/${id}/analytics`} className="border px-4 py-2 rounded">Analytics</Link>
       {devLink && <a href={devLink} target="_blank" rel="noreferrer" className="border px-4 py-2 rounded bg-amber-50">Open DEV preview</a>}
       {isPublished && <a href={productLink} target="_blank" rel="noreferrer" className="border px-4 py-2 rounded bg-emerald-50">Open product link</a>}

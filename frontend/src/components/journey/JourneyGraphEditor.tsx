@@ -286,6 +286,13 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
     setSelectedEdgeId(prev => (prev === edgeId ? null : prev))
   }, [setEdges, readOnly])
 
+  const deleteNode = useCallback((nodeId: string) => {
+    if (readOnly) return
+    setNodes(nds => nds.filter(n => n.id !== nodeId))
+    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId))
+    onSelectNode(null)
+  }, [setNodes, setEdges, readOnly, onSelectNode])
+
   const handleEdgesChange = useCallback((changes: any[]) => {
     if (readOnly) { changes = changes.filter(c => c.type !== 'remove') }
     onEdgesChange(changes)
@@ -464,9 +471,23 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Node configuration</h3>
               {selectedNode && (
-                <Badge variant="outline" className="font-mono text-[10px]">
-                  {selectedNode.type}
-                </Badge>
+                <div className="flex items-center gap-1.5">
+                  <Badge variant="outline" className="font-mono text-[10px]">
+                    {selectedNode.type}
+                  </Badge>
+                  {!readOnly && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-6 gap-1 rounded-full px-2 text-[10px]"
+                      onClick={() => deleteNode(selectedNode.id)}
+                      aria-label="Delete node"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Delete
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
             {selectedNode ? (
