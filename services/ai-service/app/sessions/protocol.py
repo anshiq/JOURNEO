@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, model_validator
 from typing import Any, Literal, Optional
 
 
@@ -8,6 +8,7 @@ class StartMessage(BaseModel):
     campaignId: Optional[str] = None
     journeyId: Optional[str] = None
     devToken: Optional[str] = None
+    resumeThread: Optional[bool] = None
 
 
 class ChoiceMessage(BaseModel):
@@ -16,33 +17,57 @@ class ChoiceMessage(BaseModel):
     payload: Optional[Any] = None
 
 
+class TimeoutMessage(BaseModel):
+    type: Literal['timeout'] = 'timeout'
+    stepIndex: Optional[int] = None
+    screenId: Optional[str] = None
+
+
+class BackMessage(BaseModel):
+    type: Literal['back'] = 'back'
+
+
 class RestartMessage(BaseModel):
     type: Literal['restart'] = 'restart'
 
 
 class GotoMessage(BaseModel):
     type: Literal['goto'] = 'goto'
-    nodeId: str
+    screenId: Optional[str] = None
+    nodeId: Optional[str] = None
+
+    @model_validator(mode='after')
+    def validate_target(self):
+        if bool(self.screenId) == bool(self.nodeId):
+            raise ValueError('exactly one of screenId or nodeId is required')
+        return self
 
 
 class QueryMessage(BaseModel):
     type: Literal['query'] = 'query'
+    queryId: Optional[str] = None
     query: str
+    screenId: Optional[str] = None
+    blockId: Optional[str] = None
     nodeId: Optional[str] = None
 
 
 class ChoiceOption(BaseModel):
     handle: str
     label: str
+    source: str = 'advance'
+    blockId: Optional[str] = None
 
 
-class NodeFrame(BaseModel):
-    type: Literal['node'] = 'node'
+class ScreenFrame(BaseModel):
+    type: Literal['screen'] = 'screen'
     sessionId: str
     graphVersion: int
     stepIndex: int
-    node: dict
-    choices: list[ChoiceOption]
+    screen: dict
+    blocks: list[dict] = Field(default_factory=list)
+    choices: list[ChoiceOption] = Field(default_factory=list)
+    timeoutMs: Optional[int] = None
 
 
 class EndFrame(BaseModel):
@@ -66,6 +91,7 @@ class ErrorFrame(BaseModel):
 class QueryResultFrame(BaseModel):
     type: Literal['query_result'] = 'query_result'
     sessionId: str
+    queryId: Optional[str] = None
     decision: str
     targetNodeId: Optional[str] = None
     targetNodeType: Optional[str] = None
@@ -75,6 +101,12 @@ class QueryResultFrame(BaseModel):
     citations: Any = None
     confidence: float = 0.5
     reason: str = ""
+
+
+class ChatHistoryFrame(BaseModel):
+    type: Literal['chat_history'] = 'chat_history'
+    sessionId: str
+    messages: list[dict] = Field(default_factory=list)
 
 
 class GraphChangedWebhook(BaseModel):

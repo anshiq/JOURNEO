@@ -5,31 +5,40 @@ from app.sessions import engine as E
 
 def graph():
     return {
+        "theme": {},
+        "askAi": {"ragK": 8},
+        "screens": [
+            {"id": "s1", "blocks": ["p"], "advance": {"mode": "button", "handle": "default"}},
+        ],
         "nodes": [
             {"id": "t", "type": "trigger", "config": {}},
             {"id": "p", "type": "text", "config": {"content": "iPhone 15 Pro price 999 camera details"}},
-            {"id": "q", "type": "ask_ai", "config": {"ragK": 8}},
             {"id": "e", "type": "end", "config": {}},
         ],
         "edges": [
-            {"id": "e1", "source": "t", "target": "p"},
-            {"id": "e2", "source": "p", "target": "e"},
+            {"id": "e1", "source": "t", "target": "s1"},
+            {"id": "e2", "source": "s1", "target": "e"},
         ],
     }
 
 
 def apple_graph():
     return {
+        "theme": {},
+        "askAi": {},
+        "screens": [
+            {"id": "s1", "blocks": ["n2"], "advance": {"mode": "button", "handle": "default"}},
+            {"id": "s2", "blocks": ["n5"], "advance": {"mode": "button", "handle": "default"}},
+        ],
         "nodes": [
             {"id": "t", "type": "trigger", "config": {}},
             {"id": "n2", "type": "hero_section", "config": {"headline": "iPhone 15 Pro", "subheadline": "Titanium. So strong. So light. So Pro.", "ctas": [{"label": "Buy from $999"}]}},
             {"id": "n5", "type": "text", "config": {"content": "iPhone 15 Pro price 999 camera details"}},
-            {"id": "q", "type": "ask_ai", "config": {}},
             {"id": "e", "type": "end", "config": {}},
         ],
         "edges": [
-            {"id": "e1", "source": "t", "target": "n2"},
-            {"id": "e2", "source": "n2", "target": "e"},
+            {"id": "e1", "source": "t", "target": "s1"},
+            {"id": "e2", "source": "s1", "target": "e"},
         ],
     }
 
@@ -62,7 +71,7 @@ def test_summarize_captures_text_and_scalars():
     s = Q.summarize_graph(graph())
     by_id = {x["id"]: x for x in s}
     assert "iphone" in by_id["p"]["text"].lower()
-    assert "q" not in by_id
+    assert by_id["p"]["screenId"] == "s1"
 
 
 def test_parse_llm_output():
@@ -80,12 +89,12 @@ def test_prompt_contains_graph_and_chunks(monkeypatch):
     assert "Warranty two years" in prompt
 
 
-def test_jump_from_journey(monkeypatch):
+def test_jump_from_journey_resolves_screen(monkeypatch):
     mock_llm(monkeypatch, {"targetNodeId": "n2", "confidence": 0.9, "answer": "It is the iPhone 15 Pro.", "reason": "name"})
     mock_retrieval(monkeypatch, [])
     out = Q.resolve_query({"query": "which model?", "journey_graph": apple_graph(), "config": {}, "attempt": 1})
     assert out["decision"] == "jump"
-    assert out["target_node_id"] == "n2"
+    assert out["target_node_id"] == "s1"
     assert out["target_node_type"] == "hero_section"
     assert out["answer"] == "It is the iPhone 15 Pro."
     assert (out.get("target_node_details") or {}).get("title") == "iPhone 15 Pro"
@@ -135,8 +144,8 @@ def test_unknown_node_id_treated_as_message(monkeypatch):
     assert out.get("target_node_id") is None
 
 
-def test_floating_node_never_jumped(monkeypatch):
-    mock_llm(monkeypatch, {"targetNodeId": "q", "confidence": 0.95, "answer": "Ask me.", "reason": "bad"})
+def test_flow_node_never_jumped(monkeypatch):
+    mock_llm(monkeypatch, {"targetNodeId": "t", "confidence": 0.95, "answer": "Start.", "reason": "bad"})
     mock_retrieval(monkeypatch, [])
     out = Q.resolve_query({"query": "x?", "journey_graph": graph(), "config": {}, "attempt": 1})
     assert out["decision"] == "rag"
@@ -201,31 +210,18 @@ def test_template_answer_fallback():
     assert Q.template_answer({}) == ""
 
 
-def test_engine_ask_ai_helpers():
+def test_engine_ask_ai_fixture():
     g = graph()
-    assert E.find_ask_ai_node(g)["id"] == "q"
     assert E.ask_ai_config(g)["ragK"] == 8
-    assert E.ask_ai_config(g, "q")["ragK"] == 8
-    assert E.ask_ai_config({"nodes": [], "edges": []}) == {}
-    assert E.entry_node(g)["id"] == "t"
-    floating_only = {"nodes": [{"id": "q", "type": "ask_ai", "config": {}}], "edges": []}
-    assert E.entry_node(floating_only)["id"] == "q"
+    assert E.ask_ai_config(g, "s1")["ragK"] == 8
+    assert E.ask_ai_config({"nodes": [], "edges": [], "screens": []}) == {}
+    assert E.entry_vertex(g)["id"] == "s1"
 
 
-def test_jump_to_floating_node_always_reachable():
-    from app.sessions.store import new_session
-    g = graph()
-    nodes = E.node_index(g)
-    sess = new_session("j", "c", "test", 1, "t")
-    kind, _, target = E.jump_to(sess, g, nodes, "q")
-    assert kind == "moved" and target == "q"
-    assert sess["current_id"] == "q"
-
-
-def test_summarize_excludes_floating_node():
-    s = Q.summarize_graph(graph())
-    assert all(x["type"] != "ask_ai" for x in s)
-    assert any(x["id"] == "p" for x in s)
+def test_summarize_tags_screen():
+    s = Q.summarize_graph(apple_graph())
+    assert all("screenId" in x for x in s)
+    assert any(x["id"] == "n2" for x in s)
 
 
 def test_fallback_model_used_when_primary_fails(monkeypatch):

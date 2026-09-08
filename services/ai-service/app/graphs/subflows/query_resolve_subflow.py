@@ -11,12 +11,28 @@ CONFIDENCE_BAR = 0.5
 
 
 def summarize_graph(graph, limit=60, chars=220):
-    nodes = (graph or {}).get("nodes", []) if isinstance(graph, dict) else []
-    out = []
-    for n in nodes[:limit]:
-        if not isinstance(n, dict):
+    g = graph if isinstance(graph, dict) else {}
+    nodes = g.get("nodes", []) if isinstance(g.get("nodes", []), list) else []
+    by_id = {n.get("id"): n for n in nodes if isinstance(n, dict) and n.get("id")}
+    owner = {}
+    for s in g.get("screens", []) or []:
+        if not isinstance(s, dict):
             continue
-        if (n.get("type") or "") == "ask_ai":
+        for b in s.get("blocks", []) or []:
+            owner[b] = s.get("id")
+    order = []
+    for s in g.get("screens", []) or []:
+        if not isinstance(s, dict):
+            continue
+        for b in s.get("blocks", []) or []:
+            if b in by_id:
+                order.append(by_id[b])
+    for n in nodes:
+        if isinstance(n, dict) and n.get("id") and n.get("id") not in owner and (n.get("type") or "") in ("trigger", "condition", "end"):
+            order.append(n)
+    out = []
+    for n in order[:limit]:
+        if not isinstance(n, dict):
             continue
         cfg = n.get("config") if isinstance(n.get("config"), dict) else {}
         parts = []
@@ -43,7 +59,7 @@ def summarize_graph(graph, limit=60, chars=220):
         ctas = cfg.get("ctas")
         if isinstance(ctas, list) and ctas:
             parts.append("ctas:" + "|".join([str(c.get("label") if isinstance(c, dict) else c)[:60] for c in ctas[:4]]))
-        out.append({"id": n.get("id"), "type": n.get("type"), "text": " ".join(parts)[:600]})
+        out.append({"id": n.get("id"), "type": n.get("type"), "screenId": owner.get(n.get("id")), "text": " ".join(parts)[:600]})
     return out
 
 
@@ -182,6 +198,12 @@ def resolve_query(state: DecisionState):
     node_ids = {n.get("id") for n in nodes if isinstance(n, dict) and n.get("id")}
     id_to_node = {n.get("id"): n for n in nodes if isinstance(n, dict) and n.get("id")}
     id_to_type = {nid: (n.get("type") or "") for nid, n in id_to_node.items()}
+    owner = {}
+    for s in (graph.get("screens", []) if isinstance(graph, dict) else []) or []:
+        if not isinstance(s, dict):
+            continue
+        for b in s.get("blocks", []) or []:
+            owner[b] = s.get("id")
     summary = summarize_graph(graph)
     chunks = []
     if allow_rag:
@@ -194,11 +216,12 @@ def resolve_query(state: DecisionState):
     except Exception as e:
         return out_of_context(refusal, f"llm-error:{str(e)[:120]}", attempt, kb_results={"results": chunks})
     kb = {"results": chunks}
-    if tid and tid in node_ids and id_to_type.get(tid) != "ask_ai" and conf >= CONFIDENCE_BAR and allow_jump:
+    if tid and tid in node_ids and id_to_type.get(tid) not in ("ask_ai", "trigger", "condition", "end") and conf >= CONFIDENCE_BAR and allow_jump:
+        jump_target = owner.get(tid, tid)
         details = node_details(id_to_node.get(tid))
         final = answer or template_answer(details) or tid
         cits = [{"chunk_id": c.get("chunk_id"), "snippet": (c.get("content") or "")[:200], "similarity": c.get("similarity")} for c in chunks]
-        return {"decision": "jump", "branch": "jump", "outcome": final[:1200], "answer": final[:1200], "target_node_id": tid, "target_node_type": id_to_type.get(tid, ""), "target_node_summary": node_summary_text(id_to_node.get(tid)), "target_node_details": details, "citations": cits, "confidence": conf, "reason": reason, "attempt": attempt, "kb_results": kb}
+        return {"decision": "jump", "branch": "jump", "outcome": final[:1200], "answer": final[:1200], "target_node_id": jump_target, "target_node_type": id_to_type.get(tid, ""), "target_node_summary": node_summary_text(id_to_node.get(tid)), "target_node_details": details, "citations": cits, "confidence": conf, "reason": reason, "attempt": attempt, "kb_results": kb}
     if answer:
         cits = [{"chunk_id": c.get("chunk_id"), "snippet": (c.get("content") or "")[:200], "similarity": c.get("similarity")} for c in chunks]
         return {"decision": "rag", "branch": "rag_answered", "outcome": answer[:1200], "answer": answer[:1200], "citations": cits, "confidence": conf or 0.6, "reason": reason, "attempt": attempt, "kb_results": kb}

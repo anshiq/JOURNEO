@@ -16,12 +16,13 @@ class RunSession(Base):
     completed_at = Column(DateTime, nullable=True)
 
 
-class RunNodeExecution(Base):
-    __tablename__ = "run_node_executions"
+
+class RunScreenExecution(Base):
+    __tablename__ = "run_screen_executions"
     id = Column(Integer, primary_key=True, autoincrement=True)
     session_id = Column(String, index=True)
-    node_id = Column(String)
-    node_type = Column(String)
+    screen_id = Column(String)
+    block_ids = Column(Text, nullable=True)
     handle = Column(String, nullable=True)
     status = Column(String)
     profile_json = Column(JSON, nullable=True)
@@ -48,10 +49,13 @@ def save_session(sess, request_id=None):
         db.close()
 
 
-def save_execution(session_id, node_id, node_type, handle, profile):
+def save_execution(session_id, screen_id, block_ids, handle, profile):
     db = SessionLocal()
     try:
-        db.add(RunNodeExecution(session_id=session_id, node_id=node_id, node_type=node_type, handle=handle, status="served", profile_json=dict(profile or {})))
+        import json
+        bids = block_ids if isinstance(block_ids, str) else json.dumps(block_ids or [])
+        db.add(RunScreenExecution(session_id=session_id, screen_id=screen_id, block_ids=bids, handle=handle, status="served", profile_json=dict(profile or {})))
+
         db.commit()
     finally:
         db.close()
@@ -84,7 +88,7 @@ def get_session_with_executions(session_id):
         row = db.query(RunSession).filter(RunSession.id == session_id).first()
         if row is None:
             return None
-        execs = db.query(RunNodeExecution).filter(RunNodeExecution.session_id == session_id).order_by(RunNodeExecution.id.asc()).all()
+        execs = db.query(RunScreenExecution).filter(RunScreenExecution.session_id == session_id).order_by(RunScreenExecution.id.asc()).all()
         return {
             "id": row.id,
             "journeyId": row.journey_id,
@@ -94,7 +98,7 @@ def get_session_with_executions(session_id):
             "status": row.status,
             "createdAt": row.created_at.isoformat() if row.created_at else None,
             "completedAt": row.completed_at.isoformat() if row.completed_at else None,
-            "executions": [{"nodeId": e.node_id, "nodeType": e.node_type, "handle": e.handle, "status": e.status, "createdAt": e.created_at.isoformat() if e.created_at else None} for e in execs],
+            "executions": [{"screenId": e.screen_id, "blockIds": e.block_ids, "handle": e.handle, "status": e.status, "createdAt": e.created_at.isoformat() if e.created_at else None} for e in execs],
         }
     finally:
         db.close()

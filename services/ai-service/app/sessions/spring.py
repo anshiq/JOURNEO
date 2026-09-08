@@ -40,7 +40,11 @@ def parse_graph(graph_json):
         raw = {}
     nodes = raw.get("nodes", []) if isinstance(raw.get("nodes", []), list) else []
     edges = raw.get("edges", []) if isinstance(raw.get("edges", []), list) else []
-    return {"nodes": nodes, "edges": edges, "theme": raw.get("theme", {})}
+    screens = raw.get("screens", []) if isinstance(raw.get("screens", []), list) else []
+    ask_ai = raw.get("askAi")
+    if ask_ai is not None and not isinstance(ask_ai, dict):
+        ask_ai = None
+    return {"nodes": nodes, "edges": edges, "screens": screens, "theme": raw.get("theme", {}), "askAi": ask_ai}
 
 
 def pick_journey(journey, mode, journey_id=None):
