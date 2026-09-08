@@ -41,3 +41,26 @@ test('the screen palette item creates an empty screen', () => {
   expect(graph.screens).toHaveLength(1)
   expect(graph.screens[0].blocks).toEqual([])
 })
+
+test('deleting a screen from the canvas removes it and its blocks', () => {
+  const seen: JourneyGraph[] = []
+  render(<Harness onGraph={g => seen.push(g)} />)
+  fireEvent.doubleClick(screen.getByTestId('palette-item-text'))
+  expect(seen[seen.length - 1].screens).toHaveLength(1)
+  fireEvent.click(screen.getByLabelText('Delete screen'))
+  const graph = seen[seen.length - 1]
+  expect(graph.screens).toHaveLength(0)
+  expect(graph.nodes).toHaveLength(0)
+})
+
+test('deleting a screen does not resurrect it as an empty ghost on the next sync', () => {
+  const seen: JourneyGraph[] = []
+  render(<Harness onGraph={g => seen.push(g)} />)
+  fireEvent.doubleClick(screen.getByTestId('palette-item-trigger'))
+  fireEvent.doubleClick(screen.getByTestId('palette-item-text'))
+  fireEvent.click(screen.getByLabelText('Delete screen'))
+  fireEvent.doubleClick(screen.getByTestId('palette-item-end'))
+  const graph = seen[seen.length - 1]
+  expect(graph.screens).toHaveLength(0)
+  expect(graph.nodes.map(n => n.type).sort()).toEqual(['end', 'trigger'])
+})

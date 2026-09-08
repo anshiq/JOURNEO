@@ -317,12 +317,13 @@ export function toFlow(g: JourneyGraph): { nodes: Node[]; edges: Edge[] } {
 }
 
 export function fromFlow(nodes: Node[], edges: Edge[], theme: ThemeConfig, prevScreens?: Screen[], prevAskAi?: AskAiFixture | null): JourneyGraph {
+  const prevScreenById = new Map<string, Screen>()
+  for (const s of prevScreens || []) prevScreenById.set(s.id, s)
   const screenById = new Map<string, Screen>()
-  for (const s of prevScreens || []) screenById.set(s.id, { ...s, blocks: [] })
   for (const n of nodes) {
     if (n.type === 'screenNode') {
       const d = (n.data || {}) as any
-      const prev = screenById.get(n.id)
+      const prev = prevScreenById.get(n.id)
       const s: Screen = {
         id: n.id,
         name: d.screen?.name || prev?.name || 'Screen',

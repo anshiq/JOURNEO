@@ -8,7 +8,7 @@ from app.db.models.knowledge import KnowledgeSource, DocumentChunk
 from app.db.models.proposals import ActionProposal
 from app.db.models.anomaly import AnomalyEvent
 from app.db.models.eval import EvalRun
-from app.sessions.persistence import RunSession, RunNodeExecution, RunActivityEvent
+from app.sessions.persistence import RunSession, RunScreenExecution, RunActivityEvent
 from sqlalchemy import text
 
 app=FastAPI(title="Journeo AI Service", version="0.1.0")
