@@ -9,7 +9,6 @@ import { inputDefinition } from '../input'
 import { selectDefinition } from '../select'
 import { checkboxDefinition } from '../checkbox'
 import { ratingDefinition } from '../rating'
-import { containerDefinition } from '../container'
 import { dividerDefinition } from '../divider'
 import { cardDefinition } from '../card'
 import { heroSectionDefinition } from '../hero_section'
@@ -18,7 +17,6 @@ import { formDefinition } from '../form'
 import { countdownDefinition } from '../countdown'
 import { alertDefinition } from '../alert'
 import { badgeDefinition } from '../badge'
-import { askAiDefinition } from '../ask_ai'
 
 export const nodeRegistry = {
   trigger: triggerDefinition,
@@ -32,7 +30,6 @@ export const nodeRegistry = {
   select: selectDefinition,
   checkbox: checkboxDefinition,
   rating: ratingDefinition,
-  container: containerDefinition,
   divider: dividerDefinition,
   card: cardDefinition,
   hero_section: heroSectionDefinition,
@@ -41,19 +38,18 @@ export const nodeRegistry = {
   countdown: countdownDefinition,
   alert: alertDefinition,
   badge: badgeDefinition,
-  ask_ai: askAiDefinition,
 } as const
 
 export type RegistryType = typeof nodeRegistry
 export type NodeType = keyof RegistryType
 export const allNodeTypes = Object.keys(nodeRegistry) as NodeType[]
 export const nodeCategories: Record<string, NodeType[]> = {
-  'Flow': ['trigger','condition','end'],
-  'Content': ['text','image','video','badge','alert'],
-  'Form': ['button','input','select','checkbox','rating'],
-  'Layout': ['container','divider'],
-  'Display': ['card','hero_section'],
-  'Interactive': ['quiz','form','countdown','ask_ai'],
+  'Flow': ['trigger', 'condition', 'end'],
+  'Content': ['text', 'image', 'video', 'badge', 'alert'],
+  'Form': ['button', 'input', 'select', 'checkbox', 'rating'],
+  'Layout': ['divider'],
+  'Display': ['card', 'hero_section'],
+  'Interactive': ['quiz', 'form', 'countdown'],
 }
 export const nodeInfo: Record<NodeType, string> = {
   trigger: 'Journey entry point',
@@ -67,7 +63,6 @@ export const nodeInfo: Record<NodeType, string> = {
   select: 'Dropdown select',
   checkbox: 'Checkbox input',
   rating: 'Star rating',
-  container: 'Layout container',
   divider: 'Separator line',
   card: 'Content card',
   hero_section: 'Hero banner',
@@ -76,9 +71,7 @@ export const nodeInfo: Record<NodeType, string> = {
   countdown: 'Countdown timer',
   alert: 'Alert notification',
   badge: 'Label tag',
-  ask_ai: 'Floating AI query',
 }
-export const branchCapableNodeTypes: NodeType[] = ['condition','quiz','video']
 export function getDefinition(type: string) { return (nodeRegistry as any)[type] }
 export function getSchema(type: string) { return (nodeRegistry as any)[type]?.schema }
 export function getDefaultConfig(type: string) { return (nodeRegistry as any)[type]?.defaultConfig }

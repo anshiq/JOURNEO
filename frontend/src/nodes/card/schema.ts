@@ -5,5 +5,5 @@ export const cardSchema = z.object({
   badge: z.string().optional(),
   title: z.string().optional(),
   description: z.string().optional(),
-  actions: z.array(z.object({ label: z.string(), variant: z.enum(['solid', 'outline', 'ghost']) })).optional(),
+  actions: z.array(z.object({ label: z.string(), variant: z.enum(['solid', 'outline', 'ghost']), handle: z.string().optional() })).optional(),
 })

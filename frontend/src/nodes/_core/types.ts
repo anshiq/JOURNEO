@@ -86,6 +86,19 @@ export const styleSchema = z.object({
   ...effectsSchema.shape,
 })
 export type NodeStyle = z.infer<typeof styleSchema>
+export const MAX_TIMEOUT_SECONDS = 86400
+export const nodeBlockSchema = z.object({
+  blockKey: z.string().regex(/^[a-zA-Z0-9_]{1,40}$/).optional(),
+  blockRequired: z.boolean().optional(),
+  blockOwnsExit: z.boolean().optional(),
+  blockSpan: z.number().int().min(1).max(12).optional(),
+  blockVisibleWhen: z.object({
+    field: z.string().min(1),
+    operator: z.enum(['eq', 'neq', 'contains', 'gt', 'lt', 'gte', 'lte']),
+    value: z.any(),
+  }).optional(),
+})
+export type NodeBlock = z.infer<typeof nodeBlockSchema>
 export type NodeType = string
 export interface ThemeConfig { primary: string; accent: string; surface: string; foreground: string; font: string; radius: number; cta: string }
 export interface NodeDefinition<C = any> {
@@ -96,6 +109,10 @@ export interface NodeDefinition<C = any> {
   schema: z.ZodTypeAny
   defaultConfig: C
   handles?: { inputs: number; outputs: string[] }
+  renderable?: boolean
+  valueType?: boolean
+  canOwnExit?: boolean
+  exitHandles?: string[]
   Device?: React.FC<any>
   JourneyConfig?: React.FC<any>
   StyleConfig?: React.FC<any>

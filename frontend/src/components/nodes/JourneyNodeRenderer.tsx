@@ -1,7 +1,7 @@
 import { Handle, Position, type NodeProps } from 'reactflow'
 import {
   Zap, GitBranch, Flag, MessageCircle,
-  Type, Image, Video, MousePointer, Square, List, CheckSquare, Star, Minus, Layout, Bell, CreditCard, Clock, AlertTriangle,
+  Type, Image, Video, MousePointer, Square, List, CheckSquare, Star, Minus, Bell, CreditCard, Clock, AlertTriangle,
 } from 'lucide-react'
 import { nodeRegistry } from '../../nodes/_core/registry'
 import { cn } from '../../lib/utils'
@@ -19,7 +19,7 @@ const ICONS: Record<string, any> = {
   select: List,
   checkbox: CheckSquare,
   rating: Star,
-  container: Layout,
+
   divider: Minus,
   card: CreditCard,
   hero_section: Image,
@@ -113,6 +113,7 @@ export default function JourneyNodeRenderer({ data, selected }: NodeProps) {
   const frame = CATEGORY_FRAME[category] || CATEGORY_FRAME.content
   const header = CATEGORY_HEADER[category] || CATEGORY_HEADER.content
   const handles = OUTCOME_HANDLES[type]
+  const isBlock = Boolean(data.isBlock)
   const isFloating = FLOATING_NODE_TYPES.includes(type)
   const hasError = !!data.hasError
   const isHighlighted = !!data.isHighlighted
@@ -124,7 +125,7 @@ export default function JourneyNodeRenderer({ data, selected }: NodeProps) {
       hasError && 'outline outline-2 outline-rouge outline-offset-2',
       isHighlighted && 'outline outline-1 outline-rouge outline-offset-2',
     )}>
-      {!isFloating && <Handle type="target" position={Position.Left} className="!border-background !bg-foreground" />}
+      {!isBlock && !isFloating && <Handle type="target" position={Position.Left} className="!border-background !bg-foreground" />}
       <div className={cn('flex items-center gap-2 border-b border-border px-3 py-2', header)}>
         <Icon size={14} className="flex-shrink-0" />
         <span className="text-eyebrow truncate">{type.replace(/_/g, ' ')}</span>
@@ -134,12 +135,12 @@ export default function JourneyNodeRenderer({ data, selected }: NodeProps) {
       <div className="p-3">
         <Preview type={type} config={data.config} />
       </div>
-      {!isFloating && (handles
+      {!isBlock && !isFloating && (handles
         ? <div className="flex justify-between px-3 pb-1 font-mono text-[9px] text-muted-foreground">
             {handles.map(h => <span key={h}>{h}</span>)}
           </div>
         : null)}
-      {!isFloating && (handles
+      {!isBlock && !isFloating && (handles
         ? handles.map((h, i) => (
             <Handle key={h} id={h} type="source" position={Position.Right}
               style={{ top: `${35 + i * 20}%` }} className="!border-background !bg-foreground" />

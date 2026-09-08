@@ -19,11 +19,13 @@ export interface AdLayoutTokens {
   stagePadding: number
   contentMaxWidth: number
   cardPadding: number
+  blockGap: number
+  advanceBarHeight: number
 }
 export const AD_LAYOUT: Record<ViewportKind, AdLayoutTokens> = {
-  mobile: { stagePadding: 16, contentMaxWidth: 420, cardPadding: 16 },
-  tablet: { stagePadding: 32, contentMaxWidth: 640, cardPadding: 24 },
-  desktop: { stagePadding: 48, contentMaxWidth: 880, cardPadding: 32 },
+  mobile: { stagePadding: 16, contentMaxWidth: 420, cardPadding: 16, blockGap: 12, advanceBarHeight: 56 },
+  tablet: { stagePadding: 32, contentMaxWidth: 640, cardPadding: 24, blockGap: 16, advanceBarHeight: 64 },
+  desktop: { stagePadding: 48, contentMaxWidth: 880, cardPadding: 32, blockGap: 20, advanceBarHeight: 64 },
 }
 export function isViewportId(value: unknown): value is ViewportId {
   return typeof value === 'string' && value in DEVICE_VIEWPORTS

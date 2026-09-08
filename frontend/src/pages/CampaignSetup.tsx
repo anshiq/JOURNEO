@@ -12,7 +12,7 @@ import { bus, useEvent } from '../lib/eventBus'
 import { DEVICE_VIEWPORTS, isViewportId } from '../lib/viewports'
 import { devLinkFor } from '../lib/devLink'
 import { useCampaignJourney } from '../hooks/useCampaignJourney'
-import { hasContent, effectiveTheme, THEME_PRESETS } from '../lib/journeyGraph'
+import { hasContent, THEME_PRESETS } from '../lib/journeyGraph'
 import {
   ArrowLeft,
   ArrowRight,
@@ -333,8 +333,7 @@ export default function CampaignSetup() {
 
   const updateNodeTheme = (key: keyof Theme, value: string | number) => {
     if (!selectedNodeId) return
-    journey.applyNodePatch(selectedNodeId, { theme: { [key]: value } })
-    bus.emit('node:update', { nodeId: selectedNodeId, config: { theme: { [key]: value } } })
+    journey.applyGraph({ ...journey.graph, theme: { ...journey.graph.theme, [key]: value } })
   }
 
   const updateNodeStyle = (key: keyof NodeStyle, value: any) => {
@@ -480,7 +479,7 @@ export default function CampaignSetup() {
 
   const styleableNodes = useMemo(() => journey.graph.nodes.filter(n => getStyleConfig(n.type) != null), [journey.graph])
   const selectedNode = selectedNodeId ? journey.graph.nodes.find(n => n.id === selectedNodeId) ?? null : null
-  const selectedNodeTheme = useMemo(() => effectiveTheme(journey.graph, selectedNodeId), [journey.graph, selectedNodeId])
+  const selectedNodeTheme = useMemo(() => journey.graph.theme, [journey.graph.theme])
   const progressPct = useMemo(() => {
     const known = [Boolean(name.trim()), Boolean(journey.journeyId), hasContent(journey.graph), Boolean(knowledgeStatus?.kind === 'success'), Boolean(publishStatus?.kind === 'success')]
     const done = known.filter(Boolean).length
@@ -682,7 +681,7 @@ export default function CampaignSetup() {
                   start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined }}
                   viewportId="iphone14"
                   studio
-                  askAiConfig={hasContent(journey.graph) ? (journey.graph.nodes.find(n => n.type === 'ask_ai')?.config ?? null) : undefined}
+                  askAiConfig={hasContent(journey.graph) ? journey.graph.askAi : undefined}
                 />
               </div>
             )}
@@ -703,7 +702,7 @@ export default function CampaignSetup() {
                     <div className="flex min-h-0 flex-1 flex-col p-2">
                       {hasContent(journey.graph) ? (
                         <div className="h-full min-h-[420px]">
-                          <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={journey.graph.nodes.find(n => n.type === 'ask_ai')?.config ?? null} />
+                          <LiveAdStage start={{ mode: 'test', campaignId: id, journeyId: journey.journeyId || undefined, devToken: campaign?.devToken }} viewportId={viewportForDevice(expDevice)} device={expDevice} framed studio askAiConfig={journey.graph.askAi} />
                         </div>
                       ) : (
                         <div className="flex h-full min-h-[320px] items-center justify-center rounded-none border border-dashed bg-muted/20">
@@ -739,7 +738,7 @@ export default function CampaignSetup() {
                             <Badge variant="outline" className="font-mono text-[10px]">{selectedNode.id.slice(0,6)}</Badge>
                           </div>
                           <StyleConfigRouter type={selectedNode.type} style={selectedNode.config.style || {}} onChange={(k,v)=> updateNodeStyle(k,v)} theme={selectedNodeTheme} config={selectedNode.config} onConfigChange={updateNodeConfig} />
-                          <Button variant="outline" size="sm" onClick={() => selectedNodeId && journey.applyNodePatch(selectedNodeId, { style: null, theme: null })} className="w-full gap-2">Reset node style</Button>
+                          <Button variant="outline" size="sm" onClick={() => selectedNodeId && journey.applyNodePatch(selectedNodeId, { style: null })} className="w-full gap-2">Reset node style</Button>
                           <Button variant="ghost" size="sm" onClick={() => { setSelectedNodeId(null); bus.emit('node:select', { nodeId: null, source: 'toolbar' }) }} className="w-full">Close</Button>
                         </div>
                       ) : (

@@ -87,7 +87,7 @@ test('concurrent save calls are coalesced into a single extra request', async ()
 test('empty-graph guard refuses to persist an empty graph over a saved non-empty journey', async () => {
   mockedApi.get.mockResolvedValue({
     status: 200,
-    data: { id: 'j1', status: 'DRAFT', graphJson: JSON.stringify({ schemaVersion: 2, theme: {}, nodes: [{ id: 'n1', type: 'trigger', position: { x: 0, y: 0 }, config: {} }], edges: [] }) },
+    data: { id: 'j1', status: 'DRAFT', graphJson: JSON.stringify({ schemaVersion: 3, theme: {}, screens: [{ id: 's1', blocks: ['b1'], layout: {}, advance: { mode: 'button', handle: 'default' }, back: { show: false } }], nodes: [{ id: 'n1', type: 'trigger', position: { x: 0, y: 0 }, config: {} }, { id: 'b1', type: 'text', position: { x: 0, y: 0 }, config: { content: 'hello' } }], edges: [] }) },
   })
   const { result } = renderHook(() => useCampaignJourney('c1'))
   await act(async () => { await result.current.load() })

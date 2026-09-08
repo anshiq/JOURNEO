@@ -5,5 +5,5 @@ export const heroSectionSchema = z.object({
   subheadline: z.string().optional(),
   image: z.string().optional(),
   imagePosition: z.enum(['left', 'right', 'background']).default('right'),
-  ctas: z.array(z.object({ label: z.string(), variant: z.enum(['solid', 'outline']) })),
+  ctas: z.array(z.object({ label: z.string(), variant: z.enum(['solid', 'outline']), handle: z.string().optional() })).optional().default([]),
 })

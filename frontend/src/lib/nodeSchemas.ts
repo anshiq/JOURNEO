@@ -1,4 +1,4 @@
-export { nodeRegistry, allNodeTypes, nodeCategories, nodeInfo, branchCapableNodeTypes, getDefinition, getSchema, getDefaultConfig, getDevice, getJourneyConfig, getStyleConfig } from '../nodes/_core/registry'
+export { nodeRegistry, allNodeTypes, nodeCategories, nodeInfo, getDefinition, getSchema, getDefaultConfig, getDevice, getJourneyConfig, getStyleConfig } from '../nodes/_core/registry'
 export type { NodeType } from '../nodes/_core/registry'
 export { styleSchema, type NodeStyle, type ThemeConfig } from '../nodes/_core/types'
 export { validateNodeConfig, defaultConfigFor, isKnownNodeType } from '../nodes/_core/helpers'

@@ -12,4 +12,7 @@ export type Events = {
   'execution:advance': { from: string; to: string; handle?: string }
   'journey:save': { campaignId: string; graph: any }
   'journey:publish': { campaignId: string; journeyId: string }
+  'screen:select': { screenId: string | null; source: 'canvas' | 'device' | 'toolbar' }
+  'screen:update': { screenId: string; patch: any }
+  'block:reorder': { screenId: string; blocks: string[] }
 }

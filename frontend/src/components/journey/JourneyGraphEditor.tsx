@@ -7,7 +7,8 @@ import { validateGraph } from '../../lib/validation'
 import JourneyNodeRenderer from '../nodes/JourneyNodeRenderer'
 import { JourneyConfigRouter } from '../../nodes/_core/ConfigRouter'
 import { bus, useEvent } from '../../lib/eventBus'
-import { toFlow, fromFlow, patchNode, type JourneyGraph } from '../../lib/journeyGraph'
+import { toFlow, fromFlow, patchNode, defaultScreenValues, type JourneyGraph } from '../../lib/journeyGraph'
+import { defaultScreen, seedBlockKey } from '../../lib/screen'
 import { cn } from '../../lib/utils'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
@@ -21,7 +22,9 @@ import { ArrowRight, HelpCircle, Link2, Palette, Plus, Search, Trash2 } from 'lu
 
 export const NODE_DRAG_MIME = 'application/x-journey-node-type'
 
-const reactFlowNodeTypes = { journeyNode: JourneyNodeRenderer }
+import ScreenGroupRenderer from './ScreenGroupRenderer'
+
+const reactFlowNodeTypes = { journeyNode: JourneyNodeRenderer, flowNode: JourneyNodeRenderer, screenNode: ScreenGroupRenderer }
 
 export interface JourneyGraphEditorProps {
   graph: JourneyGraph
@@ -242,34 +245,46 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
     if (readOnly) return
     const src = nodes.find(n => n.id === params.source)
     const tgt = nodes.find(n => n.id === params.target)
-    if ((src?.data as any)?.type === 'ask_ai' || (tgt?.data as any)?.type === 'ask_ai') return
+    if (!src || !tgt || src.type === 'journeyNode' || tgt.type === 'journeyNode') return
     setEdges(eds => addEdge({ ...params, id: crypto.randomUUID() }, eds))
   }, [nodes, readOnly, setEdges])
 
   const addNode = useCallback((type: NodeType, position?: { x: number; y: number }) => {
     if (readOnly) return null
-    if (type === 'ask_ai') {
-      const existing = (rfInstance.current?.getNodes() || nodes).find(n => (n.data as any)?.type === 'ask_ai')
-      if (existing) {
-        onSelectNode(existing.id)
-        bus.emit('node:select', { nodeId: existing.id, source: 'canvas' })
-        return existing.id
-      }
-    }
     const nid = crypto.randomUUID()
-    const cfg = defaultConfigFor(type)
+    const cfg = { ...defaultConfigFor(type) }
+    if (['input', 'select', 'checkbox', 'rating'].includes(type) && !cfg.blockKey) cfg.blockKey = seedBlockKey()
     const pos = position || { x: 100 + Math.random() * 400, y: 100 + Math.random() * 300 }
-    const newNode: Node = { id: nid, type: 'journeyNode', position: pos, data: { label: `${type} ${nid.slice(0, 4)}`, type, config: cfg } }
-    setNodes(nds => [...nds, newNode])
+    if (type === 'trigger' || type === 'condition' || type === 'end') {
+      const flowNode: Node = { id: nid, type: 'flowNode', position: pos, data: { label: `${type} ${nid.slice(0, 4)}`, type, config: cfg } }
+      setNodes(nds => [...nds, flowNode])
+    } else {
+      const screen = defaultScreen({ id: crypto.randomUUID(), name: `${type.replace(/_/g, ' ')} screen`, position: pos, blocks: [nid] })
+      const screenNode: Node = { id: screen.id, type: 'screenNode', position: screen.position, style: { width: screen.size.width, height: screen.size.height }, data: { screen, exits: [screen.advance.handle], blockCount: 1 } }
+      const blockNode: Node = { id: nid, type: 'journeyNode', parentNode: screen.id, extent: 'parent', position: { x: 12, y: 44 }, draggable: true, data: { label: `${type} ${nid.slice(0, 4)}`, type, config: cfg, screenId: screen.id, blockIndex: 0, isBlock: true } }
+      setNodes(nds => [...nds, screenNode, blockNode])
+    }
     bus.emit('node:track', { nodeId: nid, type, viewportId: 'iphone14' as any })
     onSelectNode(nid)
     bus.emit('node:select', { nodeId: nid, source: 'canvas' })
     return nid
-  }, [nodes, readOnly, setNodes, onSelectNode])
+  }, [readOnly, setNodes, onSelectNode])
+
+  const addScreen = useCallback(() => {
+    if (readOnly) return
+    const screen = defaultScreen({ id: crypto.randomUUID(), name: `Screen ${nodes.filter(n => n.type === 'screenNode').length + 1}`, position: { x: 100, y: 100 } })
+    setNodes(nds => [...nds, { id: screen.id, type: 'screenNode', position: screen.position, style: { width: screen.size.width, height: screen.size.height }, data: { screen, exits: [screen.advance.handle], blockCount: 0 } }])
+    bus.emit('screen:select', { screenId: screen.id, source: 'canvas' })
+  }, [nodes, readOnly, setNodes])
 
   const onNodeClick = useCallback((_: any, node: Node) => {
-    onSelectNode(node.id)
     setSelectedEdgeId(null)
+    if (node.type === 'screenNode') {
+      onSelectNode(null)
+      bus.emit('screen:select', { screenId: node.id, source: 'canvas' })
+      return
+    }
+    onSelectNode(node.id)
     flashNode(node.id)
     bus.emit('node:select', { nodeId: node.id, source: 'canvas' })
   }, [flashNode, onSelectNode])
@@ -325,15 +340,12 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
   }, [addNode, readOnly])
 
   useEffect(() => {
-    const errs = validateGraph(
-      nodes.map(n => ({ id: n.id, type: (n.data as any).type, config: (n.data as any).config })),
-      edges.map(e => ({ id: e.id, source: e.source, target: e.target, sourceHandle: (e as any).sourceHandle, label: (e as any).label })),
-    )
-    const hasTrigger = nodes.some(n => (n.data as any).type === 'trigger')
-    const draft = edges.length === 0 || !hasTrigger
-    const filtered = draft ? errs.filter(e => e.message !== 'Unreachable node') : errs
+    const draftGraph = fromFlow(nodes, edges, themeRef.current, graph.screens, graph.askAi)
+    const errs = validateGraph(draftGraph)
+    const draft = edges.length === 0 || !nodes.some(n => (n.data as any).type === 'trigger')
+    const filtered = draft ? errs.filter(e => e.message !== 'Unreachable screen') : errs
     setValidation(filtered)
-  }, [nodes, edges])
+  }, [nodes, edges, graph.screens, graph.askAi])
 
   const errorNodeIds = useMemo(() => new Set(validation.map(e => e.nodeId)), [validation])
   const errorsByNode = useMemo(() => {
@@ -416,6 +428,17 @@ export default function JourneyGraphEditor({ graph, onGraphChange, selectedNodeI
           </div>
           <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
             <Input value={paletteSearch} onChange={e => setPaletteSearch(e.target.value)} placeholder="Search..." className="h-7 mb-2 text-xs" />
+            {!readOnly && (
+              <button
+                type="button"
+                data-testid="palette-item-screen"
+                onClick={addScreen}
+                className="mb-2 flex w-full items-center gap-1.5 border border-primary/40 bg-primary/5 px-1.5 py-1 text-[11px] text-primary transition-colors hover:border-primary hover:bg-primary/10"
+              >
+                <Plus className="h-3 w-3" />
+                <span className="flex-1 text-left">Screen</span>
+              </button>
+            )}
             {!readOnly && (
               <button
                 type="button"
