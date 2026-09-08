@@ -35,7 +35,9 @@ class CampaignControllerTest {
 
   private Map<String,Object> graphBody(String nodeId) {
     Map<String,Object> graph = new HashMap<>();
+    graph.put("schemaVersion", 3);
     graph.put("nodes", List.of(Map.of("id", nodeId, "type", "trigger")));
+    graph.put("screens", List.of());
     graph.put("edges", List.of());
     Map<String,Object> body = new HashMap<>();
     body.put("graph", graph);
@@ -55,7 +57,7 @@ class CampaignControllerTest {
   @Test void upsertUpdatesExistingJourneyWithoutCreatingDuplicate() {
     Journey existing = new Journey();
     existing.setCampaignId("c1");
-    existing.setGraphJson("{\"nodes\":[],\"edges\":[]}");
+    existing.setGraphJson("{\"schemaVersion\":3,\"screens\":[],\"nodes\":[],\"edges\":[]}");
     when(jourRepo.findFirstByCampaignIdOrderByCreatedAtAsc("c1")).thenReturn(Optional.of(existing));
     ResponseEntity<?> res = controller.upsertJourney("c1", graphBody("n2"));
     assertEquals(200, res.getStatusCode().value());
@@ -78,7 +80,7 @@ class CampaignControllerTest {
     Journey existing = new Journey();
     existing.setCampaignId("c1");
     existing.setVersion(1);
-    existing.setGraphJson("{\"nodes\":[{\"id\":\"t1\",\"type\":\"trigger\"},{\"id\":\"e1\",\"type\":\"end\"}],\"edges\":[{\"id\":\"e\",\"source\":\"t1\",\"target\":\"e1\"}]}");
+    existing.setGraphJson("{\"schemaVersion\":3,\"screens\":[{\"id\":\"s1\",\"blocks\":[\"b1\"],\"layout\":{},\"advance\":{\"mode\":\"button\",\"handle\":\"default\"},\"back\":{\"show\":false}}],\"nodes\":[{\"id\":\"t1\",\"type\":\"trigger\"},{\"id\":\"b1\",\"type\":\"text\",\"config\":{\"content\":\"hello\"}},{\"id\":\"e1\",\"type\":\"end\"}],\"edges\":[{\"id\":\"e1\",\"source\":\"t1\",\"target\":\"s1\"},{\"id\":\"e2\",\"source\":\"s1\",\"target\":\"e1\",\"sourceHandle\":\"default\"}]}");
     when(jourRepo.findFirstByCampaignIdOrderByCreatedAtAsc("c1")).thenReturn(Optional.of(existing));
     ResponseEntity<?> res = controller.publishJourney("c1");
     assertEquals(200, res.getStatusCode().value());
@@ -90,7 +92,7 @@ class CampaignControllerTest {
   @Test void publishFailsValidationOnEmptyGraph() {
     Journey existing = new Journey();
     existing.setCampaignId("c1");
-    existing.setGraphJson("{\"nodes\":[],\"edges\":[]}");
+    existing.setGraphJson("{\"schemaVersion\":3,\"screens\":[],\"nodes\":[],\"edges\":[]}");
     when(jourRepo.findFirstByCampaignIdOrderByCreatedAtAsc("c1")).thenReturn(Optional.of(existing));
     ResponseEntity<?> res = controller.publishJourney("c1");
     assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());

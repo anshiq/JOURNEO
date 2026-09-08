@@ -80,15 +80,16 @@ public class CampaignController {
             gj=jourRepo.findFirstByCampaignIdOrderByCreatedAtAsc(id).map(Journey::getGraphJson).orElse("{}");
         }
         var errs=new JourneyGraphValidator().validate(gj);
-        List<Map<String,String>> out=errs.stream().map(e->{Map<String,String> m=new HashMap<>(); m.put("nodeId",e.nodeId); m.put("field",e.field); m.put("message",e.message); return m;}).toList();
-        return Map.of("valid",errs.isEmpty(),"errors",out);
+        List<Map<String,String>> out=errs.stream().map(e->{Map<String,String> m=new HashMap<>(); m.put("nodeId",e.nodeId); m.put("field",e.field); m.put("message",e.message); m.put("severity",e.severity); return m;}).toList();
+        return Map.of("valid",errs.stream().noneMatch(e -> !"warning".equals(e.severity)),"errors",out);
     }
     @PostMapping("/campaigns/{id}/journey/publish") public ResponseEntity<?> publishJourney(@PathVariable String id){
         var opt=jourRepo.findFirstByCampaignIdOrderByCreatedAtAsc(id);
         if(opt.isEmpty()) return ResponseEntity.notFound().build();
         Journey j=opt.get();
         var errs=new JourneyGraphValidator().validate(j.getGraphJson());
-        if(!errs.isEmpty()) return ResponseEntity.badRequest().body(Map.of("valid",false,"errors",errs.stream().map(e->Map.of("nodeId",e.nodeId,"message",e.message)).toList()));
+        List<JourneyGraphValidator.ValidationError> blocking=errs.stream().filter(e -> !"warning".equals(e.severity)).toList();
+        if(!blocking.isEmpty()) return ResponseEntity.badRequest().body(Map.of("valid",false,"errors",errs.stream().map(e->Map.of("nodeId",e.nodeId,"message",e.message,"severity",e.severity)).toList()));
         j.setStatus("PUBLISHED");
         j.setVersion(j.getVersion()+1);
         j.setUpdatedAt(Instant.now());
