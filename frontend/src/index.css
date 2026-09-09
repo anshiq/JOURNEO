@@ -143,6 +143,17 @@
   -webkit-text-size-adjust: 100%;
 }
 
+[data-ad-stage] [data-ad-scroll],
+[data-ad-stage] [data-ask-ai-messages] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+[data-ad-stage] [data-ad-scroll]::-webkit-scrollbar,
+[data-ad-stage] [data-ask-ai-messages]::-webkit-scrollbar {
+  display: none;
+}
+
 [data-ad-stage] *,
 [data-ad-stage] *::before,
 [data-ad-stage] *::after {

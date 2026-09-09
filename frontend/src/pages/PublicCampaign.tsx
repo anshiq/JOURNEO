@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { journeyApi } from '../lib/api'
-import { DEVICE_VIEWPORTS } from '../lib/viewports'
+import { parseGraph } from '../lib/journeyGraph'
+import { DEVICE_VIEWPORTS, type ViewportId } from '../lib/viewports'
 import LiveAdStage from '../components/preview/LiveAdStage'
 import { useLiveViewport, useViewport } from '../lib/viewport'
 
@@ -12,6 +13,24 @@ function Notice({ title, body }: { title: string; body?: string }) {
       {body && <p className="mt-3 text-muted-foreground">{body}</p>}
     </main>
   )
+}
+
+function useGlobalAskAi(campaignId: string | null): any {
+  const [askAi, setAskAi] = useState<any>(undefined)
+  useEffect(() => {
+    if (!campaignId) return
+    let cancelled = false
+    journeyApi.get(`/api/campaigns/${campaignId}/journey`).then(r => {
+      if (cancelled || !r.data?.graphJson) return
+      try {
+        setAskAi(parseGraph(r.data.graphJson).askAi ?? undefined)
+      } catch {
+      }
+    }).catch(() => {
+    })
+    return () => { cancelled = true }
+  }, [campaignId])
+  return askAi
 }
 
 export default function PublicCampaign() {
@@ -31,9 +50,14 @@ function LiveAd() {
   }, [id])
   if (exists === null) return null
   if (!exists) return <Notice title="Campaign unavailable" body="This campaign link is invalid or is no longer available." />
+  return <LiveAdContent id={id} viewportId={viewportId} />
+}
+
+function LiveAdContent({ id, viewportId }: { id: string; viewportId: ViewportId }) {
+  const askAi = useGlobalAskAi(id)
   return (
     <main className="fixed inset-0 overflow-hidden">
-      <LiveAdStage start={{ mode: 'live', campaignId: id }} viewportId={viewportId} />
+      <LiveAdStage start={{ mode: 'live', campaignId: id }} viewportId={viewportId} askAiConfig={askAi} />
     </main>
   )
 }
@@ -56,6 +80,11 @@ function DevPreview({ token }: { token: string }) {
   }, [])
   if (failed) return <Notice title="Campaign unavailable" body="This dev link is invalid or has been rotated." />
   if (!campaignId) return null
+  return <DevPreviewContent token={token} campaignId={campaignId} viewportId={viewportId} setViewportId={setViewportId} />
+}
+
+function DevPreviewContent({ token, campaignId, viewportId, setViewportId }: { token: string; campaignId: string; viewportId: ViewportId; setViewportId: (v: ViewportId) => void }) {
+  const askAi = useGlobalAskAi(campaignId)
   return (
     <main className="fixed inset-0 flex flex-col bg-white">
       <div className="flex min-h-0 flex-1 flex-col p-3">
@@ -66,7 +95,7 @@ function DevPreview({ token }: { token: string }) {
           </select>
         </div>
         <div className="min-h-0 flex-1">
-          <LiveAdStage start={{ mode: 'test', campaignId, devToken: token }} viewportId={viewportId} />
+          <LiveAdStage start={{ mode: 'test', campaignId, devToken: token }} viewportId={viewportId} askAiConfig={askAi} />
         </div>
       </div>
     </main>

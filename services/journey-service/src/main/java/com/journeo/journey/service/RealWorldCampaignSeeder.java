@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.Instant;
 
 @Component
 public class RealWorldCampaignSeeder implements CommandLineRunner {
@@ -135,6 +136,8 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         campaign.setObjective(p.objective());
         campaign.setAudience(p.audience());
         campaign.setStatus("ACTIVE");
+        campaign.setDeletedAt(null);
+        campaign.setUpdatedAt(Instant.now());
         campaignRepository.save(campaign);
 
         String graphJson = serialize(buildGraph(p));
@@ -209,7 +212,6 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         a.put("allowRag", true);
         a.put("answerStyle", "thread");
         a.put("persistence", "session");
-        a.put("scope", "global");
         a.put("pinnedPanel", true);
         a.put("allowPin", true);
         a.put("allowAdjust", true);
@@ -312,6 +314,7 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         Map<String, Object> c = new LinkedHashMap<>();
         c.put("content", content);
         c.put("variant", "body");
+        c.put("style", responsiveStyle());
         return c;
     }
 
@@ -320,6 +323,7 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         c.put("src", src);
         c.put("alt", alt);
         c.put("aspectRatio", "4/3");
+        c.put("style", responsiveMediaStyle());
         return c;
     }
 
@@ -329,6 +333,7 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         c.put("controls", true);
         c.put("autoplay", false);
         c.put("loop", false);
+        c.put("style", responsiveStyle());
         return c;
     }
 
@@ -346,6 +351,7 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         c.put("allowSkip", true);
         c.put("skipLabel", "Skip question");
         c.put("submitMode", "instant");
+        c.put("style", responsiveStyle());
         return c;
     }
 
@@ -357,7 +363,22 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
         c.put("fullWidth", true);
         c.put("action", "link");
         c.put("href", href);
+        c.put("style", responsiveStyle());
         return c;
+    }
+
+    private Map<String, Object> responsiveStyle() {
+        Map<String, Object> s = new LinkedHashMap<>();
+        s.put("width", "100%");
+        s.put("maxWidth", "100%");
+        s.put("minWidth", "0px");
+        return s;
+    }
+
+    private Map<String, Object> responsiveMediaStyle() {
+        Map<String, Object> s = responsiveStyle();
+        s.put("objectFit", "cover");
+        return s;
     }
 
     private String serialize(Map<String, Object> graph) {

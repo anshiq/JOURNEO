@@ -38,7 +38,7 @@ export function validateGraph(input: any): any[] {
     }
   }
   for (const n of nodes) {
-    if (['trigger', 'condition', 'end'].includes(n.type)) continue
+    if (['trigger', 'condition', 'end', 'ask_ai'].includes(n.type)) continue
     if (!owner.has(n.id)) errs.push({ nodeId: n.id, field: 'blocks', message: 'Renderable block is not in any screen' })
   }
   const triggers = nodes.filter(n => n.type === 'trigger')
@@ -106,10 +106,6 @@ export function validateGraph(input: any): any[] {
       if (!srcScreen || !(srcScreen.blocks || []).includes(bid)) errs.push({ nodeId: e.id, field: 'edges', message: `Edge handle references block ${bid} outside source screen` })
     }
   })
-  if (g.askAi && (g.askAi as any).scope === 'per-screen') {
-    const anyEnabled = screens.some(s => s.askAi?.enabled)
-    if (!anyEnabled) errs.push({ nodeId: 'graph', field: 'askAi.scope', message: 'per-screen scope has no enabled screen', severity: 'warning' })
-  }
   const adj2 = new Map<string, any[]>()
   edges.forEach(e => {
     if (!adj2.has(e.source)) adj2.set(e.source, [])

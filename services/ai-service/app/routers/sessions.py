@@ -102,7 +102,7 @@ def screen_frame_payload(sess, graph, screen, blocks, choices, timeout_ms):
         sessionId=sess["id"],
         graphVersion=sess["graph_version"],
         stepIndex=sess["step_index"],
-        screen=engine_mod.screen_payload(screen, theme, graph.get("askAi")),
+        screen=engine_mod.screen_payload(screen, theme),
         blocks=[{"nodeId": b.get("nodeId"), "type": b.get("type"), "config": b.get("config", {})} for b in blocks],
         choices=[protocol.ChoiceOption(handle=c["handle"], label=c["label"], source=c.get("source", "advance"), blockId=c.get("blockId")) for c in choices],
         timeoutMs=timeout_ms,

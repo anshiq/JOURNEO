@@ -5,8 +5,6 @@ import { getNodeStyle } from '../../nodes/_core/preview'
 import { useScreenForm } from './useScreenForm'
 import BlockRenderer from './BlockRenderer'
 import ScreenAdvanceBar from './ScreenAdvanceBar'
-import PinnedAnswers from './PinnedAnswers'
-import { useAskAiStore, threadKeyFor } from '../../lib/askAiThread'
 import type { StartParams } from '../../lib/liveSession'
 
 export default function ScreenRenderer({ client, screen, blocks, choices, layout, start, studio, selectedBlockId, flashingBlockId, timeoutMs, onSelectBlock }: {
@@ -24,14 +22,6 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
 }) {
   const form = useScreenForm(screen.id, blocks, screen.advance || {})
   const [overlay, setOverlay] = React.useState<Record<string, { config?: any; style?: any }>>({})
-  const fixture = (screen as any).askAiFixture || (screen as any).askAi
-  const threadKey = threadKeyFor(start.mode, start.campaignId, start.journeyId)
-  const thread = useAskAiStore(state => state.threads[threadKey])
-  const ensure = useAskAiStore(state => state.ensure)
-  const patch = useAskAiStore(state => state.patchMessage)
-  React.useEffect(() => {
-    if (fixture) ensure(threadKey, fixture.historyLimit || 100)
-  }, [ensure, fixture, threadKey])
   React.useEffect(() => {
     const handler = (event: any) => {
       const p = event.detail || event
@@ -67,7 +57,6 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
     if (rule.operator === 'lte') return a <= b
     return true
   }), [mergedBlocks, form.values])
-  const pinned = React.useMemo(() => (thread?.messages || []).filter(m => m.pinned), [thread])
   const handleAdvance = React.useCallback(() => {
     const advance = screen.advance || {}
     client.sendChoice(advance.handle || 'default', form.collect())
@@ -86,14 +75,12 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
     minWidth: 0,
     width: '100%',
     boxSizing: 'border-box',
-    overflowY: screen.layout?.scroll === 'hidden' ? 'hidden' : 'auto',
+    overflowY: screen.layout?.scroll === 'hidden' ? 'hidden' : screen.layout?.scroll === 'paged' ? 'auto' : 'visible',
     overflowX: 'clip',
     scrollSnapType: screen.layout?.scroll === 'paged' ? 'y mandatory' : undefined,
-    paddingBottom: layout.advanceBarHeight,
   }
   return (
     <div className="relative w-full min-w-0 max-w-full" data-screen-id={screen.id}>
-      {fixture?.pinnedPanel && <PinnedAnswers theme={screen.theme} messages={pinned} onUnpin={id => patch(threadKey, id, { pinned: false }, fixture.historyLimit || 100)} />}
       {timeoutMs && <TimeoutCountdown timeoutMs={timeoutMs} resetKey={screen.id} />}
       <div className="mt-2" style={surfaceStyle}>
         {visibleBlocks.map(block => {

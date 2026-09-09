@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import JourneyGraphEditor from './JourneyGraphEditor'
 import { emptyGraph, type JourneyGraph } from '../../lib/journeyGraph'
+import { validateGraph } from '../../lib/validation'
 
 class FakeResizeObserver {
   observe() {}
@@ -63,4 +64,15 @@ test('deleting a screen does not resurrect it as an empty ghost on the next sync
   const graph = seen[seen.length - 1]
   expect(graph.screens).toHaveLength(0)
   expect(graph.nodes.map(n => n.type).sort()).toEqual(['end', 'trigger'])
+})
+
+test('adding an ask_ai node floats outside screens and validates clean', () => {
+  const seen: JourneyGraph[] = []
+  render(<Harness onGraph={g => seen.push(g)} />)
+  fireEvent.doubleClick(screen.getByTestId('palette-item-ask_ai'))
+  const graph = seen[seen.length - 1]
+  expect(graph.nodes.map(n => n.type)).toEqual(['ask_ai'])
+  expect(graph.screens).toHaveLength(0)
+  const errs = validateGraph(graph)
+  expect(errs.filter(e => e.nodeId !== 'graph' && e.nodeId !== 'edges')).toEqual([])
 })

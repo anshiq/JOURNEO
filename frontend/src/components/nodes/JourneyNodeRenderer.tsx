@@ -101,7 +101,7 @@ function Preview({ type, config }: { type: string; config: any }) {
     case 'badge':
       return <span className="bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{cfg.label || 'Badge'}</span>
     case 'ask_ai':
-      return <div className="text-xs text-foreground">{truncate(cfg.placeholder, 40) || 'Ask anything...'}</div>
+      return <div className="text-xs"><div className="truncate text-foreground">{truncate(cfg.placeholder, 40) || 'Ask anything...'}</div><div className="text-muted-foreground">floating · top-{cfg.style?.top || 'auto'} right-{cfg.style?.right || '16px'} bottom-{cfg.style?.bottom || '16px'}</div></div>
     default:
       return <div className="text-xs text-muted-foreground">{type}</div>
   }

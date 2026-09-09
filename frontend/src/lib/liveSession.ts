@@ -61,8 +61,6 @@ export interface LiveScreenMeta {
   style?: any
   advance: any
   back: any
-  askAi?: any
-  askAiFixture?: any
 }
 
 export type LiveState =

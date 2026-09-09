@@ -36,7 +36,7 @@ export function JourneyConfigRouter({ type, config, onChange, errors }: { type: 
   const def = getDefinition(type)
   const Cmp = def?.JourneyConfig
   if (!Cmp) return <div className="text-xs text-muted-foreground">No config for {type}</div>
-  const showBlock = !['trigger', 'condition', 'end'].includes(type)
+  const showBlock = !['trigger', 'condition', 'end', 'ask_ai'].includes(type)
   return (
     <div>
       {showBlock && <BlockMetaSection config={config} onChange={onChange} />}

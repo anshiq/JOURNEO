@@ -149,7 +149,7 @@ def screen_exits(graph, screen):
     return exits
 
 
-def screen_payload(screen, theme, ask_ai=None):
+def screen_payload(screen, theme):
     merged = dict(theme or {})
     st = screen.get("theme")
     if isinstance(st, dict):
@@ -159,7 +159,6 @@ def screen_payload(screen, theme, ask_ai=None):
     adv = screen.get("advance") or {}
     if not adv.get("handle"):
         adv = {**adv, "handle": "default"}
-    fixture = ask_ai if isinstance(ask_ai, dict) else None
     return {
         "id": screen.get("id"),
         "name": screen.get("name", ""),
@@ -168,8 +167,6 @@ def screen_payload(screen, theme, ask_ai=None):
         "style": screen.get("style"),
         "advance": adv,
         "back": screen.get("back", {"show": False, "label": "Back"}),
-        "askAi": screen.get("askAi"),
-        "askAiFixture": fixture,
     }
 
 

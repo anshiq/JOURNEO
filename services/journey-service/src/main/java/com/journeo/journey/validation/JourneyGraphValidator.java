@@ -23,8 +23,9 @@ public class JourneyGraphValidator {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Set<String> FLOW_TYPES = Set.of("trigger", "condition", "end");
+    private static final Set<String> FLOATING_TYPES = Set.of("ask_ai");
     private static final Set<String> VALUE_TYPES = Set.of("input", "select", "checkbox", "rating");
-    private static final Set<String> KNOWN_TYPES = Set.of("trigger", "condition", "end", "text", "image", "video", "button", "input", "select", "checkbox", "rating", "divider", "card", "hero_section", "quiz", "form", "countdown", "alert", "badge");
+    private static final Set<String> KNOWN_TYPES = Set.of("trigger", "condition", "end", "text", "image", "video", "button", "input", "select", "checkbox", "rating", "divider", "card", "hero_section", "quiz", "form", "countdown", "alert", "badge", "ask_ai");
     private static final Set<String> OPERATORS = Set.of("eq", "neq", "contains", "gt", "lt", "gte", "lte");
 
     public List<ValidationError> validate(String graphJson) {
@@ -94,7 +95,7 @@ public class JourneyGraphValidator {
             }
 
             for (Map.Entry<String, JsonNode> entry : nodeById.entrySet()) {
-                if (!FLOW_TYPES.contains(entry.getValue().path("type").asText()) && !ownerByBlock.containsKey(entry.getKey())) errors.add(new ValidationError(entry.getKey(), "blocks", "Renderable block is not in any screen"));
+                if (!FLOW_TYPES.contains(entry.getValue().path("type").asText()) && !FLOATING_TYPES.contains(entry.getValue().path("type").asText()) && !ownerByBlock.containsKey(entry.getKey())) errors.add(new ValidationError(entry.getKey(), "blocks", "Renderable block is not in any screen"));
             }
             if (triggerIds.size() != 1) errors.add(new ValidationError("graph", "trigger", "Exactly one trigger required, found " + triggerIds.size()));
 
@@ -116,12 +117,6 @@ public class JourneyGraphValidator {
                 Set<String> visited = reachable(triggerIds.get(0), adjacency, vertexIds);
                 for (String screenId : screenById.keySet()) if (!visited.contains(screenId)) errors.add(new ValidationError(screenId, "graph", "Unreachable screen"));
                 if (hasCycle(adjacency, vertexIds)) errors.add(new ValidationError("graph", "edges", "Cycle detected outside subflow boundary"));
-            }
-            JsonNode askAi = root.get("askAi");
-            if (askAi != null && askAi.isObject() && "per-screen".equals(askAi.path("scope").asText())) {
-                boolean enabled = false;
-                for (JsonNode screen : screens) enabled |= screen.path("askAi").path("enabled").asBoolean(false);
-                if (!enabled) errors.add(new ValidationError("graph", "askAi.scope", "per-screen scope has no enabled screen", "warning"));
             }
         } catch (Exception exception) {
             errors.add(new ValidationError("graph", "json", "Invalid JSON: " + exception.getMessage()));

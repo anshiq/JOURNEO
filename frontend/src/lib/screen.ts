@@ -73,7 +73,6 @@ export function defaultScreen(partial?: Partial<Screen>): Screen {
     advance: partial?.advance || defaultAdvance(),
     back: partial?.back || { show: false, label: 'Back' },
     timeoutSeconds: partial?.timeoutSeconds,
-    askAi: partial?.askAi,
   }
 }
 

@@ -48,13 +48,6 @@ export interface ScreenAdvance {
 
 export interface ScreenBack { show: boolean; label: string }
 
-export interface ScreenAskAi {
-  enabled: boolean
-  mode: 'floating' | 'inline'
-  inlineIndex?: number
-  pinPosition: 'top' | 'bottom'
-}
-
 export interface Screen {
   id: string
   name: string
@@ -67,7 +60,6 @@ export interface Screen {
   advance: ScreenAdvance
   back: ScreenBack
   timeoutSeconds?: number
-  askAi?: ScreenAskAi
 }
 
 export interface AskAiFixture {
@@ -80,7 +72,6 @@ export interface AskAiFixture {
   allowRag: boolean
   answerStyle: 'thread' | 'single'
   persistence: 'session' | 'screen' | 'ephemeral'
-  scope: 'global' | 'per-screen'
   pinnedPanel: boolean
   allowPin: boolean
   allowAdjust: boolean
@@ -102,6 +93,16 @@ export const EDITORIAL_THEME: ThemeConfig = { primary: '#000000', accent: '#E600
 export const THEME_PRESETS: Record<string, ThemeConfig> = { Classic: { ...DEFAULT_THEME }, Editorial: { ...EDITORIAL_THEME } }
 
 export const FLOW_TYPES = new Set(['trigger', 'condition', 'end'])
+export const FLOATING_TYPES = new Set(['ask_ai'])
+export const SCREEN_CONTENT_TOP = 44
+export const BLOCK_INSET_X = 12
+export const BLOCK_GAP = 12
+export const BLOCK_SLOT_H = 84
+export const SCREEN_FOOTER_H = 48
+export const SCREEN_MIN_H = 160
+export function screenHeightForBlockCount(count: number): number {
+  return Math.max(SCREEN_MIN_H, SCREEN_CONTENT_TOP + count * BLOCK_SLOT_H + SCREEN_FOOTER_H)
+}
 
 export function defaultAskAi(): AskAiFixture {
   return {
@@ -114,7 +115,6 @@ export function defaultAskAi(): AskAiFixture {
     allowRag: true,
     answerStyle: 'thread',
     persistence: 'session',
-    scope: 'global',
     pinnedPanel: true,
     allowPin: true,
     allowAdjust: true,
@@ -221,7 +221,6 @@ export function parseGraph(graphJson: string | null | undefined): JourneyGraph {
     },
     back: { show: Boolean(s?.back?.show), label: typeof s?.back?.label === 'string' ? s.back.label : 'Back' },
     timeoutSeconds: typeof s?.timeoutSeconds === 'number' ? s.timeoutSeconds : undefined,
-    askAi: s?.askAi && typeof s.askAi === 'object' ? s.askAi : undefined,
   }))
   const edges: GraphEdge[] = edgesRaw.map((e: any, i: number) => ({
     id: String(e?.id ?? `e-${i}`),
@@ -269,12 +268,14 @@ export function toFlow(g: JourneyGraph): { nodes: Node[]; edges: Edge[] } {
   const out: Node[] = []
   for (const s of g.screens) {
     const exits = s.advance.mode === 'button' || s.advance.mode === 'auto' ? [s.advance.handle || 'default'] : []
+    const fittedH = Math.max(s.size.height, screenHeightForBlockCount(s.blocks.length))
+    const fittedSize = { width: s.size.width, height: fittedH }
     out.push({
       id: s.id,
       type: 'screenNode',
       position: s.position,
-      style: { width: s.size.width, height: s.size.height },
-      data: { screen: s, exits, blockCount: s.blocks.length },
+      style: { width: fittedSize.width, height: fittedH },
+      data: { screen: { ...s, size: fittedSize }, exits, blockCount: s.blocks.length },
     })
   }
   const owner = blockOwnerIndex(g)
@@ -287,8 +288,7 @@ export function toFlow(g: JourneyGraph): { nodes: Node[]; edges: Edge[] } {
         id: n.id,
         type: 'journeyNode',
         parentNode: s.id,
-        extent: 'parent',
-        position: { x: 12, y: 44 + i * 84 },
+        position: { x: BLOCK_INSET_X, y: SCREEN_CONTENT_TOP + i * BLOCK_SLOT_H },
         draggable: true,
         data: { label: n.label, type: n.type, config: n.config, blockIndex: i, screenId: s.id, isBlock: true }
       })
@@ -296,6 +296,16 @@ export function toFlow(g: JourneyGraph): { nodes: Node[]; edges: Edge[] } {
   }
   for (const n of g.nodes) {
     if (owner.has(n.id)) continue
+    if (FLOATING_TYPES.has(n.type)) {
+      out.push({
+        id: n.id,
+        type: 'flowNode',
+        position: n.position,
+        draggable: true,
+        data: { label: n.label, type: n.type, config: n.config, isFloating: true },
+      })
+      continue
+    }
     if (!FLOW_TYPES.has(n.type)) continue
     out.push({
       id: n.id,
@@ -336,7 +346,6 @@ export function fromFlow(nodes: Node[], edges: Edge[], theme: ThemeConfig, prevS
         advance: d.screen?.advance || prev?.advance || { mode: 'button', handle: 'default', label: '', position: 'bottom-sticky', variant: 'solid', fullWidth: true, requireValid: true, requireBlocks: [] },
         back: d.screen?.back || prev?.back || { show: false, label: 'Back' },
         timeoutSeconds: d.screen?.timeoutSeconds ?? prev?.timeoutSeconds,
-        askAi: d.screen?.askAi ?? prev?.askAi,
       }
       screenById.set(n.id, s)
     }
@@ -423,7 +432,6 @@ export function addScreen(g: JourneyGraph, screen?: Partial<Screen>): JourneyGra
     advance: screen?.advance || { mode: 'button', handle: 'default', label: '', position: 'bottom-sticky', variant: 'solid', fullWidth: true, requireValid: true, requireBlocks: [] },
     back: screen?.back || { show: false, label: 'Back' },
     timeoutSeconds: screen?.timeoutSeconds,
-    askAi: screen?.askAi,
   }
   return { ...g, screens: [...g.screens, s] }
 }
@@ -445,7 +453,7 @@ export function groupIntoScreen(g: JourneyGraph, nodeIds: string[], screenName?:
   if (ids.length === 0) return g
   for (const id of ids) {
     const n = g.nodes.find(x => x.id === id)
-    if (n && FLOW_TYPES.has(n.type)) return g
+    if (n && (FLOW_TYPES.has(n.type) || FLOATING_TYPES.has(n.type))) return g
   }
   const owner = blockOwnerIndex(g)
   const touchedScreens = new Set<string>()

@@ -49,7 +49,7 @@ export default function AskAiOverlay({ client, config, sessionStatus, theme, sta
   return (
     <div className="absolute bottom-4 right-4 z-20 flex max-h-[60vh] w-[min(20rem,calc(100%-2rem))] min-w-0 max-w-[calc(100%-2rem)] flex-col overflow-hidden border" style={{ backgroundColor: t.surface, color: t.foreground, borderColor: t.primary, borderRadius: t.radius, fontFamily: t.font }}>
       <div className="flex items-center gap-2 border-b px-3 py-2" style={{ borderColor: t.primary + '33' }}><MessageCircle size={14} /><span className="text-xs font-semibold">Ask AI</span><span className="ml-auto text-[10px] opacity-60">{thread?.messages.filter(m => m.pinned).length || 0} pinned</span><button onClick={() => setOpen(key, false)} className="opacity-60 hover:opacity-100"><X size={14} /></button></div>
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden p-3" aria-live="polite">
+      <div data-ask-ai-messages className="min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-hidden overscroll-contain p-3" aria-live="polite">
         {(thread?.messages || []).map(message => (
           <div key={message.id} className={message.role === 'user' ? 'ml-4 border px-2 py-1.5 text-xs sm:ml-8' : 'mr-2 border px-2 py-1.5 text-xs'} style={{ borderColor: t.primary + '33', borderRadius: t.radius, opacity: message.status === 'error' ? 0.65 : 1, overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 }}>
             <div className="mb-1 text-[9px] uppercase opacity-50">{message.role}</div>

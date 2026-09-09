@@ -1,9 +1,11 @@
 import * as React from 'react'
 import type { DeviceProps } from '../_core/device'
-export const AskAiDevice: React.FC<DeviceProps> = ({ config, theme }) => {
+import { applyStyle } from '../_core/preview'
+export const AskAiDevice: React.FC<DeviceProps> = ({ config, theme, style }) => {
   const cfg = config || {}
+  const applied = applyStyle(style || {}) as React.CSSProperties
   return (
-    <div className="w-full min-w-0 max-w-full break-words border px-3 py-2 text-sm opacity-70" style={{ borderRadius: theme.radius, fontFamily: theme.font, maxWidth: '100%', boxSizing: 'border-box' }}>
+    <div className="w-full min-w-0 max-w-full break-words border px-3 py-2 text-sm opacity-70" style={{ maxWidth: '100%', boxSizing: 'border-box', ...applied, borderRadius: (applied as any).borderRadius ?? theme.radius, fontFamily: (applied as any).fontFamily || theme.font }}>
       <div className="flex min-w-0 max-w-full items-center gap-2">
         <span className="shrink-0 text-base" aria-hidden>💬</span>
         <span className="min-w-0 flex-1 truncate opacity-70">{cfg.placeholder || 'Ask anything...'}</span>

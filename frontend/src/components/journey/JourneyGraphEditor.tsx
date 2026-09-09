@@ -34,6 +34,12 @@ import {
   fromFlow,
   patchNode,
   defaultScreenValues,
+  SCREEN_CONTENT_TOP,
+  BLOCK_INSET_X,
+  BLOCK_GAP,
+  BLOCK_SLOT_H,
+  SCREEN_FOOTER_H,
+  SCREEN_MIN_H,
   type JourneyGraph,
 } from "../../lib/journeyGraph";
 import { defaultScreen, seedBlockKey } from "../../lib/screen";
@@ -88,7 +94,7 @@ export interface JourneyGraphEditorProps {
 
 function graphStructuralFingerprint(g: JourneyGraph): string {
   return JSON.stringify({
-    screens: g.screens.map((s) => s.id),
+    screens: g.screens.map((s) => [s.id, s.blocks]),
     nodes: g.nodes.map((n) => [n.id, n.type, n.config]),
     edges: g.edges.map((e) => [
       e.id,
@@ -97,6 +103,113 @@ function graphStructuralFingerprint(g: JourneyGraph): string {
       e.sourceHandle,
       e.label,
     ]),
+  });
+}
+
+function getScreenBounds(n: Node): { x: number; y: number; w: number; h: number } {
+  const dataScreen = (n.data as any)?.screen;
+  const w =
+    Number((n as any).width ?? (n.style as any)?.width ?? dataScreen?.size?.width) ||
+    320;
+  const h =
+    Number((n as any).height ?? (n.style as any)?.height ?? dataScreen?.size?.height) ||
+    420;
+  return { x: n.position.x, y: n.position.y, w, h };
+}
+
+function findScreenAtPosition(
+  screenNodes: Node[],
+  pos: { x: number; y: number },
+): string | null {
+  for (let i = screenNodes.length - 1; i >= 0; i--) {
+    const n = screenNodes[i];
+    const b = getScreenBounds(n);
+    if (pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h)
+      return n.id;
+  }
+  return null;
+}
+
+function isFlowType(t: string): boolean {
+  return t === "trigger" || t === "condition" || t === "end";
+}
+
+function isFloatingType(t: string): boolean {
+  return t === "ask_ai";
+}
+
+function childHeight(n: Node): number {
+  return Number((n as any).height) || BLOCK_SLOT_H;
+}
+
+function screenChildrenBottom(all: Node[], screenId: string): number {
+  let bottom = 0;
+  for (const n of all) {
+    if (n.type === "journeyNode" && (n as any).parentNode === screenId) {
+      bottom = Math.max(bottom, (n.position?.y ?? 0) + childHeight(n));
+    }
+  }
+  return bottom;
+}
+
+function fitScreenHeight(currentH: number, childrenBottom: number): number {
+  return Math.max(currentH, SCREEN_MIN_H, childrenBottom + SCREEN_FOOTER_H);
+}
+
+function restackScreens(all: Node[], screenIds: Set<string> | null): Node[] {
+  const targets = new Map<string, Node[]>();
+  for (const n of all) {
+    const p = (n as any).parentNode;
+    if (n.type === "journeyNode" && p && (!screenIds || screenIds.has(p))) {
+      const l = targets.get(p) || [];
+      l.push(n);
+      targets.set(p, l);
+    }
+  }
+  if (targets.size === 0) return all;
+  let changed = false;
+  const pos = new Map<string, { x: number; y: number }>();
+  const heights = new Map<string, number>();
+  for (const [pid, kids] of targets) {
+    const ordered = [...kids].sort((a, b) => a.position.y - b.position.y);
+    let y = SCREEN_CONTENT_TOP;
+    for (const k of ordered) {
+      if (k.position.x !== BLOCK_INSET_X || Math.abs(k.position.y - y) > 0.5) {
+        pos.set(k.id, { x: BLOCK_INSET_X, y });
+        changed = true;
+      }
+      y += childHeight(k) + BLOCK_GAP;
+    }
+    const screen = all.find((n) => n.id === pid && n.type === "screenNode");
+    if (screen) {
+      const cur = getScreenBounds(screen).h;
+      const need = Math.max(SCREEN_MIN_H, y - BLOCK_GAP + SCREEN_FOOTER_H);
+      if (need > cur + 0.5) {
+        heights.set(pid, need);
+        changed = true;
+      }
+    }
+  }
+  if (!changed) return all;
+  return all.map((n) => {
+    const p = pos.get(n.id);
+    if (p) return { ...n, position: p };
+    const h = heights.get(n.id);
+    if (h !== undefined) {
+      const b = getScreenBounds(n);
+      const prev = (n.data as any).screen;
+      const count = targets.get(n.id)?.length ?? 0;
+      return {
+        ...n,
+        style: { ...(n.style as any), width: b.w, height: h },
+        data: {
+          ...n.data,
+          screen: { ...prev, size: { width: b.w, height: h } },
+          blockCount: count,
+        },
+      };
+    }
+    return n;
   });
 }
 
@@ -283,8 +396,13 @@ export default function JourneyGraphEditor({
   const [paletteSearch, setPaletteSearch] = useState("");
   const [cmdOpen, setCmdOpen] = useState(false);
   const [cmdSearch, setCmdSearch] = useState("");
+  const [selectedScreenId, setSelectedScreenId] = useState<string | null>(null);
+  const [dropTargetScreenId, setDropTargetScreenId] = useState<string | null>(null);
   const rfInstance = useRef<ReactFlowInstance | null>(null);
   const hasFitInitial = useRef(false);
+  const nodesRef = useRef<Node[]>([]);
+  nodesRef.current = nodes;
+  const layoutSigRef = useRef<string>("");
 
   const seededRef = useRef(false);
   const structuralFpRef = useRef<string>("");
@@ -355,6 +473,23 @@ export default function JourneyGraphEditor({
     }
   }, [nodes, edges, readOnly]);
 
+  useEffect(() => {
+    if (readOnly) return;
+    const parts: string[] = [];
+    for (const n of nodes) {
+      if (n.type === "screenNode") parts.push(`s:${n.id}`);
+      else if (n.type === "journeyNode")
+        parts.push(
+          `c:${(n as any).parentNode || ""}:${n.id}:${Math.round(Number((n as any).height) || 0)}`,
+        );
+    }
+    parts.sort();
+    const sig = parts.join("|");
+    if (sig === layoutSigRef.current) return;
+    layoutSigRef.current = sig;
+    setNodes((nds) => restackScreens(nds, null));
+  }, [nodes, readOnly, setNodes]);
+
   useEffect(
     () => () => {
       if (debounceTimerRef.current)
@@ -394,7 +529,9 @@ export default function JourneyGraphEditor({
         !src ||
         !tgt ||
         src.type === "journeyNode" ||
-        tgt.type === "journeyNode"
+        tgt.type === "journeyNode" ||
+        isFloatingType((src.data as any)?.type) ||
+        isFloatingType((tgt.data as any)?.type)
       )
         return;
       setEdges((eds) => addEdge({ ...params, id: crypto.randomUUID() }, eds));
@@ -402,9 +539,95 @@ export default function JourneyGraphEditor({
     [nodes, readOnly, setEdges],
   );
 
+  const addBlockToScreen = useCallback(
+    (type: NodeType, screenId: string) => {
+      if (readOnly) return null;
+      const target = nodesRef.current.find(
+        (n) => n.id === screenId && n.type === "screenNode",
+      );
+      if (!target) return null;
+      const nid = crypto.randomUUID();
+      const cfg = { ...defaultConfigFor(type) };
+      if (
+        ["input", "select", "checkbox", "rating"].includes(type) &&
+        !cfg.blockKey
+      )
+        cfg.blockKey = seedBlockKey();
+      const siblings = nodesRef.current.filter(
+        (n) => (n as any).parentNode === screenId,
+      );
+      const childCount = siblings.length;
+      const y = Math.max(
+        SCREEN_CONTENT_TOP,
+        screenChildrenBottom(nodesRef.current, screenId) + BLOCK_GAP,
+      );
+      const b = getScreenBounds(target);
+      const newH = fitScreenHeight(b.h, y + BLOCK_SLOT_H);
+      setNodes((nds) =>
+        nds
+          .map((n) => {
+            if (n.id === screenId) {
+              const prev = (n.data as any).screen;
+              return {
+                ...n,
+                style: { ...(n.style as any), width: b.w, height: newH },
+                data: {
+                  ...n.data,
+                  screen: {
+                    ...prev,
+                    size: { width: b.w, height: newH },
+                  },
+                  blockCount: childCount + 1,
+                },
+              };
+            }
+            return n;
+          })
+          .concat([
+            {
+              id: nid,
+              type: "journeyNode",
+              parentNode: screenId,
+              position: { x: BLOCK_INSET_X, y },
+              draggable: true,
+              data: {
+                label: `${type} ${nid.slice(0, 4)}`,
+                type,
+                config: cfg,
+                screenId,
+                blockIndex: childCount,
+                isBlock: true,
+              },
+            } as Node,
+          ]),
+      );
+      bus.emit("node:track", {
+        nodeId: nid,
+        type,
+        viewportId: "iphone14" as any,
+      });
+      onSelectNode(nid);
+      bus.emit("node:select", { nodeId: nid, source: "canvas" });
+      return nid;
+    },
+    [readOnly, setNodes, onSelectNode],
+  );
+
   const addNode = useCallback(
     (type: NodeType, position?: { x: number; y: number }) => {
       if (readOnly) return null;
+      const floating = isFloatingType(type as string);
+      if (!floating && !isFlowType(type as string) && position) {
+        const screens = nodesRef.current.filter((n) => n.type === "screenNode");
+        const hit = findScreenAtPosition(screens, position);
+        if (hit) return addBlockToScreen(type, hit);
+      }
+      if (!floating && !isFlowType(type as string) && !position && selectedScreenId) {
+        const stillThere = nodesRef.current.some(
+          (n) => n.id === selectedScreenId && n.type === "screenNode",
+        );
+        if (stillThere) return addBlockToScreen(type, selectedScreenId);
+      }
       const nid = crypto.randomUUID();
       const cfg = { ...defaultConfigFor(type) };
       if (
@@ -416,7 +639,21 @@ export default function JourneyGraphEditor({
         x: 100 + Math.random() * 400,
         y: 100 + Math.random() * 300,
       };
-      if (type === "trigger" || type === "condition" || type === "end") {
+      if (floating) {
+        const floatingNode: Node = {
+          id: nid,
+          type: "flowNode",
+          position: pos,
+          draggable: true,
+          data: {
+            label: `ask ai ${nid.slice(0, 4)}`,
+            type,
+            config: cfg,
+            isFloating: true,
+          },
+        };
+        setNodes((nds) => [...nds, floatingNode]);
+      } else if (isFlowType(type as string)) {
         const flowNode: Node = {
           id: nid,
           type: "flowNode",
@@ -442,8 +679,7 @@ export default function JourneyGraphEditor({
           id: nid,
           type: "journeyNode",
           parentNode: screen.id,
-          extent: "parent",
-          position: { x: 12, y: 44 },
+          position: { x: BLOCK_INSET_X, y: SCREEN_CONTENT_TOP },
           draggable: true,
           data: {
             label: `${type} ${nid.slice(0, 4)}`,
@@ -455,6 +691,7 @@ export default function JourneyGraphEditor({
           },
         };
         setNodes((nds) => [...nds, screenNode, blockNode]);
+        setSelectedScreenId(screen.id);
       }
       bus.emit("node:track", {
         nodeId: nid,
@@ -465,7 +702,7 @@ export default function JourneyGraphEditor({
       bus.emit("node:select", { nodeId: nid, source: "canvas" });
       return nid;
     },
-    [readOnly, setNodes, onSelectNode],
+    [readOnly, setNodes, onSelectNode, addBlockToScreen, selectedScreenId],
   );
 
   const addScreen = useCallback(() => {
@@ -485,6 +722,7 @@ export default function JourneyGraphEditor({
         data: { screen, exits: [screen.advance.handle], blockCount: 0 },
       },
     ]);
+    setSelectedScreenId(screen.id);
     bus.emit("screen:select", { screenId: screen.id, source: "canvas" });
   }, [nodes, readOnly, setNodes]);
 
@@ -492,10 +730,13 @@ export default function JourneyGraphEditor({
     (_: any, node: Node) => {
       setSelectedEdgeId(null);
       if (node.type === "screenNode") {
+        setSelectedScreenId(node.id);
         onSelectNode(null);
         bus.emit("screen:select", { screenId: node.id, source: "canvas" });
         return;
       }
+      const parent = (node as any).parentNode as string | undefined;
+      if (node.type === "journeyNode" && parent) setSelectedScreenId(parent);
       onSelectNode(node.id);
       flashNode(node.id);
       bus.emit("node:select", { nodeId: node.id, source: "canvas" });
@@ -554,6 +795,8 @@ export default function JourneyGraphEditor({
       setEdges((eds) =>
         eds.filter((e) => e.source !== screenId && e.target !== screenId),
       );
+      setSelectedScreenId((prev) => (prev === screenId ? null : prev));
+      setDropTargetScreenId((prev) => (prev === screenId ? null : prev));
     },
     [setNodes, setEdges, readOnly, selectedNodeId, onSelectNode],
   );
@@ -623,15 +866,32 @@ export default function JourneyGraphEditor({
       if (readOnly) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
+      const flowPos = rfInstance.current?.screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+      if (flowPos) {
+        const screens = nodesRef.current.filter((n) => n.type === "screenNode");
+        const hit = findScreenAtPosition(screens, flowPos);
+        setDropTargetScreenId((prev) => (prev === hit ? prev : hit));
+      }
     },
     [readOnly],
   );
 
+  const onDragLeave = useCallback(() => {
+    setDropTargetScreenId(null);
+  }, []);
+
   const onDrop = useCallback(
     (e: DragEvent) => {
       e.preventDefault();
+      e.stopPropagation();
+      setDropTargetScreenId(null);
       if (readOnly) return;
-      const type = e.dataTransfer.getData(NODE_DRAG_MIME) as string;
+      const type =
+        (e.dataTransfer.getData(NODE_DRAG_MIME) as string) ||
+        (e.dataTransfer.getData("text/plain") as string);
       if (!type || !(allNodeTypes as string[]).includes(type)) return;
       const flowPos = rfInstance.current?.screenToFlowPosition({
         x: e.clientX,
@@ -640,6 +900,75 @@ export default function JourneyGraphEditor({
       addNode(type as any, flowPos || undefined);
     },
     [addNode, readOnly],
+  );
+
+  const onNodeDragStop = useCallback(
+    (_e: any, dragged: Node | undefined, all?: Node[]) => {
+      if (readOnly || !dragged) return;
+      if (dragged.type !== "journeyNode") return;
+      const list = (all as Node[]) || nodesRef.current;
+      const curParent = (dragged as any).parentNode as string | undefined;
+      if (!curParent) return;
+      const parentNode = list.find((n) => n.id === curParent);
+      const parentPos = parentNode?.position || { x: 0, y: 0 };
+      const absX = parentPos.x + dragged.position.x + 112;
+      const absY = parentPos.y + dragged.position.y + 30;
+      const screens = list.filter((n) => n.type === "screenNode");
+      const hit = findScreenAtPosition(screens, { x: absX, y: absY });
+      if (!hit || hit === curParent) {
+        setNodes((nds) => restackScreens(nds, new Set([curParent])));
+        return;
+      }
+      setNodes((nds) => {
+        const targetNode = nds.find((n) => n.id === hit);
+        if (!targetNode) return nds;
+        const targetCount = nds.filter(
+          (n) => (n as any).parentNode === hit,
+        ).length;
+        const b = getScreenBounds(targetNode);
+        const newY = Math.max(
+          SCREEN_CONTENT_TOP,
+          screenChildrenBottom(nds, hit) + BLOCK_GAP,
+        );
+        const newH = fitScreenHeight(b.h, newY + BLOCK_SLOT_H);
+        const next = nds.map((n) => {
+          if (n.id === hit) {
+            const prev = (n.data as any).screen;
+            return {
+              ...n,
+              style: { ...(n.style as any), width: b.w, height: newH },
+              data: {
+                ...n.data,
+                screen: { ...prev, size: { width: b.w, height: newH } },
+                blockCount: targetCount + 1,
+              },
+            };
+          }
+          if (n.id === dragged.id) {
+            return {
+              ...n,
+              parentNode: hit,
+              position: { x: BLOCK_INSET_X, y: newY },
+              data: {
+                ...(n.data as any),
+                screenId: hit,
+                blockIndex: targetCount,
+              },
+            };
+          }
+          if (n.id === curParent && n.type === "screenNode") {
+            const remaining = nds.filter(
+              (x) => (x as any).parentNode === curParent && x.id !== dragged.id,
+            ).length;
+            return { ...n, data: { ...(n.data as any), blockCount: remaining } };
+          }
+          return n;
+        });
+        return restackScreens(next, new Set([hit, curParent]));
+      });
+      setSelectedScreenId(hit);
+    },
+    [readOnly, setNodes],
   );
 
   useEffect(() => {
@@ -677,16 +1006,38 @@ export default function JourneyGraphEditor({
     () =>
       nodes.map((n) => ({
         ...n,
+        selected:
+          n.id === selectedNodeId ||
+          (n.type === "screenNode" && n.id === selectedScreenId)
+            ? true
+            : (n as any).selected,
         data: {
           ...n.data,
           hasError: errorNodeIds.has(n.id),
           isHighlighted: highlightedId === n.id,
+          isDropTarget:
+            n.type === "screenNode" && n.id === dropTargetScreenId,
+          isSelectedScreen:
+            n.type === "screenNode" && n.id === selectedScreenId,
           ...(n.type === "screenNode" && !readOnly
-            ? { onDelete: () => deleteScreen(n.id) }
+            ? {
+                onDelete: () => deleteScreen(n.id),
+                onAddBlock: (t: string) => addBlockToScreen(t as any, n.id),
+              }
             : {}),
         },
       })),
-    [nodes, errorNodeIds, highlightedId, readOnly, deleteScreen],
+    [
+      nodes,
+      errorNodeIds,
+      highlightedId,
+      readOnly,
+      deleteScreen,
+      selectedNodeId,
+      selectedScreenId,
+      dropTargetScreenId,
+      addBlockToScreen,
+    ],
   );
 
   useEffect(() => {
@@ -841,10 +1192,23 @@ export default function JourneyGraphEditor({
                   draggable={!readOnly}
                   onDragStart={(e) => {
                     e.dataTransfer.setData(NODE_DRAG_MIME, t);
+                    try {
+                      e.dataTransfer.setData("text/plain", t);
+                    } catch {}
                     e.dataTransfer.effectAllowed = "move";
                   }}
+                  onDragEnd={() => setDropTargetScreenId(null)}
+                  onClick={() => {
+                    if (!readOnly && selectedScreenId && !isFlowType(t) && !isFloatingType(t)) {
+                      addBlockToScreen(t as any, selectedScreenId);
+                    }
+                  }}
                   onDoubleClick={() => addNode(t as any)}
-                  title={nodeInfo[t] || "Drag to canvas · double-click to add"}
+                  title={
+                    selectedScreenId && !isFlowType(t) && !isFloatingType(t)
+                      ? `${nodeInfo[t] || t} · click to add to selected screen · drag onto a screen or canvas · double-click to add`
+                      : `${nodeInfo[t] || "Drag to canvas · double-click to add"} · drag onto a screen to add into it`
+                  }
                   className="group mb-0.5 flex cursor-grab items-center justify-between rounded-none border border-border/60 bg-background px-1.5 py-1 text-[11px] text-foreground/80 transition-colors hover:border-foreground hover:bg-secondary active:cursor-grabbing"
                 >
                   <span className="truncate">{t.replace(/_/g, " ")}</span>
@@ -858,6 +1222,7 @@ export default function JourneyGraphEditor({
           <div
             className="relative h-full w-full bg-muted/20"
             onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
             onDrop={onDrop}
           >
             <ReactFlow
@@ -880,6 +1245,10 @@ export default function JourneyGraphEditor({
               onNodeClick={onNodeClick}
               onEdgeClick={onEdgeClick}
               onPaneClick={onPaneClick}
+              onNodeDragStop={onNodeDragStop}
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+              onDragLeave={onDragLeave}
               nodesDraggable={!readOnly}
               nodesConnectable={!readOnly}
               deleteKeyCode={readOnly ? [] : ["Delete", "Backspace"]}

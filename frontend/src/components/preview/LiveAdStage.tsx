@@ -125,7 +125,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
     bus.on('node:update', handler as any)
     return () => bus.off('node:update', handler as any)
   }, [])
-  const askAi = screenState ? ((screenState.screen as any).askAiFixture || (screenState.screen as any).askAi || askAiConfig) : askAiConfig
+  const askAi = askAiConfig
   const content = (
     <div data-ad-content className="my-auto w-full min-w-0 max-w-full break-words" style={{ maxWidth: `min(${layout.contentMaxWidth}px, 100%)` }}>
       {state.status === 'connecting' || state.status === 'stale' ? (
@@ -139,7 +139,14 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
       ) : null}
     </div>
   )
-  const stage = <div data-ad-stage data-viewport={viewportId} data-mode="live" className="relative h-full w-full overflow-y-auto overflow-x-hidden" style={{ backgroundColor: theme.surface, color: theme.foreground, fontFamily: theme.font }}><div className="flex min-h-full w-full justify-center" style={{ padding: layout.stagePadding }}>{content}</div>{askAi && <AskAiOverlay client={client} config={askAi} sessionStatus={state.status} theme={theme} start={start} screenId={screen?.id} />}</div>
+  const stage = (
+    <div data-ad-stage data-viewport={viewportId} data-mode="live" className="relative h-full w-full overflow-hidden" style={{ backgroundColor: theme.surface, color: theme.foreground, fontFamily: theme.font }}>
+      <div data-ad-scroll className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain">
+        <div className="flex min-h-full w-full justify-center" style={{ padding: layout.stagePadding }}>{content}</div>
+      </div>
+      {askAi && <AskAiOverlay client={client} config={askAi} sessionStatus={state.status} theme={theme} start={start} screenId={screen?.id} />}
+    </div>
+  )
   if (!framed) return stage
-  return <div data-ad-stage data-viewport={viewportId} data-mode="live" className="h-full w-full"><FramedScreen viewportId={viewportId} device={device} zoom={zoom}><div className="relative h-full overflow-y-auto overflow-x-hidden">{stage}</div></FramedScreen></div>
+  return <div data-ad-stage data-viewport={viewportId} data-mode="live" className="h-full w-full"><FramedScreen viewportId={viewportId} device={device} zoom={zoom}>{stage}</FramedScreen></div>
 }
