@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { journeyApi } from '../lib/api'
 import { devLinkFor } from '../lib/devLink'
@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 
 export default function CampaignDetail(){
   const {id}=useParams()
+  const qc=useQueryClient()
   const {data:camp, refetch:refetchCamp, isLoading}=useQuery({queryKey:['campaign',id], queryFn: async()=>(await journeyApi.get(`/api/campaigns/${id}`)).data})
   const {data:journeys}=useQuery({queryKey:['journeys',id], queryFn: async()=>(await journeyApi.get(`/api/campaigns/${id}/journeys`)).data})
   const {data:activity}=useQuery({queryKey:['activity',id], queryFn: async()=>(await journeyApi.get(`/api/campaigns/${id}/activity`)).data})
@@ -23,11 +24,15 @@ export default function CampaignDetail(){
   const copy=()=>{ if(devLink){ navigator.clipboard?.writeText(devLink); setCopied(true); toast.success('Dev link copied'); setTimeout(()=>setCopied(false),1500)} }
   const copyProduct=()=>{ navigator.clipboard?.writeText(productLink); setCopied(true); toast.success('Product link copied'); setTimeout(()=>setCopied(false),1500)}
   const rotate=async()=>{ setRotating(true); try{ await journeyApi.post(`/api/campaigns/${id}/dev-link/rotate`); refetchCamp() } finally{ setRotating(false)} }
+  const isDeleted=!!camp.deletedAt
+  const remove=async()=>{ if(!window.confirm(`Hide "${camp.name}" from listing? Direct links will keep working.`)) return; try{ await journeyApi.delete(`/api/campaigns/${id}`); toast.success('Campaign hidden from listing'); qc.invalidateQueries({queryKey:['campaigns']}); refetchCamp() } catch{ toast.error('Delete failed') } }
+  const restore=async()=>{ try{ await journeyApi.post(`/api/campaigns/${id}/restore`); toast.success('Campaign restored'); qc.invalidateQueries({queryKey:['campaigns']}); refetchCamp() } catch{ toast.error('Restore failed') } }
   return <div>
     <p className="text-eyebrow text-muted-foreground">Campaign</p>
     <h1 className="font-display text-display-lg mt-2">{camp.name}</h1>
     <div className="mt-2 font-mono text-mono-xs text-muted-foreground">{camp.id} · {camp.status}</div>
     <div className="mt-3 flex flex-wrap items-center gap-2">
+      {isDeleted && <Badge variant="destructive">Hidden from listing</Badge>}
       {isPublished && <Badge variant="default">Published</Badge>}
       {!isPublished && <Badge variant="outline">{camp.status}</Badge>}
       <span className="text-eyebrow text-muted-foreground">Dev link</span>
@@ -48,7 +53,10 @@ export default function CampaignDetail(){
       <Button variant="outline" asChild><Link to={`/campaigns/${id}/analytics`}>Analytics</Link></Button>
       {devLink && <Button variant="outline" asChild><a href={devLink} target="_blank" rel="noreferrer">Open DEV preview</a></Button>}
       {isPublished && <Button variant="outline" asChild><a href={productLink} target="_blank" rel="noreferrer">Open product link</a></Button>}
+      {!isDeleted && <Button variant="outline" onClick={remove}>Hide from listing</Button>}
+      {isDeleted && <Button variant="outline" onClick={restore}>Restore to listing</Button>}
     </div>
+    {isDeleted && <div className="mt-4 border border-border p-3 text-sm text-muted-foreground">Hidden from campaign listing. Direct links (/c/{id}) keep working.</div>}
     <Separator className="my-8" />
     <h2 className="font-display text-display-md">Journeys</h2>
     <div className="mt-4">

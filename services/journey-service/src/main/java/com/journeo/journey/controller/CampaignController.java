@@ -24,8 +24,23 @@ public class CampaignController {
     @org.springframework.beans.factory.annotation.Value("${ai-service-url:http://localhost:8084}") String aiUrl;
     public CampaignController(CampaignRepository cr, JourneyRepository jr, ActivityEventRepository ar, RestTemplate rt, DevLinkService dls){this.campRepo=cr;this.jourRepo=jr;this.actRepo=ar;this.rest=rt;this.devLinkService=dls;}
     @PostMapping("/campaigns") public Campaign create(@RequestBody Map<String,Object> b){ Campaign c=new Campaign(); c.setName((String)b.getOrDefault("name","Untitled")); c.setDescription((String)b.getOrDefault("description","")); c.setObjective((String)b.getOrDefault("objective","")); c.setAudience((String)b.getOrDefault("audience","")); c.setStatus("ACTIVE"); devLinkService.ensureDevToken(c); campRepo.save(c); RequestContextHolder.put("campaignId",c.getId()); return c; }
-    @GetMapping("/campaigns") public List<Campaign> list(){ return campRepo.findAll(); }
+    @GetMapping("/campaigns") public List<Campaign> list(@RequestParam(defaultValue="false") boolean includeDeleted){ if(includeDeleted) return campRepo.findAll(); return campRepo.findByDeletedAtIsNull(); }
     @GetMapping("/campaigns/{id}") public ResponseEntity<Campaign> get(@PathVariable String id){ return campRepo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build()); }
+    @DeleteMapping("/campaigns/{id}") public ResponseEntity<?> softDelete(@PathVariable String id){
+        return campRepo.findById(id).map(c->{
+            c.setDeletedAt(Instant.now());
+            c.setUpdatedAt(Instant.now());
+            campRepo.save(c);
+            return ResponseEntity.noContent().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    @PostMapping("/campaigns/{id}/restore") public ResponseEntity<Campaign> restore(@PathVariable String id){
+        return campRepo.findById(id).map(c->{
+            c.setDeletedAt(null);
+            c.setUpdatedAt(Instant.now());
+            return ResponseEntity.ok(campRepo.save(c));
+        }).orElse(ResponseEntity.notFound().build());
+    }
     @PutMapping("/campaigns/{id}") public ResponseEntity<Campaign> update(@PathVariable String id, @RequestBody Map<String,Object> b){
         return campRepo.findById(id).map(c->{
             if(b.containsKey("name")) c.setName((String)b.get("name"));

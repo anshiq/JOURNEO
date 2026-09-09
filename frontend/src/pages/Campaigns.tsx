@@ -15,7 +15,8 @@ import { toast } from 'sonner'
 export default function Campaigns(){
   const navigate=useNavigate()
   const qc=useQueryClient()
-  const {data, isLoading}=useQuery({queryKey:['campaigns'], queryFn: async()=> (await journeyApi.get('/api/campaigns')).data})
+  const [showDeleted,setShowDeleted]=useState(false)
+  const {data, isLoading}=useQuery({queryKey:['campaigns',showDeleted], queryFn: async()=> (await journeyApi.get(`/api/campaigns?includeDeleted=${showDeleted}`)).data})
   const [name,setName]=useState('')
   const [createdDevLink,setCreatedDevLink]=useState<string|null>(null)
   const [copied,setCopied]=useState(false)
@@ -27,6 +28,9 @@ export default function Campaigns(){
     navigate(`/campaigns/${campaign.id}/setup`)
   }})
   const copy=()=>{ if(createdDevLink){ navigator.clipboard?.writeText(createdDevLink); setCopied(true); toast.success('Dev link copied'); setTimeout(()=>setCopied(false),1500)} }
+  const delMut=useMutation({mutationFn: async(id:string)=> (await journeyApi.delete(`/api/campaigns/${id}`)).data, onSuccess:()=>{ qc.invalidateQueries({queryKey:['campaigns']}); toast.success('Campaign hidden from listing') }, onError:()=>toast.error('Delete failed')})
+  const restoreMut=useMutation({mutationFn: async(id:string)=> (await journeyApi.post(`/api/campaigns/${id}/restore`)).data, onSuccess:()=>{ qc.invalidateQueries({queryKey:['campaigns']}); toast.success('Campaign restored') }, onError:()=>toast.error('Restore failed')})
+  const remove=(c:any)=>{ if(!window.confirm(`Hide "${c.name}" from listing? Direct links will keep working.`)) return; delMut.mutate(c.id) }
   return <div>
     <p className="text-eyebrow text-muted-foreground">Index</p>
     <h1 className="font-display text-display-xl mt-2">Campaigns</h1>
@@ -34,6 +38,7 @@ export default function Campaigns(){
     <div className="mt-6 flex gap-2">
       <Input value={name} onChange={e=>setName(e.target.value)} placeholder="New campaign name" className="flex-1" aria-label="New campaign name" />
       <Button disabled={!name.trim() || mut.isPending} onClick={()=>mut.mutate()}>{mut.isPending?'Creating…':'Create campaign'}</Button>
+      <Button variant="outline" onClick={()=>setShowDeleted(v=>!v)}>{showDeleted?'Hide hidden':'Show hidden'}</Button>
     </div>
     {createdDevLink && <Alert className="mt-4">
       <AlertTitle>Dev link ready</AlertTitle>
@@ -48,18 +53,28 @@ export default function Campaigns(){
     <div className="mt-8">
       {isLoading && <div className="space-y-3">{[0,1,2].map(i=><Skeleton key={i} className="h-20 w-full" />)}</div>}
       {!isLoading && (data||[]).map((c:any)=><div key={c.id}>
-        <Link to={`/campaigns/${c.id}`} className="group flex items-baseline justify-between gap-6 py-6">
+        <div className="group flex items-baseline justify-between gap-6 py-6">
+        <Link to={`/campaigns/${c.id}`} className="flex min-w-0 flex-1 items-baseline justify-between gap-6">
           <div className="min-w-0">
             <div className="font-display text-display-md truncate group-hover:underline group-hover:underline-offset-4">{c.name}</div>
             <div className="mt-1 font-mono text-mono-xs text-muted-foreground">{c.id}</div>
             {c.devToken && <div className="mt-1 font-mono text-mono-xs text-muted-foreground">DEV /d/{c.devToken.slice(0,8)}</div>}
           </div>
           <div className="flex shrink-0 items-center gap-3">
+            {c.deletedAt && <Badge variant="destructive">Hidden</Badge>}
             <Badge variant="outline">{c.status}</Badge>
             <span className="text-eyebrow text-muted-foreground">Journey</span>
             <span className="text-eyebrow text-muted-foreground">Analytics</span>
           </div>
         </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          {!c.deletedAt && <Button variant="outline" size="sm" disabled={delMut.isPending} onClick={()=>remove(c)}>Hide</Button>}
+          {c.deletedAt && <>
+            <Button variant="outline" size="sm" asChild><Link to={`/c/${c.id}`} target="_blank" rel="noreferrer">Open</Link></Button>
+            <Button variant="outline" size="sm" disabled={restoreMut.isPending} onClick={()=>restoreMut.mutate(c.id)}>Restore</Button>
+          </>}
+        </div>
+        </div>
         <Separator />
       </div>)}
     </div>
