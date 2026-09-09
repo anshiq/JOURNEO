@@ -51,6 +51,13 @@ async def resolve_user_query(journey_id, campaign_id, graph, query, screen_id=No
         "confidence": 0.5,
     }
     res = await decision_graph.ainvoke(state)
+    suggested = []
+    if cfg.get("allowRag", True):
+        try:
+            from app.routers.query import suggested_questions
+            suggested = suggested_questions(query, k=cfg.get("ragK", 4))
+        except Exception:
+            suggested = []
     return {
         "decision": res.get("decision", "reject"),
         "branch": res.get("branch", "rejected"),
@@ -62,6 +69,7 @@ async def resolve_user_query(journey_id, campaign_id, graph, query, screen_id=No
         "citations": res.get("citations", []),
         "confidence": res.get("confidence", 0.5),
         "reason": res.get("reason", ""),
+        "suggested_questions": suggested,
     }
 
 
@@ -179,6 +187,8 @@ async def session_ws(websocket: WebSocket):
         entry_id = entry.get("id") if isinstance(entry, dict) else None
         sess = await sessions.create(journey.get("id"), campaign_id, start.mode, version, entry_id)
         sess["chat"] = []
+        if start.device:
+            sess["profile"]["device"] = start.device
         await sessions.attach(sess["id"], websocket)
         await asyncio.to_thread(persist_mod.save_session, sess, None)
         await asyncio.to_thread(persist_mod.save_activity, campaign_id, sess["id"], "session_started", {"mode": start.mode, "graphVersion": version})
@@ -274,7 +284,7 @@ async def session_ws(websocket: WebSocket):
                             sess.setdefault("chat", []).append({"queryId": qmsg.queryId, "query": q, "decision": out["decision"], "answer": out.get("answer"), "screenId": screen_ctx})
                         except Exception:
                             pass
-                        await websocket.send_json(protocol.QueryResultFrame(sessionId=sess["id"], queryId=qmsg.queryId, decision=out["decision"], targetNodeId=out.get("target_node_id"), targetNodeType=out.get("target_node_type"), targetNodeSummary=out.get("target_node_summary"), targetNodeDetails=out.get("target_node_details"), answer=out.get("answer"), citations=out.get("citations") or [], confidence=float(out.get("confidence") or 0.5), reason=out.get("reason") or "").model_dump())
+                        await websocket.send_json(protocol.QueryResultFrame(sessionId=sess["id"], queryId=qmsg.queryId, decision=out["decision"], targetNodeId=out.get("target_node_id"), targetNodeType=out.get("target_node_type"), targetNodeSummary=out.get("target_node_summary"), targetNodeDetails=out.get("target_node_details"), answer=out.get("answer"), citations=out.get("citations") or [], confidence=float(out.get("confidence") or 0.5), reason=out.get("reason") or "", suggestedQuestions=out.get("suggested_questions") or []).model_dump())
                         if out["decision"] == "jump" and out.get("target_node_id"):
                             if screen_ctx != sess["current_id"]:
                                 pass

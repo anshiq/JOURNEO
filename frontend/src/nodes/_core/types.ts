@@ -86,6 +86,8 @@ export const styleSchema = z.object({
   ...effectsSchema.shape,
 })
 export type NodeStyle = z.infer<typeof styleSchema>
+export type Breakpoint = 'mobile' | 'tablet' | 'desktop'
+export type ResponsiveOverride<T> = { mobile?: Partial<T>; tablet?: Partial<T>; desktop?: Partial<T> }
 export const MAX_TIMEOUT_SECONDS = 86400
 export const nodeBlockSchema = z.object({
   blockKey: z.string().regex(/^[a-zA-Z0-9_]{1,40}$/).optional(),

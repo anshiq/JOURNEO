@@ -5,6 +5,7 @@ import com.journeo.journey.entity.Journey;
 import com.journeo.journey.repository.ActivityEventRepository;
 import com.journeo.journey.repository.CampaignRepository;
 import com.journeo.journey.repository.JourneyRepository;
+import com.journeo.journey.repository.FieldValueRepository;
 import com.journeo.journey.service.DevLinkService;
 import com.journeo.journey.validation.BadGraphException;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +29,8 @@ class CampaignControllerTest {
     ActivityEventRepository actRepo = mock(ActivityEventRepository.class);
     RestTemplate rest = mock(RestTemplate.class);
     DevLinkService devLinkService = mock(DevLinkService.class);
-    controller = new CampaignController(campRepo, jourRepo, actRepo, rest, devLinkService);
+    FieldValueRepository fieldValueRepo = mock(FieldValueRepository.class);
+    controller = new CampaignController(campRepo, jourRepo, actRepo, rest, devLinkService, fieldValueRepo);
     when(campRepo.existsById("c1")).thenReturn(true);
     when(jourRepo.save(any(Journey.class))).thenAnswer(inv -> inv.getArgument(0));
   }

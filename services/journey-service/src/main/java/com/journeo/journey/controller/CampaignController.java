@@ -18,11 +18,12 @@ import java.util.*;
 public class CampaignController {
     private final CampaignRepository campRepo; private final JourneyRepository jourRepo;
     private final ActivityEventRepository actRepo;
+    private final FieldValueRepository fieldValueRepo;
     private final RestTemplate rest; private final DevLinkService devLinkService; private final ObjectMapper mapper=new ObjectMapper();
     @org.springframework.beans.factory.annotation.Value("${analytics-service-url:http://localhost:8082}") String analyticsUrl;
     @org.springframework.beans.factory.annotation.Value("${connectors-service-url:http://localhost:8083}") String connUrl;
     @org.springframework.beans.factory.annotation.Value("${ai-service-url:http://localhost:8084}") String aiUrl;
-    public CampaignController(CampaignRepository cr, JourneyRepository jr, ActivityEventRepository ar, RestTemplate rt, DevLinkService dls){this.campRepo=cr;this.jourRepo=jr;this.actRepo=ar;this.rest=rt;this.devLinkService=dls;}
+    public CampaignController(CampaignRepository cr, JourneyRepository jr, ActivityEventRepository ar, RestTemplate rt, DevLinkService dls, FieldValueRepository fvr){this.campRepo=cr;this.jourRepo=jr;this.actRepo=ar;this.rest=rt;this.devLinkService=dls;this.fieldValueRepo=fvr;}
     @PostMapping("/campaigns") public Campaign create(@RequestBody Map<String,Object> b){ Campaign c=new Campaign(); c.setName((String)b.getOrDefault("name","Untitled")); c.setDescription((String)b.getOrDefault("description","")); c.setObjective((String)b.getOrDefault("objective","")); c.setAudience((String)b.getOrDefault("audience","")); c.setStatus("ACTIVE"); devLinkService.ensureDevToken(c); campRepo.save(c); RequestContextHolder.put("campaignId",c.getId()); return c; }
     @GetMapping("/campaigns") public List<Campaign> list(@RequestParam(defaultValue="false") boolean includeDeleted){ if(includeDeleted) return campRepo.findAll(); return campRepo.findByDeletedAtIsNull(); }
     @GetMapping("/campaigns/{id}") public ResponseEntity<Campaign> get(@PathVariable String id){ return campRepo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build()); }
@@ -118,6 +119,17 @@ public class CampaignController {
         Journey j=opt.get();
         Map<String,Object> out=new HashMap<>(); out.put("journeyId",j.getId()); out.put("campaignId",id); out.put("version",j.getVersion()); out.put("status",j.getStatus()); out.put("updatedAt",j.getUpdatedAt()!=null?j.getUpdatedAt().toString():"");
         return ResponseEntity.ok(out);
+    }
+    @PostMapping("/campaigns/{id}/journey/validate-field") public ResponseEntity<?> validateField(@PathVariable String id,@RequestBody Map<String,Object> b){
+        if(!campRepo.existsById(id)) return ResponseEntity.notFound().build();
+        String fieldKey=(String)b.get("fieldKey"); String value=(String)b.get("value");
+        if(fieldKey==null || value==null) return ResponseEntity.badRequest().body(Map.of("error","fieldKey and value are required"));
+        boolean exists=fieldValueRepo.existsByCampaignIdAndFieldKeyAndValue(id, fieldKey, value);
+        if(!exists){
+            FieldValue fv=new FieldValue(); fv.setCampaignId(id); fv.setFieldKey(fieldKey); fv.setValue(value);
+            try{ fieldValueRepo.save(fv); }catch(DataIntegrityViolationException ignored){ exists=true; }
+        }
+        return ResponseEntity.ok(Map.of("unique", !exists));
     }
     @DeleteMapping("/campaigns/{id}/journeys/{jid}") public ResponseEntity<?> deleteJourney(@PathVariable String id,@PathVariable String jid){
         var opt=jourRepo.findById(jid);

@@ -2,9 +2,27 @@ import * as React from 'react'
 import type { JourneyConfigProps } from '../_core/config'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
+import { FileUploader } from '@/components/ui/FileUploader'
+import { BreakpointTabs } from '../_core/journeyWidgets'
 export const VideoJourneyConfig: React.FC<JourneyConfigProps> = ({ config, onChange }) => {
   const cfg = config || {}
   const set = (patch: any) => onChange({ ...cfg, ...patch })
-  return <div className="space-y-3"><div className="overflow-hidden rounded-none border bg-muted/30"><svg viewBox="0 0 320 180" className="h-36 w-full" role="img" aria-label="Sample video"><rect x="0" y="0" width="320" height="180" fill="hsl(var(--muted))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="hsl(var(--muted-foreground))" opacity="0.3" /><circle cx="160" cy="90" r="30" fill="hsl(var(--muted-foreground))" opacity="0.5" /><polygon points="150,72 150,108 180,90" fill="hsl(var(--background))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="none" stroke="hsl(var(--border))" strokeWidth="2" /></svg></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.autoplay} onChange={e => set({ autoplay: e.target.checked })} /> Autoplay</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.loop} onChange={e => set({ loop: e.target.checked })} /> Loop</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.controls ?? true} onChange={e => set({ controls: e.target.checked })} /> Controls</label></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showWatchedButton ?? true} onChange={e => set({ showWatchedButton: e.target.checked })} /> Watched btn</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showSkipButton ?? true} onChange={e => set({ showSkipButton: e.target.checked })} /> Skip btn</label></div><div className="grid grid-cols-2 gap-2"><div className="space-y-1"><Label>Watched label</Label><Input value={cfg.watchedLabel || ''} onChange={e => set({ watchedLabel: e.target.value })} placeholder="I watched it" /></div><div className="space-y-1"><Label>Skip label</Label><Input value={cfg.skipLabel || ''} onChange={e => set({ skipLabel: e.target.value })} placeholder="Skip" /></div></div></div>
+  return <div className="space-y-3"><div className="overflow-hidden rounded-none border bg-muted/30"><svg viewBox="0 0 320 180" className="h-36 w-full" role="img" aria-label="Sample video"><rect x="0" y="0" width="320" height="180" fill="hsl(var(--muted))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="hsl(var(--muted-foreground))" opacity="0.3" /><circle cx="160" cy="90" r="30" fill="hsl(var(--muted-foreground))" opacity="0.5" /><polygon points="150,72 150,108 180,90" fill="hsl(var(--background))" /><rect x="16" y="16" width="288" height="148" rx="12" fill="none" stroke="hsl(var(--border))" strokeWidth="2" /></svg></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.autoplay} onChange={e => set({ autoplay: e.target.checked })} /> Autoplay</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={!!cfg.loop} onChange={e => set({ loop: e.target.checked })} /> Loop</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.controls ?? true} onChange={e => set({ controls: e.target.checked })} /> Controls</label></div><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showWatchedButton ?? true} onChange={e => set({ showWatchedButton: e.target.checked })} /> Watched btn</label><label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={cfg.showSkipButton ?? true} onChange={e => set({ showSkipButton: e.target.checked })} /> Skip btn</label></div><div className="grid grid-cols-2 gap-2"><div className="space-y-1"><Label>Watched label</Label><Input value={cfg.watchedLabel || ''} onChange={e => set({ watchedLabel: e.target.value })} placeholder="I watched it" /></div><div className="space-y-1"><Label>Skip label</Label><Input value={cfg.skipLabel || ''} onChange={e => set({ skipLabel: e.target.value })} placeholder="Skip" /></div></div>
+    <BreakpointTabs
+      base={cfg}
+      responsive={cfg.responsive}
+      onChange={next => onChange({ ...cfg, responsive: next })}
+      renderFields={(value, setOverride) => <div className="space-y-2">
+        <div className="space-y-1">
+          <span className="text-[11px] font-medium text-muted-foreground">Video (override)</span>
+          <FileUploader value={value.src || ''} onChange={src => setOverride({ src })} kind="video" maxSizeMB={200} />
+        </div>
+        <div className="space-y-1">
+          <span className="text-[11px] font-medium text-muted-foreground">Poster (override)</span>
+          <FileUploader value={value.poster || ''} onChange={poster => setOverride({ poster })} kind="image" maxSizeMB={25} />
+        </div>
+      </div>}
+    />
+  </div>
 }
 export default VideoJourneyConfig

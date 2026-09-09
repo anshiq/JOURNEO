@@ -10,7 +10,7 @@ export const ratingDefinition: NodeDefinition<z.infer<typeof ratingSchema>> = {
   icon: 'Star',
   accent: 'border-l-amber-500',
   schema: ratingSchema,
-  defaultConfig: { value: 0, max: 5, defaultValue: 0 },
+  defaultConfig: { value: 0, max: 5, defaultValue: 0, icon: 'star' },
   renderable: true,
   valueType: true,
   canOwnExit: false,

@@ -127,7 +127,16 @@ public class JourneyGraphValidator {
     private void validateNodeConfig(List<ValidationError> errors, String id, String type, JsonNode config) {
         if ("condition".equals(type)) {
             if (config.path("field").asText().isBlank()) errors.add(new ValidationError(id, "config.field", "Condition node requires field"));
-            if (!OPERATORS.contains(config.path("operator").asText())) errors.add(new ValidationError(id, "config.operator", "Condition requires a valid operator"));
+            JsonNode branches = config.path("branches");
+            if (branches.isArray() && branches.size() > 0) {
+                for (JsonNode branch : branches) {
+                    if (branch.path("handle").asText().isBlank()) errors.add(new ValidationError(id, "config.branches", "Each branch requires a handle"));
+                    String branchOp = branch.path("operator").asText();
+                    if (!branchOp.isBlank() && !OPERATORS.contains(branchOp)) errors.add(new ValidationError(id, "config.branches", "Branch operator must be valid"));
+                }
+            } else if (!OPERATORS.contains(config.path("operator").asText())) {
+                errors.add(new ValidationError(id, "config.operator", "Condition requires a valid operator"));
+            }
         } else if ("image".equals(type) && config.path("src").asText().isBlank()) errors.add(new ValidationError(id, "config.src", "image requires src"));
         else if ("button".equals(type) && config.path("label").asText().isBlank()) errors.add(new ValidationError(id, "config.label", "button requires label"));
         else if ("select".equals(type) && (!config.path("options").isArray() || config.path("options").isEmpty())) errors.add(new ValidationError(id, "config.options", "select requires at least 1 option"));

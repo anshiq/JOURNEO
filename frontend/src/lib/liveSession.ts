@@ -1,4 +1,5 @@
 import { AI_URL } from './api'
+import { resolve as resolveBreakpoint } from '../nodes/_core/useBreakpoint'
 
 export interface StartParams {
   mode: 'live' | 'test'
@@ -6,6 +7,7 @@ export interface StartParams {
   journeyId?: string
   devToken?: string
   resumeThread?: boolean
+  device?: 'mobile' | 'tablet' | 'desktop'
 }
 
 export interface LiveChoice {
@@ -45,6 +47,7 @@ export interface QueryResult {
   citations?: QueryCitation[]
   confidence?: number
   reason?: string
+  suggestedQuestions?: string[]
 }
 
 export interface LiveBlock {
@@ -61,6 +64,7 @@ export interface LiveScreenMeta {
   style?: any
   advance: any
   back: any
+  sizeMode?: 'fixed' | 'viewport'
 }
 
 export type LiveState =
@@ -125,7 +129,8 @@ export class LiveSessionClient {
     const ws = new WebSocket(sessionWsUrl())
     this.ws = ws
     ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'start', mode: params.mode, campaignId: params.campaignId, journeyId: params.journeyId, devToken: params.devToken, resumeThread: params.resumeThread }))
+      const device = params.device || (typeof window !== 'undefined' ? resolveBreakpoint(window.innerWidth) : undefined)
+      ws.send(JSON.stringify({ type: 'start', mode: params.mode, campaignId: params.campaignId, journeyId: params.journeyId, devToken: params.devToken, resumeThread: params.resumeThread, device }))
     }
     ws.onmessage = ev => {
       let msg: any = null

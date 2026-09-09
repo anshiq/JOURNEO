@@ -4,4 +4,6 @@ export const inputSchema = z.object({
   placeholder: z.string().optional(),
   label: z.string().optional(),
   helperText: z.string().optional(), required: z.boolean().optional(), pattern: z.string().optional(), minLength: z.number().optional(), maxLength: z.number().optional(), min: z.number().optional(), max: z.number().optional(), autoComplete: z.string().optional(),
+  mask: z.string().optional(),
+  checkUniqueness: z.boolean().optional(),
 })

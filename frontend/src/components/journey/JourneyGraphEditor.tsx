@@ -9,7 +9,6 @@ import {
 import ReactFlow, {
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -24,7 +23,7 @@ import {
   defaultConfigFor,
   nodeInfo,
 } from "../../nodes/_core/registry";
-import type { NodeType } from "../../nodes/_core/types";
+import type { NodeType, Breakpoint } from "../../nodes/_core/types";
 import { validateGraph } from "../../lib/validation";
 import JourneyNodeRenderer from "../nodes/JourneyNodeRenderer";
 import { JourneyConfigRouter } from "../../nodes/_core/ConfigRouter";
@@ -33,7 +32,6 @@ import {
   toFlow,
   fromFlow,
   patchNode,
-  defaultScreenValues,
   SCREEN_CONTENT_TOP,
   BLOCK_INSET_X,
   BLOCK_GAP,
@@ -41,8 +39,11 @@ import {
   SCREEN_FOOTER_H,
   SCREEN_MIN_H,
   type JourneyGraph,
+  type Screen,
 } from "../../lib/journeyGraph";
 import { defaultScreen, seedBlockKey } from "../../lib/screen";
+import JourneyStylePanel from "./JourneyStylePanel";
+import ScreenPropertiesPanel from "./ScreenPropertiesPanel";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
@@ -397,6 +398,7 @@ export default function JourneyGraphEditor({
   const [cmdOpen, setCmdOpen] = useState(false);
   const [cmdSearch, setCmdSearch] = useState("");
   const [selectedScreenId, setSelectedScreenId] = useState<string | null>(null);
+  const [previewBreakpoint, setPreviewBreakpoint] = useState<Breakpoint | undefined>(undefined);
   const [dropTargetScreenId, setDropTargetScreenId] = useState<string | null>(null);
   const rfInstance = useRef<ReactFlowInstance | null>(null);
   const hasFitInitial = useRef(false);
@@ -1076,6 +1078,47 @@ export default function JourneyGraphEditor({
     [readOnly, selectedNodeId, graph, setNodes],
   );
 
+  const selectedScreen = useMemo(
+    () => graph.screens.find((s) => s.id === selectedScreenId) ?? null,
+    [graph, selectedScreenId],
+  );
+
+  const onScreenPropsChange = useCallback(
+    (next: Screen) => {
+      if (readOnly || !selectedScreenId) return;
+      const patched: JourneyGraph = {
+        ...graph,
+        screens: graph.screens.map((s) => (s.id === selectedScreenId ? next : s)),
+      };
+      structuralFpRef.current = graphStructuralFingerprint(patched);
+      suppressNextEmitRef.current = true;
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === selectedScreenId
+            ? {
+                ...n,
+                style: { ...(n.style as any), width: next.size.width, height: next.size.height },
+                data: { ...n.data, screen: next, exits: (n.data as any).exits },
+              }
+            : n,
+        ),
+      );
+      onGraphChangeRef.current(patched);
+    },
+    [readOnly, selectedScreenId, graph, setNodes],
+  );
+
+  const onThemeChange = useCallback(
+    (next: JourneyGraph["theme"]) => {
+      if (readOnly) return;
+      themeRef.current = next;
+      const patched: JourneyGraph = { ...graph, theme: next };
+      structuralFpRef.current = graphStructuralFingerprint(patched);
+      onGraphChangeRef.current(patched);
+    },
+    [readOnly, graph],
+  );
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -1341,6 +1384,22 @@ export default function JourneyGraphEditor({
                 errors={errorsByNode.get(selectedNode.id)}
                 onChange={onNodeConfigChange}
               />
+            ) : selectedScreen ? (
+              <ScreenPropertiesPanel
+                screen={selectedScreen}
+                onChange={onScreenPropsChange}
+                readOnly={readOnly}
+                previewBreakpoint={previewBreakpoint}
+                onPreviewBreakpointChange={(bp) => {
+                  setPreviewBreakpoint(bp);
+                  bus.emit("device:viewportChange", {
+                    viewportId:
+                      bp === "mobile" ? "iphone14" : bp === "tablet" ? "ipadAir" : "desktopHD",
+                    width: bp === "mobile" ? 390 : bp === "tablet" ? 820 : 1440,
+                    height: bp === "mobile" ? 844 : bp === "tablet" ? 1180 : 900,
+                  });
+                }}
+              />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-none border border-dashed bg-muted/30 px-4 py-10 text-center">
                 <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-none bg-primary/10 text-primary">
@@ -1350,10 +1409,12 @@ export default function JourneyGraphEditor({
                   No node selected
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Click a node on the canvas to edit its configuration.
+                  Click a node on the canvas to edit its configuration, or click a screen to edit its properties.
                 </p>
               </div>
             )}
+            <Separator className="my-4" />
+            <JourneyStylePanel theme={graph.theme} onChange={onThemeChange} readOnly={readOnly} />
             <Separator className="my-4" />
             <ConnectionsPanel
               edges={edges}

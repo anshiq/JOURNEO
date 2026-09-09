@@ -8,6 +8,25 @@
 @tailwind components;
 @tailwind utilities;
 
+.journeo-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.journeo-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.journeo-scrollbar-thin {
+  scrollbar-width: thin;
+}
+.journeo-scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.journeo-scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

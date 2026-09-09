@@ -12,5 +12,7 @@ export interface DeviceProps<C = any> {
   isFlashing?: boolean
   studio?: boolean
   onSelect?: () => void
+  profile?: Record<string, any>
+  campaignId?: string
 }
 export type DeviceComponent<C = any> = React.FC<DeviceProps<C>>

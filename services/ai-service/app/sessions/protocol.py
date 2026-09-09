@@ -9,6 +9,7 @@ class StartMessage(BaseModel):
     journeyId: Optional[str] = None
     devToken: Optional[str] = None
     resumeThread: Optional[bool] = None
+    device: Optional[Literal['mobile', 'tablet', 'desktop']] = None
 
 
 class ChoiceMessage(BaseModel):
@@ -101,6 +102,7 @@ class QueryResultFrame(BaseModel):
     citations: Any = None
     confidence: float = 0.5
     reason: str = ""
+    suggestedQuestions: Any = None
 
 
 class ChatHistoryFrame(BaseModel):

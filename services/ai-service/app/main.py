@@ -74,7 +74,7 @@ async def startup():
     except Exception as e:
         print(f"scheduler failed {e}")
 
-from app.routers import decision_nodes, knowledge, optimizer, studio_ai, anomaly, eval, sessions, query
+from app.routers import decision_nodes, knowledge, optimizer, studio_ai, anomaly, eval, sessions, query, vision
 app.include_router(decision_nodes.router)
 app.include_router(knowledge.router)
 app.include_router(optimizer.router)
@@ -83,6 +83,7 @@ app.include_router(anomaly.router)
 app.include_router(eval.router)
 app.include_router(sessions.router)
 app.include_router(query.router)
+app.include_router(vision.router)
 
 @app.get("/health")
 async def health(): return {"status":"ok"}

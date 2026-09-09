@@ -13,7 +13,8 @@ public class AnalyticsController {
     private final LlmUsageRepository llmRepo;
     private final MetricDefinitionRepository metricRepo;
     private final RequestLogRepository logRepo;
-    public AnalyticsController(DeliveryEventRepository d, LlmUsageRepository l, MetricDefinitionRepository m, RequestLogRepository lr){this.deliveryRepo=d;this.llmRepo=l;this.metricRepo=m;this.logRepo=lr;}
+    private final ClickEventRepository clickRepo;
+    public AnalyticsController(DeliveryEventRepository d, LlmUsageRepository l, MetricDefinitionRepository m, RequestLogRepository lr, ClickEventRepository cr){this.deliveryRepo=d;this.llmRepo=l;this.metricRepo=m;this.logRepo=lr;this.clickRepo=cr;}
     @GetMapping("/api/analytics/campaigns/{id}/reach")
     public Map<String,Object> reach(@PathVariable String id, @RequestParam(required=false) String from, @RequestParam(required=false) String to){
         LocalDate f=from!=null?LocalDate.parse(from):LocalDate.now().minusDays(30);
@@ -42,6 +43,13 @@ public class AnalyticsController {
         e.setCostUsd(((Number)b.getOrDefault("costUsd",0)).doubleValue());
         RequestContextHolder.put("llmUsage",e.getAgentType());
         return llmRepo.save(e);
+    }
+    @PostMapping("/api/analytics/click")
+    public ClickEvent logClick(@RequestBody Map<String,Object> b){
+        ClickEvent e=new ClickEvent();
+        e.setCampaignId((String)b.get("campaignId")); e.setEventName((String)b.getOrDefault("eventName","unknown"));
+        e.setSessionId((String)b.get("sessionId"));
+        return clickRepo.save(e);
     }
     @GetMapping("/api/analytics/llm-cost")
     public Map<String,Object> llmCost(@RequestParam(required=false) String campaignId){

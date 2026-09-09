@@ -7,6 +7,11 @@ export const formSchema = z.object({
     placeholder: z.string().optional(),
     required: z.boolean().optional(),
     options: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+    visibleWhen: z.object({ field: z.string(), operator: z.string(), value: z.any().optional() }).optional(),
+    step: z.number().optional(),
   })).min(1),
   submitLabel: z.string().default('Submit'),
+  multiStep: z.boolean().optional(),
+  nextLabel: z.string().optional(),
+  backLabel: z.string().optional(),
 })

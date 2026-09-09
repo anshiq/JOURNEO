@@ -61,7 +61,9 @@ function Preview({ type, config }: { type: string; config: any }) {
     case 'trigger':
       return <div className="text-xs text-muted-foreground">Journey entry point</div>
     case 'condition':
-      return <div className="font-mono text-xs text-foreground">{cfg.field} {cfg.operator} {JSON.stringify(cfg.value)}</div>
+      return Array.isArray(cfg.branches) && cfg.branches.length > 0
+        ? <div className="font-mono text-xs text-foreground">{cfg.field} · {cfg.branches.length} branches</div>
+        : <div className="font-mono text-xs text-foreground">{cfg.field} {cfg.operator} {JSON.stringify(cfg.value)}</div>
     case 'end':
       return <div className="text-xs text-muted-foreground">Journey end</div>
     case 'text':
@@ -112,7 +114,10 @@ export default function JourneyNodeRenderer({ data, selected }: NodeProps) {
   const category = (nodeRegistry as any)[type]?.category || 'content'
   const frame = CATEGORY_FRAME[category] || CATEGORY_FRAME.content
   const header = CATEGORY_HEADER[category] || CATEGORY_HEADER.content
-  const handles = OUTCOME_HANDLES[type]
+  const conditionBranches = type === 'condition' ? (data.config?.branches as any[] | undefined) : undefined
+  const handles = conditionBranches && conditionBranches.length > 0
+    ? [...conditionBranches.map(b => b.handle), data.config?.elseHandle || 'else']
+    : OUTCOME_HANDLES[type]
   const isBlock = Boolean(data.isBlock)
   const isFloating = FLOATING_NODE_TYPES.includes(type)
   const hasError = !!data.hasError

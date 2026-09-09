@@ -1,4 +1,11 @@
 import type * as React from 'react'
+import type { Breakpoint, ResponsiveOverride } from './types'
+
+export function resolveResponsiveConfig<T extends Record<string, any>>(cfg: T, breakpoint: Breakpoint): T {
+  const responsive = (cfg as any)?.responsive as ResponsiveOverride<T> | undefined
+  if (!responsive || !responsive[breakpoint]) return cfg
+  return { ...cfg, ...responsive[breakpoint] }
+}
 
 export const AD_GUARD: React.CSSProperties = {
   maxWidth: '100%',

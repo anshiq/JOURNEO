@@ -6,6 +6,7 @@ import { useScreenForm } from './useScreenForm'
 import BlockRenderer from './BlockRenderer'
 import ScreenAdvanceBar from './ScreenAdvanceBar'
 import type { StartParams } from '../../lib/liveSession'
+import { analyticsApi } from '../../lib/api'
 
 export default function ScreenRenderer({ client, screen, blocks, choices, layout, start, studio, selectedBlockId, flashingBlockId, timeoutMs, onSelectBlock }: {
   client: LiveSessionClient
@@ -33,6 +34,15 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
     window.addEventListener('journeo:node-update', handler as EventListener)
     return () => window.removeEventListener('journeo:node-update', handler as EventListener)
   }, [])
+  React.useEffect(() => {
+    const handler = (event: any) => {
+      const p = event.detail || {}
+      const sessionId = client.state.status === 'screen' || client.state.status === 'ended' ? client.state.sessionId : undefined
+      analyticsApi.post('/api/analytics/click', { campaignId: start.campaignId, eventName: p.event, sessionId }).catch(() => {})
+    }
+    window.addEventListener('journeo:click-analytics', handler as EventListener)
+    return () => window.removeEventListener('journeo:click-analytics', handler as EventListener)
+  }, [client, start.campaignId])
   const mergedBlocks = React.useMemo(() => blocks.map(block => {
     const p = overlay[block.nodeId]
     if (!p) return block
@@ -78,11 +88,50 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
     overflowY: screen.layout?.scroll === 'hidden' ? 'hidden' : screen.layout?.scroll === 'paged' ? 'auto' : 'visible',
     overflowX: 'clip',
     scrollSnapType: screen.layout?.scroll === 'paged' ? 'y mandatory' : undefined,
+    ...(screen.layout?.scrollbar === 'thin' ? { scrollbarWidth: 'thin' as any } : screen.layout?.scrollbar === 'hidden' ? { scrollbarWidth: 'none' as any } : {}),
   }
+  const scrollbarClass = screen.layout?.scrollbar === 'hidden' ? 'journeo-scrollbar-hidden' : screen.layout?.scrollbar === 'thin' ? 'journeo-scrollbar-thin' : ''
+  const advanceMode = screen.advance?.mode || 'button'
+  const gesture = screen.advance?.gesture || 'none'
+  const rootRef = React.useRef<HTMLDivElement | null>(null)
+  const touchStartYRef = React.useRef<number | null>(null)
+  React.useEffect(() => {
+    if (gesture === 'none') return
+    const el = rootRef.current
+    if (!el) return
+    if (gesture === 'tap-anywhere') {
+      const onClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement
+        if (target.closest('button, a, input, select, textarea, [role="button"]')) return
+        handleAdvance()
+      }
+      el.addEventListener('click', onClick)
+      return () => el.removeEventListener('click', onClick)
+    }
+    if (gesture === 'swipe-up') {
+      const onTouchStart = (e: TouchEvent) => { touchStartYRef.current = e.touches[0]?.clientY ?? null }
+      const onTouchEnd = (e: TouchEvent) => {
+        const startY = touchStartYRef.current
+        touchStartYRef.current = null
+        if (startY == null) return
+        const endY = e.changedTouches[0]?.clientY ?? startY
+        if (startY - endY > 48) handleAdvance()
+      }
+      el.addEventListener('touchstart', onTouchStart, { passive: true })
+      el.addEventListener('touchend', onTouchEnd, { passive: true })
+      return () => {
+        el.removeEventListener('touchstart', onTouchStart)
+        el.removeEventListener('touchend', onTouchEnd)
+      }
+    }
+  }, [gesture, handleAdvance])
+  const rootStyle: React.CSSProperties = screen.sizeMode === 'viewport'
+    ? { height: '100dvh', width: '100dvw', maxWidth: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }
+    : {}
   return (
-    <div className="relative w-full min-w-0 max-w-full" data-screen-id={screen.id}>
-      {timeoutMs && <TimeoutCountdown timeoutMs={timeoutMs} resetKey={screen.id} />}
-      <div className="mt-2" style={surfaceStyle}>
+    <div ref={rootRef} className={`relative w-full min-w-0 max-w-full ${scrollbarClass}`} style={rootStyle} data-screen-id={screen.id}>
+      {timeoutMs && advanceMode === 'auto' && <TimeoutCountdown timeoutMs={timeoutMs} resetKey={screen.id} />}
+      <div className={`mt-2 ${scrollbarClass}`} style={screen.sizeMode === 'viewport' ? { ...surfaceStyle, flex: '1 1 auto', minHeight: 0 } : surfaceStyle}>
         {visibleBlocks.map(block => {
           const cfg = block.config || {}
           const style = getNodeStyle(cfg)
@@ -101,6 +150,7 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
                 isSelected={selectedBlockId === block.nodeId}
                 isFlashing={flashingBlockId === block.nodeId}
                 onSelect={onSelectBlock}
+                campaignId={start.campaignId}
               />
             </div>
           )

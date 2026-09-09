@@ -202,6 +202,19 @@ def eval_operator(pv, op, val):
 
 
 def local_branch(config, profile):
+    branches = config.get("branches")
+    if isinstance(branches, list) and branches:
+        field = config.get("field")
+        pv = str(profile.get(field, "")) if field else ""
+        for b in branches:
+            if not isinstance(b, dict) or not b.get("handle"):
+                continue
+            op = b.get("operator") or config.get("operator")
+            if op not in KNOWN_OPERATORS:
+                continue
+            if eval_operator(pv, op, b.get("value")):
+                return b["handle"]
+        return config.get("elseHandle") or "else"
     field = config.get("field")
     op = config.get("operator")
     if not field or op not in KNOWN_OPERATORS:

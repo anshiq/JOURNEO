@@ -4,7 +4,7 @@ import { getNodeStyle } from '../../nodes/_core/preview'
 import { evalVisibleWhen } from '../../lib/screen'
 import type { LiveBlock, LiveSessionClient } from '../../lib/liveSession'
 
-export default function BlockRenderer({ client, block, theme, values, errors, setValue, studio, isSelected, isFlashing, onSelect }: {
+export default function BlockRenderer({ client, block, theme, values, errors, setValue, studio, isSelected, isFlashing, onSelect, campaignId }: {
   client: LiveSessionClient
   block: LiveBlock
   theme: any
@@ -15,6 +15,7 @@ export default function BlockRenderer({ client, block, theme, values, errors, se
   isSelected?: boolean
   isFlashing?: boolean
   onSelect?: (id: string | null) => void
+  campaignId?: string
 }) {
   const Device = getDevice(block.type)
   const cfg = block.config || {}
@@ -62,6 +63,8 @@ export default function BlockRenderer({ client, block, theme, values, errors, se
         isFlashing={isFlashing}
         studio={studio}
         onSelect={studio ? () => onSelect?.(block.nodeId) : undefined}
+        profile={values}
+        campaignId={campaignId}
       />
       {error && <div className="mt-1 text-[11px] text-red-600">{error}</div>}
     </div>

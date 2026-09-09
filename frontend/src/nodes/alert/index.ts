@@ -13,7 +13,7 @@ export const alertDefinition: NodeDefinition<z.infer<typeof alertSchema>> = {
   defaultConfig: { variant: 'info', message: 'Important information' },
   renderable: true,
   valueType: false,
-  canOwnExit: false,
+  canOwnExit: true,
   exitHandles: ['default'],
   handles: { inputs: 1, outputs: ['default'] },
   Device: AlertDevice,

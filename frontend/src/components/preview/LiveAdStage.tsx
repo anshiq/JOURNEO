@@ -5,7 +5,7 @@ import 'react-device-bezels/styles.css'
 import { initialDeviceForViewport, type FrameDevice } from './devices'
 export type { FrameDevice } from './devices'
 
-import { adLayoutFor, DEFAULT_VIEWPORT, type ViewportId } from '../../lib/viewports'
+import { adLayoutFor, DEVICE_VIEWPORTS, DEFAULT_VIEWPORT, type ViewportId } from '../../lib/viewports'
 import { LiveSessionClient, type LiveState, type StartParams } from '../../lib/liveSession'
 import { DEFAULT_THEME } from '../../lib/journeyGraph'
 import AskAiOverlay from './AskAiOverlay'
@@ -144,7 +144,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
       <div data-ad-scroll className="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain">
         <div className="flex min-h-full w-full justify-center" style={{ padding: layout.stagePadding }}>{content}</div>
       </div>
-      {askAi && <AskAiOverlay client={client} config={askAi} sessionStatus={state.status} theme={theme} start={start} screenId={screen?.id} />}
+      {askAi && <AskAiOverlay client={client} config={askAi} sessionStatus={state.status} theme={theme} start={start} screenId={screen?.id} breakpoint={DEVICE_VIEWPORTS[viewportId].kind} />}
     </div>
   )
   if (!framed) return stage

@@ -52,7 +52,7 @@ export function registryExitHandles(type: string, config?: any): string[] {
 }
 
 export function defaultLayout(): Screen['layout'] {
-  return { mode: 'stack', direction: 'column', gap: '12px', padding: '0px', align: 'stretch', justify: 'start', scroll: 'auto' }
+  return { mode: 'stack', direction: 'column', gap: '12px', padding: '0px', align: 'stretch', justify: 'start', scroll: 'auto', scrollbar: 'auto' }
 }
 
 export function defaultAdvance(): Screen['advance'] {
@@ -66,6 +66,7 @@ export function defaultScreen(partial?: Partial<Screen>): Screen {
     name: partial?.name || 'Screen',
     position: partial?.position || { x: 80, y: 80 },
     size: partial?.size || { width: 320, height: 420 },
+    sizeMode: partial?.sizeMode || 'fixed',
     blocks: partial?.blocks || [],
     layout: partial?.layout || defaultLayout(),
     style: partial?.style,

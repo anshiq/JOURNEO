@@ -1,7 +1,34 @@
+import json
+import re
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Any, Optional
 from app.graphs.subflows.query_resolve_subflow import query_resolve_graph
+from app.rag.retriever import retrieve_for_llm
+from app.llm.client import invoke_with_fallback, llm_available
+
+
+def suggested_questions(query: str, k: int = 4, n: int = 3):
+    if not llm_available():
+        return []
+    try:
+        chunks = retrieve_for_llm(query, k=k)
+        if not chunks:
+            return []
+        context = "\n".join(c.get("content", "")[:400] for c in chunks[:k])
+        prompt = (
+            f"Based on this context, suggest {n} short, relevant follow-up questions a user might ask next. "
+            f"Return ONLY a JSON array of strings.\n\nContext:\n{context}\n\nOriginal question: {query}"
+        )
+        result = invoke_with_fallback(prompt)
+        text = getattr(result, "content", "") or ""
+        m = re.search(r"\[.*\]", text, re.DOTALL)
+        if not m:
+            return []
+        arr = json.loads(m.group(0))
+        return [str(q).strip() for q in arr if str(q).strip()][:n]
+    except Exception:
+        return []
 
 router = APIRouter(prefix="/v1/query", tags=["query"])
 
@@ -35,6 +62,7 @@ async def resolve(req: QueryResolveReq):
         "confidence": 0.5,
     }
     res = await query_resolve_graph.ainvoke(state)
+    allow_rag = cfg.get("allowRag", True)
     return {
         "decision": res.get("decision", "reject"),
         "branch": res.get("branch", "rejected"),
@@ -47,4 +75,5 @@ async def resolve(req: QueryResolveReq):
         "confidence": res.get("confidence", 0.5),
         "reason": res.get("reason", ""),
         "usedFallback": res.get("used_fallback", False),
+        "suggestedQuestions": suggested_questions(req.query, k=cfg.get("ragK", req.k or 4)) if allow_rag else [],
     }

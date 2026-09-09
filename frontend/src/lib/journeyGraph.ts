@@ -29,6 +29,7 @@ export interface ScreenLayout {
   columns?: number
   maxWidth?: string
   scroll: 'auto' | 'hidden' | 'paged'
+  scrollbar?: 'auto' | 'thin' | 'hidden'
 }
 
 export type AdvanceMode = 'button' | 'block' | 'auto' | 'none'
@@ -53,6 +54,7 @@ export interface Screen {
   name: string
   position: { x: number; y: number }
   size: { width: number; height: number }
+  sizeMode?: 'fixed' | 'viewport'
   blocks: string[]
   layout: ScreenLayout
   theme?: Partial<ThemeConfig>
@@ -134,6 +136,7 @@ export function defaultScreenValues(): Screen {
     name: 'Screen',
     position: { x: 80, y: 80 },
     size: { width: 320, height: 420 },
+    sizeMode: 'fixed',
     blocks: [],
     layout: { ...defaultLayout() },
     advance: { ...defaultAdvance() },
@@ -339,6 +342,7 @@ export function fromFlow(nodes: Node[], edges: Edge[], theme: ThemeConfig, prevS
         name: d.screen?.name || prev?.name || 'Screen',
         position: n.position,
         size: { width: (n as any).width || (n.style as any)?.width || d.screen?.size?.width || prev?.size?.width || 320, height: (n as any).height || (n.style as any)?.height || d.screen?.size?.height || prev?.size?.height || 420 },
+        sizeMode: d.screen?.sizeMode || prev?.sizeMode || 'fixed',
         blocks: [],
         layout: d.screen?.layout || prev?.layout || { mode: 'stack', direction: 'column', gap: '12px', padding: '0px', align: 'stretch', justify: 'start', scroll: 'auto' },
         theme: d.screen?.theme ?? prev?.theme,
