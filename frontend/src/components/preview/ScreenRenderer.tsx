@@ -72,30 +72,37 @@ export default function ScreenRenderer({ client, screen, blocks, choices, layout
     const advance = screen.advance || {}
     client.sendChoice(advance.handle || 'default', form.collect())
   }, [client, form, screen.advance])
+  const isRow = screen.layout?.mode !== 'grid' && screen.layout?.direction === 'row'
+  const gridColumns = screen.layout?.mode === 'grid' ? Math.max(1, screen.layout.columns || 2) : 1
   const blockStyle: React.CSSProperties = screen.layout?.mode === 'grid'
-    ? { display: 'grid', gridTemplateColumns: `repeat(${Math.max(1, screen.layout.columns || 2)}, minmax(0, 1fr))`, gap: screen.layout.gap || layout.blockGap }
-    : { display: 'flex', flexDirection: screen.layout?.direction === 'row' ? 'row' : 'column', gap: screen.layout?.gap || layout.blockGap }
+    ? { display: 'grid', gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`, gap: screen.layout.gap || layout.blockGap }
+    : { display: 'flex', flexDirection: screen.layout?.direction === 'row' ? 'row' : 'column', flexWrap: isRow ? 'wrap' : 'nowrap', gap: screen.layout?.gap || layout.blockGap }
   const surfaceStyle: React.CSSProperties = {
     ...blockStyle,
     alignItems: screen.layout?.align === 'center' ? 'center' : screen.layout?.align === 'end' ? 'flex-end' : screen.layout?.align === 'start' ? 'flex-start' : 'stretch',
     justifyContent: screen.layout?.justify === 'center' ? 'center' : screen.layout?.justify === 'end' ? 'flex-end' : screen.layout?.justify === 'between' ? 'space-between' : screen.layout?.justify === 'around' ? 'space-around' : 'flex-start',
     padding: screen.layout?.padding || 0,
-    maxWidth: screen.layout?.maxWidth,
+    maxWidth: screen.layout?.maxWidth ? `min(${typeof screen.layout.maxWidth === 'number' ? `${screen.layout.maxWidth}px` : screen.layout.maxWidth}, 100%)` : '100%',
+    minWidth: 0,
+    width: '100%',
+    boxSizing: 'border-box',
     overflowY: screen.layout?.scroll === 'hidden' ? 'hidden' : 'auto',
+    overflowX: 'clip',
     scrollSnapType: screen.layout?.scroll === 'paged' ? 'y mandatory' : undefined,
     paddingBottom: layout.advanceBarHeight,
   }
   return (
-    <div className="relative w-full" data-screen-id={screen.id}>
+    <div className="relative w-full min-w-0 max-w-full" data-screen-id={screen.id}>
       {fixture?.pinnedPanel && <PinnedAnswers theme={screen.theme} messages={pinned} onUnpin={id => patch(threadKey, id, { pinned: false }, fixture.historyLimit || 100)} />}
       {timeoutMs && <TimeoutCountdown timeoutMs={timeoutMs} resetKey={screen.id} />}
       <div className="mt-2" style={surfaceStyle}>
         {visibleBlocks.map(block => {
           const cfg = block.config || {}
           const style = getNodeStyle(cfg)
-          const gridColumn = cfg.blockSpan ? `span ${cfg.blockSpan}` : undefined
+          const span = cfg.blockSpan ? Math.max(1, Math.min(cfg.blockSpan, gridColumns)) : undefined
+          const gridColumn = span ? `span ${span}` : undefined
           return (
-            <div key={block.nodeId} style={{ ...(style as React.CSSProperties), gridColumn, scrollSnapAlign: screen.layout?.scroll === 'paged' ? 'start' : undefined }}>
+            <div key={block.nodeId} className="min-w-0 max-w-full" style={{ ...(style as React.CSSProperties), gridColumn, minWidth: 0, maxWidth: '100%', overflowWrap: 'break-word', scrollSnapAlign: screen.layout?.scroll === 'paged' ? 'start' : undefined }}>
               <BlockRenderer
                 client={client}
                 block={block}

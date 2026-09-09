@@ -1,5 +1,6 @@
 import { styleSchema, type NodeStyle } from './types'
 import type { ThemeConfig } from './types'
+import { safeMinWidth, safeWidth } from './responsive'
 export const defaultTheme: ThemeConfig = { primary: '#4f46e5', accent: '#f97316', surface: '#ffffff', foreground: '#111827', font: 'Inter', radius: 16, cta: 'Continue' }
 export const editorialTheme: ThemeConfig = { primary: '#000000', accent: '#E60000', surface: '#FFFFFF', foreground: '#111111', font: 'Bodoni Moda', radius: 0, cta: 'Continue' }
 export const themePresets: Record<string, ThemeConfig> = { Classic: { ...defaultTheme }, Editorial: { ...editorialTheme } }
@@ -40,10 +41,17 @@ export function applyStyle(style: NodeStyle): React.CSSProperties {
   if (style.paddingBottom) result.paddingBottom = style.paddingBottom
   if (style.paddingLeft) result.paddingLeft = style.paddingLeft
   if (style.gap) result.gap = style.gap
-  if (style.width) result.width = style.width
+  const safeW = safeWidth(style.width)
+  if (safeW) {
+    result.width = safeW
+    if (!style.maxWidth) result.maxWidth = '100%'
+  }
   if (style.height) result.height = style.height
-  if (style.minWidth) result.minWidth = style.minWidth
-  if (style.maxWidth) result.maxWidth = style.maxWidth
+  const safeMinW = safeMinWidth(style.minWidth)
+  result.minWidth = safeMinW ?? 0
+  const safeMaxW = safeWidth(style.maxWidth)
+  if (safeMaxW) result.maxWidth = safeMaxW
+  else if (safeW && !style.maxWidth) result.maxWidth = '100%'
   if (style.minHeight) result.minHeight = style.minHeight
   if (style.maxHeight) result.maxHeight = style.maxHeight
   if (style.display) result.display = style.display
@@ -57,7 +65,7 @@ export function applyStyle(style: NodeStyle): React.CSSProperties {
   if (style.gridTemplateColumns) result.gridTemplateColumns = style.gridTemplateColumns
   if (style.gridColumn) result.gridColumn = style.gridColumn
   if (style.gridRow) result.gridRow = style.gridRow
-  if (style.position) result.position = style.position
+  if (style.position) result.position = style.position === 'fixed' ? 'relative' : style.position
   if (style.top) result.top = style.top
   if (style.right) result.right = style.right
   if (style.bottom) result.bottom = style.bottom
@@ -72,6 +80,9 @@ export function applyStyle(style: NodeStyle): React.CSSProperties {
   if (style.transformOrigin) result.transformOrigin = style.transformOrigin
   if (style.cursor) result.cursor = style.cursor
   if (style.objectFit) result.objectFit = style.objectFit
+  result.boxSizing = 'border-box'
+  result.overflowWrap = (result as any).overflowWrap || 'break-word'
+  ;(result as any).wordBreak = (result as any).wordBreak || 'break-word'
   return result as React.CSSProperties
 }
 export function youtubeEmbedUrl(url: string) {

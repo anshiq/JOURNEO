@@ -127,7 +127,7 @@ export default function LiveAdStage({ start, viewportId = DEFAULT_VIEWPORT, fram
   }, [])
   const askAi = screenState ? ((screenState.screen as any).askAiFixture || (screenState.screen as any).askAi || askAiConfig) : askAiConfig
   const content = (
-    <div data-ad-content className="my-auto w-full" style={{ maxWidth: layout.contentMaxWidth }}>
+    <div data-ad-content className="my-auto w-full min-w-0 max-w-full break-words" style={{ maxWidth: `min(${layout.contentMaxWidth}px, 100%)` }}>
       {state.status === 'connecting' || state.status === 'stale' ? (
         <div className="flex flex-col items-center gap-2 py-16 text-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /><p className="text-sm text-muted-foreground">{state.status === 'stale' ? 'Updating to the latest…' : 'Loading experience…'}</p></div>
       ) : state.status === 'error' ? (

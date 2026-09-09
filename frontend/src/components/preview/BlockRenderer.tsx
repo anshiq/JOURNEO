@@ -38,8 +38,12 @@ export default function BlockRenderer({ client, block, theme, values, errors, se
         borderColor: border,
         borderRadius: 8,
         boxShadow: studio && isFlashing ? `0 0 0 4px ${theme.primary}66` : undefined,
+        maxWidth: '100%',
+        minWidth: 0,
+        boxSizing: 'border-box',
+        overflowWrap: 'break-word',
       }}
-      className="relative"
+      className="relative min-w-0 max-w-full"
     >
       {studio && isSelected && <div className="absolute -top-2 left-2 z-10 bg-foreground px-1.5 text-[9px] text-background">Selected</div>}
       <Device
