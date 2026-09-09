@@ -20,7 +20,7 @@ public class RealWorldCampaignSeeder implements CommandLineRunner {
     private final CampaignRepository campaignRepository;
     private final JourneyRepository journeyRepository;
     private final ObjectMapper mapper = new ObjectMapper();
-    @Value("${demo-data-seed:true}") private boolean enabled;
+    @Value("${demo-data-seed:false}") private boolean enabled;
     @Value("${demo-data-reset:false}") private boolean reset;
 
     public RealWorldCampaignSeeder(CampaignRepository campaignRepository, JourneyRepository journeyRepository) {
