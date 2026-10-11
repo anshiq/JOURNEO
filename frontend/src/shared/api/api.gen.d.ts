@@ -909,6 +909,11 @@ export interface components {
             logoUrl?: string | null;
         };
         
+        CheckpointBody: {
+            
+            reason: "manual" | "ai_restyle";
+        };
+        
         CreateBody: {
             
             audience?: string | null;
@@ -1587,7 +1592,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CheckpointBody"] | null;
+            };
+        };
         responses: {
             
             201: {

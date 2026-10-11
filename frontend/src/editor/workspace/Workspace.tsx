@@ -1,7 +1,8 @@
 import { isProblem } from '@shared/api/problem'
 import { strings } from '@shared/strings'
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
+import { GenerationOverlay } from '../campaign/GenerateProgress'
 import { AllDevices } from '../canvas/AllDevices'
 import { ScreenCanvas } from '../canvas/ScreenCanvas'
 import { Inspector } from '../inspector/Inspector'
@@ -45,6 +46,18 @@ function Loaded({ campaign, workspace }: { campaign: CampaignSummary; workspace:
   useShortcuts(ready)
   const others = useOtherTabs(campaign.id)
   const tab = useEditor(state => state.tab)
+  const [params, setParams] = useSearchParams()
+  const job = params.get('job')
+  const closeJob = () => {
+    const next = new URLSearchParams(params)
+    next.delete('job')
+    setParams(next, { replace: true })
+  }
+  const retryJob = (jobId: string) => {
+    const next = new URLSearchParams(params)
+    next.set('job', jobId)
+    setParams(next, { replace: true })
+  }
   if (!ready) return <p className="p-10 text-slate-500">{strings.loading}</p>
   return (
     <div className="flex h-full flex-col">
@@ -68,6 +81,7 @@ function Loaded({ campaign, workspace }: { campaign: CampaignSummary; workspace:
       <ConflictDialog campaignId={campaign.id} />
       <PlayOverlay campaignId={campaign.id} />
       <Coachmarks campaignId={campaign.id} workspace={workspace} />
+      {job ? <GenerationOverlay campaignId={campaign.id} jobId={job} onClose={closeJob} onRetry={retryJob} /> : null}
       <p className="fixed inset-x-0 bottom-0 z-50 bg-slate-900 px-4 py-2 text-center text-xs text-white min-[1280px]:hidden">
         The editor works best on a screen at least 1280 pixels wide.
       </p>

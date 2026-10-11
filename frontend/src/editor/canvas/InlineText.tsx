@@ -9,6 +9,7 @@ import { EditorContent, useEditor as useTiptap } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Bold, Italic, Link2, List, ListOrdered, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useRef } from 'react'
+import { RewriteMenu } from '../ai/RewriteMenu'
 import { useEditor } from '../store'
 import { act } from '../store/commands'
 import { Popover } from '../ui/Popover'
@@ -138,6 +139,12 @@ function RichEditor({ elementId, path, value, rich }: EditableText) {
     return out
   }, [screens])
   if (!editor) return null
+  const applyRewrite = (text: string) => {
+    window.clearTimeout(timer.current)
+    lastSent.current = text
+    act('Rewrite text', updateElement(elementId, path, text))
+    editor.commands.setContent(richToJson(parseRichText(text), mode), { emitUpdate: false })
+  }
   const button = (label: string, active: boolean, onClick: () => void, icon: React.ReactNode) => (
     <button
       type="button"
@@ -194,6 +201,12 @@ function RichEditor({ elementId, path, value, rich }: EditableText) {
               <ListOrdered size={14} />,
             )
           : null}
+        <RewriteMenu
+          kind={mode === 'inline' ? 'heading' : 'text'}
+          limit={max}
+          readText={() => serialize(editor.getJSON())}
+          onPick={applyRewrite}
+        />
         <Popover
           trigger={
             <button

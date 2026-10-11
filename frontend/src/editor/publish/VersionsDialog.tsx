@@ -15,6 +15,7 @@ const REASONS: Record<string, string> = {
   before_restore: 'Before restoring',
   before_generate: 'Before AI changes',
   before_ai: 'Before AI changes',
+  ai_restyle: 'Before restyling with AI',
   conflict_rejected: 'Your version from a conflict',
   conflict: 'Before a conflict',
   manual: 'Saved',

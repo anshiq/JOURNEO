@@ -7,6 +7,7 @@ from app.core.deps import EditorGuard, SessionDep
 from app.core.errors import NotFound, problem
 from app.modules.journeys import library, service
 from app.modules.journeys.schemas import (
+    CheckpointBody,
     DraftBody,
     EditorStateBody,
     OpsBody,
@@ -83,8 +84,11 @@ async def get_checkpoint(campaign_id: str, checkpoint_id: str, session: SessionD
 
 
 @router.post(f"{BASE}/checkpoints", status_code=201)
-async def create_checkpoint(campaign_id: str, session: SessionDep) -> dict[str, Any]:
-    return {"id": await service.create_checkpoint(session, campaign_id, "manual")}
+async def create_checkpoint(
+    campaign_id: str, session: SessionDep, body: CheckpointBody | None = None
+) -> dict[str, Any]:
+    reason = body.reason if body else "manual"
+    return {"id": await service.create_checkpoint(session, campaign_id, reason)}
 
 
 @router.post(f"{BASE}/restore")

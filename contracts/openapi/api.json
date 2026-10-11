@@ -127,6 +127,22 @@
         "title": "Brand",
         "type": "object"
       },
+      "CheckpointBody": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "default": "manual",
+            "enum": [
+              "manual",
+              "ai_restyle"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "CheckpointBody",
+        "type": "object"
+      },
       "CreateBody": {
         "additionalProperties": false,
         "properties": {
@@ -1715,6 +1731,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CheckpointBody"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "content": {

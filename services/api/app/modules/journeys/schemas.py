@@ -27,6 +27,10 @@ class PublishBody(ApiModel):
     notes: str | None = Field(default=None, max_length=200)
 
 
+class CheckpointBody(ApiModel):
+    reason: Literal["manual", "ai_restyle"] = "manual"
+
+
 class RestoreBody(ApiModel):
     version_no: int | None = Field(default=None, ge=1)
     checkpoint_id: str | None = Field(default=None, max_length=64)

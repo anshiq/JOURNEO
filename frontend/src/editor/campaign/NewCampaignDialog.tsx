@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { uploadFile } from '../inspector/widgets/ImageField'
+import { useRestyle } from '../queries/ai'
 import { type CreateCampaignBody, useCreateCampaign } from '../queries/campaigns'
 import type { Goal } from '../queries/types'
 import { Button } from '../ui/Button'
@@ -30,6 +31,7 @@ export function NewCampaignDialog({
 }) {
   const navigate = useNavigate()
   const create = useCreateCampaign()
+  const restyle = useRestyle()
   const [brief, setBrief] = useState('')
   const [goal, setGoal] = useState<Goal | null>(initialGoal ?? null)
   const [website, setWebsite] = useState('')
@@ -41,6 +43,30 @@ export function NewCampaignDialog({
   const [mode, setMode] = useState<Mode>('template')
   const [templateId, setTemplateId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const takeColourFromWebsite = () => {
+    restyle.mutate(
+      { websiteUrl: website.trim() },
+      {
+        onSuccess: result => {
+          const primary = result.theme?.colors?.primary
+          if (!primary) {
+            toast.error('No brand colour found on that website. Pick one instead.')
+            return
+          }
+          setColor(primary)
+          setUseColor(true)
+        },
+        onError: failure =>
+          toast.error(
+            isProblem(failure, 503)
+              ? 'AI is not set up'
+              : isProblem(failure)
+                ? failure.problem.detail
+                : 'Could not read that website',
+          ),
+      },
+    )
+  }
   const submit = () => {
     const body: CreateCampaignBody = {
       start: mode === 'template' && templateId ? { mode: 'template', templateId } : { mode },
@@ -190,7 +216,20 @@ export function NewCampaignDialog({
             </label>
           </div>
           <div className="min-w-56 flex-1">
-            <Field label="Website (optional)" hint="Visitor chat learns from it">
+            <Field
+              label="Website (optional)"
+              hint="Visitor chat learns from it"
+              aside={
+                <button
+                  type="button"
+                  disabled={!website.trim() || restyle.isPending}
+                  onClick={takeColourFromWebsite}
+                  className="text-xs font-medium text-indigo-700 hover:underline disabled:opacity-40"
+                >
+                  {restyle.isPending ? 'Reading website…' : 'Use my website'}
+                </button>
+              }
+            >
               {id => (
                 <TextInput
                   id={id}

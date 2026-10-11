@@ -21,6 +21,7 @@ import { stepName } from '@journey/summary'
 import { cn } from '@shared/ui/cn'
 import { ExternalLink, GitBranch, GripVertical, LayoutTemplate, MoreHorizontal, Plus, Square } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { RewriteScreenDialog } from '../ai/RewriteScreenDialog'
 import { useRecipes } from '../queries/library'
 import type { Ops } from '../queries/types'
 import { useEditor } from '../store'
@@ -136,6 +137,7 @@ function OutlineItem({
     id: row.stepId,
     disabled: fixed || kind !== 'screen',
   })
+  const [rewriting, setRewriting] = useState(false)
   if (!doc) return null
   const name = stepName(doc, row.stepId)
   const Icon = kind === 'condition' ? GitBranch : kind === 'redirect' ? ExternalLink : Square
@@ -196,6 +198,7 @@ function OutlineItem({
             kind === 'screen'
               ? [
                   { label: 'Play from here', onSelect: () => useEditor.getState().play(row.stepId) },
+                  { label: 'Rewrite this screen with AI', onSelect: () => setRewriting(true) },
                   { label: 'Duplicate', onSelect: () => act('Duplicate screen', duplicateScreen(row.stepId)) },
                   'separator',
                   { label: 'Delete', danger: true, onSelect: () => act('Delete screen', deleteScreen(row.stepId)) },
@@ -204,6 +207,7 @@ function OutlineItem({
           }
         />
       </div>
+      {rewriting ? <RewriteScreenDialog screenId={row.stepId} onOpenChange={setRewriting} /> : null}
     </li>
   )
 }

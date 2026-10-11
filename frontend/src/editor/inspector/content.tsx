@@ -10,8 +10,9 @@ import {
   updateItem,
 } from '@journey/ops/index'
 import { LIMITS } from '@shared/limits.gen'
+import { useAltText } from '../queries/ai'
 import { useEditor } from '../store'
-import { act } from '../store/commands'
+import { act, findElement } from '../store/commands'
 import { Menu } from '../ui/Menu'
 import { Switch } from '../ui/Switch'
 import { DateTimeControl, NumberControl, SegmentedControl, SelectControl, TextControl } from './controls'
@@ -136,15 +137,23 @@ function TextContent({ element }: { element: Of<'text'> }) {
   )
 }
 
+function fillAlt(elementId: string, text: string) {
+  const doc = useEditor.getState().doc
+  const element = doc ? findElement(doc, elementId)?.element : undefined
+  if (!text || element?.type !== 'image' || element.props.alt) return
+  act('Describe image', updateElement(elementId, ['props', 'alt'], text))
+}
+
 function ImageContent({ element }: { element: Of<'image'> }) {
   const props = element.props
+  const alt = useAltText()
   return (
     <>
       <ImageField
         label="Image"
         field="src"
         src={props.src}
-        onPick={image =>
+        onPick={image => {
           act(
             'Replace image',
             updateElement(element.id, ['props'], {
@@ -157,7 +166,8 @@ function ImageContent({ element }: { element: Of<'image'> }) {
               attribution: image.attribution ?? null,
             }),
           )
-        }
+          if (!props.alt) alt.mutate(image.src, { onSuccess: text => fillAlt(element.id, text) })
+        }}
       />
       <TextControl
         label="Describe the image"

@@ -80,8 +80,11 @@ export async function fetchCheckpointDoc(id: string, checkpointId: string): Prom
   return (data as unknown as { doc: JourneyDoc }).doc
 }
 
-export async function createCheckpoint(id: string): Promise<void> {
-  await api.POST('/api/v1/campaigns/{campaign_id}/journey/checkpoints', path(id))
+export async function createCheckpoint(id: string, reason: 'manual' | 'ai_restyle' = 'manual'): Promise<void> {
+  await api.POST('/api/v1/campaigns/{campaign_id}/journey/checkpoints', {
+    ...path(id),
+    body: { reason } as never,
+  })
 }
 
 export async function restore(
