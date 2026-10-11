@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import db
 from app.core.config import Settings, get_settings
-from app.core.errors import NotFound, ServiceUnavailable, ValidationFailed
+from app.core.errors import Conflict, NotFound, ServiceUnavailable, ValidationFailed
 from app.core.http import fetch_bytes, fetch_text
 from app.core.llm import LlmClient, LlmOutputError, make_llm
 from app.core.logging import log_event
@@ -191,7 +191,7 @@ async def start_generation(
     await campaigns.get(session, campaign_id)
     active = await jobs.active_for(session, campaign_id)
     if active is not None:
-        return active
+        raise Conflict("A journey is already being written for this campaign", activeJobId=active.id)
     brief = brief_of(body)
     job = await jobs.insert(session, campaign_id, brief)
     if not settings.llm.configured:

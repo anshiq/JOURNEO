@@ -1,8 +1,9 @@
 import { api } from '@shared/api/editor-client'
+import { isProblem } from '@shared/api/problem'
 import { Check, Loader2, Sparkles } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { useCancelGeneration, useGenerationJob, useStartGeneration } from '../queries/ai'
+import { aiFailureMessage, useCancelGeneration, useGenerationJob, useStartGeneration } from '../queries/ai'
 import { validateDoc } from '../queries/journey'
 import type { Workspace } from '../queries/types'
 import { useEditor } from '../store'
@@ -105,7 +106,15 @@ export function GenerationOverlay({
                 data &&
                 start.mutate(data.brief, {
                   onSuccess: result => onRetry(result.jobId),
-                  onError: () => toast.error('Could not start again. Try later.'),
+                  onError: failure => {
+                    const activeJobId = isProblem(failure, 409) ? failure.problem.activeJobId : undefined
+                    if (typeof activeJobId === 'string') {
+                      toast.info('This campaign already has a journey being written. Showing it.')
+                      onRetry(activeJobId)
+                      return
+                    }
+                    toast.error(aiFailureMessage(failure, 'Could not start again. Try later.'))
+                  },
                 })
               }
             >

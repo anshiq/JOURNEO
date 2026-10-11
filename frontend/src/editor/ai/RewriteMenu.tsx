@@ -1,7 +1,6 @@
-import { isProblem } from '@shared/api/problem'
 import { Loader2, Sparkles } from 'lucide-react'
 import { useState } from 'react'
-import { useRewrite } from '../queries/ai'
+import { aiFailureMessage, useRewrite } from '../queries/ai'
 import { useEditor } from '../store'
 import { Popover } from '../ui/Popover'
 
@@ -40,7 +39,7 @@ export function RewriteMenu({
         },
         onError: failure => {
           setSuggestions([])
-          setError(isProblem(failure, 503) ? 'AI is not set up' : 'Could not rewrite. Try again.')
+          setError(aiFailureMessage(failure, 'Could not rewrite. Try again.'))
         },
       },
     )

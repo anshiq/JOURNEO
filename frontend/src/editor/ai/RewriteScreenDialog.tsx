@@ -1,11 +1,10 @@
 import type { Screen } from '@journey/model/types'
 import { type Op, updateElement, updateItem } from '@journey/ops/index'
-import { isProblem } from '@shared/api/problem'
 import { LIMITS } from '@shared/limits.gen'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { TextControl } from '../inspector/controls'
-import { useRewriteScreen } from '../queries/ai'
+import { aiFailureMessage, useRewriteScreen } from '../queries/ai'
 import { useEditor } from '../store'
 import { act, chain } from '../store/commands'
 import { Button } from '../ui/Button'
@@ -95,7 +94,7 @@ export function RewriteScreenDialog({
         onSuccess: texts => setResult(texts),
         onError: failure => {
           setResult(null)
-          setError(isProblem(failure, 503) ? 'AI is not set up' : 'Could not rewrite this screen. Try again.')
+          setError(aiFailureMessage(failure, 'Could not rewrite this screen. Try again.'))
         },
       },
     )

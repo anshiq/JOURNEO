@@ -9,8 +9,10 @@ from openai import APIConnectionError, APIStatusError, AsyncOpenAI, RateLimitErr
 from tenacity import AsyncRetrying, retry_if_exception, stop_after_attempt, wait_exponential_jitter
 
 from app.core.config import LlmSettings
+from app.core.errors import RateLimited
 from app.core.logging import log_event
 
+AI_BUSY = "AI is busy right now. Try again in a moment."
 _FENCE = re.compile(r"```(?:json)?\s*(.*?)```", re.DOTALL)
 
 
@@ -68,6 +70,16 @@ class Llm:
     async def complete_json(
         self, *, task: str, model: str, messages: list[dict[str, Any]], max_tokens: int, timeout: float
     ) -> dict[str, Any]:
+        try:
+            return await self._complete_json(
+                task=task, model=model, messages=messages, max_tokens=max_tokens, timeout=timeout
+            )
+        except RateLimitError as exc:
+            raise RateLimited(AI_BUSY) from exc
+
+    async def _complete_json(
+        self, *, task: str, model: str, messages: list[dict[str, Any]], max_tokens: int, timeout: float
+    ) -> dict[str, Any]:
         start = time.perf_counter()
         async for attempt in AsyncRetrying(
             stop=stop_after_attempt(3),
@@ -98,6 +110,16 @@ class Llm:
         raise LlmOutputError("unreachable")
 
     async def describe_image(
+        self, *, task: str, model: str, image: bytes, mime: str, prompt: str, max_tokens: int, timeout: float
+    ) -> str:
+        try:
+            return await self._describe_image(
+                task=task, model=model, image=image, mime=mime, prompt=prompt, max_tokens=max_tokens, timeout=timeout
+            )
+        except RateLimitError as exc:
+            raise RateLimited(AI_BUSY) from exc
+
+    async def _describe_image(
         self, *, task: str, model: str, image: bytes, mime: str, prompt: str, max_tokens: int, timeout: float
     ) -> str:
         start = time.perf_counter()

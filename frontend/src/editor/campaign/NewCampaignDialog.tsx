@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { uploadFile } from '../inspector/widgets/ImageField'
-import { useRestyle } from '../queries/ai'
+import { aiFailureMessage, useRestyle } from '../queries/ai'
 import { type CreateCampaignBody, useCreateCampaign } from '../queries/campaigns'
 import type { Goal } from '../queries/types'
 import { Button } from '../ui/Button'
@@ -56,14 +56,7 @@ export function NewCampaignDialog({
           setColor(primary)
           setUseColor(true)
         },
-        onError: failure =>
-          toast.error(
-            isProblem(failure, 503)
-              ? 'AI is not set up'
-              : isProblem(failure)
-                ? failure.problem.detail
-                : 'Could not read that website',
-          ),
+        onError: failure => toast.error(aiFailureMessage(failure, 'Could not read that website')),
       },
     )
   }

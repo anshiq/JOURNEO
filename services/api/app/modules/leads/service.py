@@ -81,7 +81,7 @@ def lead_payload(lead: Lead) -> dict[str, Any]:
 async def deliver_lead(session: AsyncSession, lead_id: str, attempt: int) -> bool:
     lead = await repo.get(session, lead_id)
     if lead is None:
-        return True
+        return False
     hook = await journeys.leads_webhook(session, lead.campaign_id)
     if not hook or not hook.get("url") or not hook.get("enabled", True):
         return True

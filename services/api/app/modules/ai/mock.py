@@ -48,6 +48,7 @@ GOAL_LINE = re.compile(r"^Goal: (\w+)", re.MULTILINE)
 BRIEF_LINE = re.compile(r"^Brief: (.*)$", re.MULTILINE)
 SCREEN_LINE = re.compile(r"^- (.+?) \(([a-z-]+)\):", re.MULTILINE)
 TEXT_LINE = re.compile(r"^Text: (.*)$", re.MULTILINE)
+INSTRUCTION_LINE = re.compile(r"^Instruction: (.*)$", re.MULTILINE)
 TEXT_ITEM = re.compile(r"^- (\S+) \(max (\d+)\): (.*)$", re.MULTILINE)
 
 
@@ -183,14 +184,32 @@ def content(messages: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def rewrite(messages: list[dict[str, Any]]) -> dict[str, Any]:
-    match = TEXT_LINE.search(prompt_of(messages))
+    prompt = prompt_of(messages)
+    match = TEXT_LINE.search(prompt)
     text = (match.group(1) if match else "").strip()
+    found = INSTRUCTION_LINE.search(prompt)
+    instruction = found.group(1).lower() if found else ""
+    words = text.split()
     first = re.split(r"(?<=[.!?])\s+", text, maxsplit=1)[0]
-    return {"suggestions": [first, f"{first} Ready when you are.", " ".join(text.split()[:12])]}
+    if "short" in instruction:
+        main = " ".join(words[: max(3, len(words) // 2)])
+    elif "persuas" in instruction:
+        main = f"{first.rstrip('.!?')}. Don't miss out."
+    elif "friend" in instruction:
+        main = f"Hi there! {first}"
+    elif "simpl" in instruction:
+        main = " ".join(words[:12]).rstrip(".!?")
+    else:
+        main = first
+    return {"suggestions": [main, f"{main} Ready when you are.", f"Hello again: {main}"]}
+
+
+def screen_copy(text: str) -> str:
+    return f"{' '.join(text.split()[:30]).rstrip('.!?')}!"
 
 
 def rewrite_screen(messages: list[dict[str, Any]]) -> dict[str, Any]:
-    return {"texts": {item[0]: " ".join(item[2].split()[:30]) for item in TEXT_ITEM.findall(prompt_of(messages))}}
+    return {"texts": {item[0]: screen_copy(item[2]) for item in TEXT_ITEM.findall(prompt_of(messages))}}
 
 
 def theme(messages: list[dict[str, Any]]) -> dict[str, Any]:

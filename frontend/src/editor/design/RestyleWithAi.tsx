@@ -1,12 +1,11 @@
 import type { Theme } from '@journey/model/types'
 import { setTheme } from '@journey/ops/index'
-import { isProblem } from '@shared/api/problem'
 import { LIMITS } from '@shared/limits.gen'
 import { Loader2, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { TextControl } from '../inspector/controls'
-import { useRestyle } from '../queries/ai'
+import { aiFailureMessage, useRestyle } from '../queries/ai'
 import { createCheckpoint } from '../queries/journey'
 import { useEditor } from '../store'
 import { act, chain } from '../store/commands'
@@ -40,14 +39,7 @@ export function RestyleWithAi() {
     setProposal(null)
     restyle.mutate(source === 'prompt' ? { prompt: prompt.trim() } : { websiteUrl: website.trim() }, {
       onSuccess: result => setProposal(result.theme ?? null),
-      onError: failure =>
-        toast.error(
-          isProblem(failure, 503)
-            ? 'AI is not set up'
-            : isProblem(failure)
-              ? failure.problem.detail
-              : 'Could not restyle. Try again.',
-        ),
+      onError: failure => toast.error(aiFailureMessage(failure, 'Could not restyle. Try again.')),
     })
   }
   const apply = async () => {

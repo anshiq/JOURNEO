@@ -1,7 +1,15 @@
 import type { Theme } from '@journey/model/types'
 import { api } from '@shared/api/editor-client'
+import { isProblem } from '@shared/api/problem'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { Goal } from './types'
+
+export function aiFailureMessage(failure: unknown, fallback: string): string {
+  if (isProblem(failure, 503)) return 'AI is not set up'
+  if (isProblem(failure, 429)) return 'AI is busy. Try again in a moment.'
+  if (isProblem(failure)) return failure.problem.detail
+  return fallback
+}
 
 export type GenerationStatus = 'queued' | 'running' | 'done' | 'error' | 'cancelled'
 
