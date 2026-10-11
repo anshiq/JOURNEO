@@ -1,0 +1,126 @@
+{
+  "doc": {
+    "links": {
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_f00001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_a00001",
+                  "key": "score",
+                  "kind": "text",
+                  "label": "score"
+                },
+                {
+                  "id": "fld_b00001",
+                  "key": "email",
+                  "kind": "text",
+                  "label": "email"
+                },
+                {
+                  "id": "fld_c00001",
+                  "key": "email",
+                  "kind": "email",
+                  "label": "email"
+                }
+              ],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "E_KEY_CONFLICT",
+        "target": {
+          "field": "key",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_KEY_RESERVED",
+        "target": {
+          "field": "key",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "J_EXIT_OPEN",
+        "target": {
+          "field": "target",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "W_CONSENT",
+        "target": {
+          "field": "fields",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_aaaaaa": [
+        {
+          "key": "score",
+          "type": "text"
+        },
+        {
+          "key": "email",
+          "type": "text"
+        },
+        {
+          "key": "email",
+          "type": "email"
+        }
+      ]
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "question",
+  "name": "Question",
+  "category": "question",
+  "layout": {
+    "preset": "stack"
+  },
+  "elements": [
+    {
+      "type": "choice",
+      "props": {
+        "question": "Which option fits you best?",
+        "key": "choice",
+        "display": "buttons",
+        "options": [
+          {
+            "label": "Option A"
+          },
+          {
+            "label": "Option B"
+          },
+          {
+            "label": "Option C"
+          }
+        ],
+        "autoAdvance": true
+      }
+    }
+  ]
+}

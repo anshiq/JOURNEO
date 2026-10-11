@@ -1,0 +1,75 @@
+{
+  "doc": {
+    "links": {
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Continue"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "J_EXIT_OPEN",
+        "target": {
+          "field": "target",
+          "id": "el_b00001",
+          "itemId": "it_n00001",
+          "kind": "item",
+          "screenId": "scr_aaaaaa"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_aaaaaa": []
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

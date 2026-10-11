@@ -1,0 +1,27 @@
+{
+  "id": "dropdown",
+  "name": "Dropdown",
+  "category": "question",
+  "element": {
+    "type": "choice",
+    "props": {
+      "question": "Where are you based?",
+      "key": "region",
+      "display": "dropdown",
+      "options": [
+        {
+          "label": "Europe"
+        },
+        {
+          "label": "North America"
+        },
+        {
+          "label": "Asia"
+        },
+        {
+          "label": "Other"
+        }
+      ]
+    }
+  }
+}

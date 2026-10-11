@@ -1,0 +1,207 @@
+{
+  "doc": {
+    "links": {
+      "scr_score1": {
+        "el_r00001:band:band_high01": "scr_yay001",
+        "el_r00001:band:band_low001": "scr_sorry1",
+        "next": "scr_thanks"
+      },
+      "stp_start0": {
+        "next": "scr_score1"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_score1": {
+        "elements": [
+          {
+            "id": "el_r00001",
+            "props": {
+              "bands": [
+                {
+                  "id": "band_low001",
+                  "label": "Low",
+                  "max": 6,
+                  "min": 0
+                },
+                {
+                  "id": "band_high01",
+                  "label": "High",
+                  "max": 10,
+                  "min": 9
+                }
+              ],
+              "branchByScore": true,
+              "key": "nps",
+              "max": 10,
+              "question": "Rate",
+              "scale": "nps"
+            },
+            "type": "rating"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Continue"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_score1",
+        "name": "scr_score1"
+      },
+      "scr_sorry1": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_sorry1",
+        "name": "scr_sorry1"
+      },
+      "scr_thanks": {
+        "elements": [
+          {
+            "id": "el_h00004",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_thanks",
+        "name": "scr_thanks"
+      },
+      "scr_yay001": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_yay001",
+        "name": "scr_yay001"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_score1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_sorry1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_yay001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_score1": [
+        {
+          "key": "nps",
+          "type": "rating"
+        }
+      ],
+      "scr_sorry1": [],
+      "scr_thanks": [],
+      "scr_yay001": []
+    },
+    "ports": {
+      "scr_score1": [
+        "next",
+        "el_r00001:band:band_low001",
+        "el_r00001:band:band_high01"
+      ],
+      "scr_sorry1": [],
+      "scr_thanks": [],
+      "scr_yay001": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 3
+            },
+            "at": "scr_score1",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score1",
+          "scr_sorry1"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 8
+            },
+            "at": "scr_score1",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score1",
+          "scr_thanks"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 10
+            },
+            "at": "scr_score1",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score1",
+          "scr_yay001"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

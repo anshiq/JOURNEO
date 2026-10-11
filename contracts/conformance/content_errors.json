@@ -1,0 +1,218 @@
+{
+  "doc": {
+    "links": {
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_h00001",
+            "props": {
+              "text": ""
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_i00001",
+            "props": {
+              "src": ""
+            },
+            "type": "image"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "url",
+                    "url": "javascript:x"
+                  },
+                  "id": "it_u00001",
+                  "label": "Site"
+                }
+              ]
+            },
+            "type": "buttons"
+          },
+          {
+            "id": "el_c00001",
+            "props": {
+              "branchByAnswer": true,
+              "key": "pick",
+              "multiple": true,
+              "options": [
+                {
+                  "id": "opt_one001",
+                  "label": "One"
+                }
+              ],
+              "question": "Pick"
+            },
+            "type": "choice"
+          },
+          {
+            "id": "el_f00001",
+            "props": {
+              "fields": [],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          },
+          {
+            "id": "el_f00002",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_a00001",
+                  "key": "a",
+                  "kind": "text",
+                  "label": "a"
+                }
+              ],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "E_BRANCH_MULTI",
+        "target": {
+          "field": "branchByAnswer",
+          "id": "el_c00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_FORM_MULTI",
+        "target": {
+          "id": "el_f00002",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_REQUIRED",
+        "target": {
+          "field": "fields",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_REQUIRED",
+        "target": {
+          "field": "options",
+          "id": "el_c00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_REQUIRED",
+        "target": {
+          "field": "src",
+          "id": "el_i00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_REQUIRED",
+        "target": {
+          "field": "text",
+          "id": "el_h00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "E_URL",
+        "target": {
+          "field": "action",
+          "id": "el_b00001",
+          "itemId": "it_u00001",
+          "kind": "item",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "J_EXIT_OPEN",
+        "target": {
+          "field": "target",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "J_EXIT_OPEN",
+        "target": {
+          "field": "target",
+          "id": "el_f00002",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      },
+      {
+        "code": "W_ALT",
+        "target": {
+          "field": "alt",
+          "id": "el_i00001",
+          "kind": "element",
+          "screenId": "scr_aaaaaa"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_aaaaaa": [
+        {
+          "key": "pick",
+          "type": "choices"
+        },
+        {
+          "key": "a",
+          "type": "text"
+        }
+      ]
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

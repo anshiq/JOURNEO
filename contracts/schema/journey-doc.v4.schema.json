@@ -1,0 +1,4795 @@
+{
+  "$defs": {
+    "AllGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "all": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "after": "#/$defs/DateCondition",
+                "anyOf": "#/$defs/ChoiceCondition",
+                "before": "#/$defs/DateCondition",
+                "between": "#/$defs/NumberCondition",
+                "contains": "#/$defs/TextCondition",
+                "eq": "#/$defs/NumberCondition",
+                "equals": "#/$defs/TextCondition",
+                "gt": "#/$defs/NumberCondition",
+                "gte": "#/$defs/NumberCondition",
+                "includesAll": "#/$defs/ChoiceCondition",
+                "includesAny": "#/$defs/ChoiceCondition",
+                "includesNone": "#/$defs/ChoiceCondition",
+                "is": "#/$defs/DeviceCondition",
+                "isEmpty": "#/$defs/TextCondition",
+                "isFalse": "#/$defs/BoolCondition",
+                "isNotEmpty": "#/$defs/TextCondition",
+                "isTrue": "#/$defs/BoolCondition",
+                "lt": "#/$defs/NumberCondition",
+                "lte": "#/$defs/NumberCondition",
+                "neq": "#/$defs/NumberCondition",
+                "noneOf": "#/$defs/ChoiceCondition",
+                "notContains": "#/$defs/TextCondition",
+                "notEquals": "#/$defs/TextCondition",
+                "topOutcome": "#/$defs/OutcomeCondition"
+              },
+              "propertyName": "op"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TextCondition"
+              },
+              {
+                "$ref": "#/$defs/NumberCondition"
+              },
+              {
+                "$ref": "#/$defs/ChoiceCondition"
+              },
+              {
+                "$ref": "#/$defs/BoolCondition"
+              },
+              {
+                "$ref": "#/$defs/DeviceCondition"
+              },
+              {
+                "$ref": "#/$defs/OutcomeCondition"
+              },
+              {
+                "$ref": "#/$defs/DateCondition"
+              }
+            ]
+          },
+          "maxItems": 10,
+          "title": "All",
+          "type": "array"
+        }
+      },
+      "required": [
+        "all"
+      ],
+      "title": "AllGroup",
+      "type": "object"
+    },
+    "AnyGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "any": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "after": "#/$defs/DateCondition",
+                "anyOf": "#/$defs/ChoiceCondition",
+                "before": "#/$defs/DateCondition",
+                "between": "#/$defs/NumberCondition",
+                "contains": "#/$defs/TextCondition",
+                "eq": "#/$defs/NumberCondition",
+                "equals": "#/$defs/TextCondition",
+                "gt": "#/$defs/NumberCondition",
+                "gte": "#/$defs/NumberCondition",
+                "includesAll": "#/$defs/ChoiceCondition",
+                "includesAny": "#/$defs/ChoiceCondition",
+                "includesNone": "#/$defs/ChoiceCondition",
+                "is": "#/$defs/DeviceCondition",
+                "isEmpty": "#/$defs/TextCondition",
+                "isFalse": "#/$defs/BoolCondition",
+                "isNotEmpty": "#/$defs/TextCondition",
+                "isTrue": "#/$defs/BoolCondition",
+                "lt": "#/$defs/NumberCondition",
+                "lte": "#/$defs/NumberCondition",
+                "neq": "#/$defs/NumberCondition",
+                "noneOf": "#/$defs/ChoiceCondition",
+                "notContains": "#/$defs/TextCondition",
+                "notEquals": "#/$defs/TextCondition",
+                "topOutcome": "#/$defs/OutcomeCondition"
+              },
+              "propertyName": "op"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TextCondition"
+              },
+              {
+                "$ref": "#/$defs/NumberCondition"
+              },
+              {
+                "$ref": "#/$defs/ChoiceCondition"
+              },
+              {
+                "$ref": "#/$defs/BoolCondition"
+              },
+              {
+                "$ref": "#/$defs/DeviceCondition"
+              },
+              {
+                "$ref": "#/$defs/OutcomeCondition"
+              },
+              {
+                "$ref": "#/$defs/DateCondition"
+              }
+            ]
+          },
+          "maxItems": 10,
+          "title": "Any",
+          "type": "array"
+        }
+      },
+      "required": [
+        "any"
+      ],
+      "title": "AnyGroup",
+      "type": "object"
+    },
+    "Assistant": {
+      "additionalProperties": false,
+      "properties": {
+        "fallback": {
+          "default": "I could not find an answer to that.",
+          "maxLength": 300,
+          "title": "Fallback",
+          "type": "string"
+        },
+        "fallbackCtaLabel": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fallbackctalabel"
+        },
+        "fallbackTarget": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fallbacktarget"
+        },
+        "greeting": {
+          "default": "How can I help?",
+          "maxLength": 200,
+          "title": "Greeting",
+          "type": "string"
+        },
+        "placeholder": {
+          "default": "Ask a question",
+          "maxLength": 80,
+          "title": "Placeholder",
+          "type": "string"
+        },
+        "placement": {
+          "default": "floating",
+          "enum": [
+            "floating",
+            "pinned"
+          ],
+          "title": "Placement",
+          "type": "string"
+        },
+        "suggested": {
+          "items": {
+            "maxLength": 120,
+            "type": "string"
+          },
+          "maxItems": 6,
+          "title": "Suggested",
+          "type": "array"
+        }
+      },
+      "title": "Assistant",
+      "type": "object"
+    },
+    "Background": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "anyOf": [
+            {
+              "enum": [
+                "primary",
+                "accent",
+                "text",
+                "muted",
+                "surface",
+                "background"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Color"
+        },
+        "gradient": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Gradient"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "image": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BackgroundImage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "default": "color",
+          "enum": [
+            "color",
+            "gradient",
+            "image"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "title": "Background",
+      "type": "object"
+    },
+    "BackgroundImage": {
+      "additionalProperties": false,
+      "properties": {
+        "darken": {
+          "default": 40,
+          "maximum": 80,
+          "minimum": 0,
+          "title": "Darken",
+          "type": "integer"
+        },
+        "src": {
+          "maxLength": 2048,
+          "title": "Src",
+          "type": "string"
+        }
+      },
+      "required": [
+        "src"
+      ],
+      "title": "BackgroundImage",
+      "type": "object"
+    },
+    "BoolCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "maxLength": 40,
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "isTrue",
+            "isFalse"
+          ],
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "answer"
+      ],
+      "title": "BoolCondition",
+      "type": "object"
+    },
+    "ButtonItem": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "calendar": "#/$defs/CalendarAction",
+              "copy": "#/$defs/CopyAction",
+              "goto": "#/$defs/GotoAction",
+              "mailto": "#/$defs/MailtoAction",
+              "next": "#/$defs/NextAction",
+              "tel": "#/$defs/TelAction",
+              "url": "#/$defs/UrlAction"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NextAction"
+            },
+            {
+              "$ref": "#/$defs/GotoAction"
+            },
+            {
+              "$ref": "#/$defs/UrlAction"
+            },
+            {
+              "$ref": "#/$defs/CopyAction"
+            },
+            {
+              "$ref": "#/$defs/CalendarAction"
+            },
+            {
+              "$ref": "#/$defs/TelAction"
+            },
+            {
+              "$ref": "#/$defs/MailtoAction"
+            }
+          ],
+          "title": "Action"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 40,
+          "title": "Label",
+          "type": "string"
+        },
+        "variant": {
+          "default": "primary",
+          "enum": [
+            "primary",
+            "secondary",
+            "outline",
+            "link"
+          ],
+          "title": "Variant",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "action"
+      ],
+      "title": "ButtonItem",
+      "type": "object"
+    },
+    "ButtonsElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/ButtonsProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "buttons",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "ButtonsElement",
+      "type": "object"
+    },
+    "ButtonsProps": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/ButtonItem"
+          },
+          "maxItems": 3,
+          "title": "Items",
+          "type": "array"
+        },
+        "layout": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "stack",
+            "row"
+          ],
+          "title": "Layout",
+          "type": "string"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "title": "ButtonsProps",
+      "type": "object"
+    },
+    "CalendarAction": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "kind": {
+          "const": "calendar",
+          "title": "Kind",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "start": {
+          "maxLength": 40,
+          "title": "Start",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 120,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "kind",
+        "title",
+        "start"
+      ],
+      "title": "CalendarAction",
+      "type": "object"
+    },
+    "CardButton": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "calendar": "#/$defs/CalendarAction",
+              "copy": "#/$defs/CopyAction",
+              "goto": "#/$defs/GotoAction",
+              "mailto": "#/$defs/MailtoAction",
+              "next": "#/$defs/NextAction",
+              "tel": "#/$defs/TelAction",
+              "url": "#/$defs/UrlAction"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NextAction"
+            },
+            {
+              "$ref": "#/$defs/GotoAction"
+            },
+            {
+              "$ref": "#/$defs/UrlAction"
+            },
+            {
+              "$ref": "#/$defs/CopyAction"
+            },
+            {
+              "$ref": "#/$defs/CalendarAction"
+            },
+            {
+              "$ref": "#/$defs/TelAction"
+            },
+            {
+              "$ref": "#/$defs/MailtoAction"
+            }
+          ],
+          "title": "Action"
+        },
+        "label": {
+          "maxLength": 40,
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "action"
+      ],
+      "title": "CardButton",
+      "type": "object"
+    },
+    "CardItem": {
+      "additionalProperties": false,
+      "properties": {
+        "badge": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Badge"
+        },
+        "button": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CardButton"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "image": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Image"
+        },
+        "imageAlt": {
+          "anyOf": [
+            {
+              "maxLength": 250,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imagealt"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "maxLength": 24,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "title": {
+          "maxLength": 80,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "CardItem",
+      "type": "object"
+    },
+    "CardsElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/CardsProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "cards",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "CardsElement",
+      "type": "object"
+    },
+    "CardsProps": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "anyOf": [
+            {
+              "enum": [
+                2,
+                3,
+                4
+              ],
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Columns"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/CardItem"
+          },
+          "maxItems": 12,
+          "title": "Items",
+          "type": "array"
+        },
+        "layout": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "grid",
+            "carousel",
+            "list"
+          ],
+          "title": "Layout",
+          "type": "string"
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "title": "CardsProps",
+      "type": "object"
+    },
+    "ChoiceCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "maxLength": 40,
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "anyOf",
+            "noneOf",
+            "includesAny",
+            "includesAll",
+            "includesNone"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+            "type": "string"
+          },
+          "maxItems": 24,
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "answer"
+      ],
+      "title": "ChoiceCondition",
+      "type": "object"
+    },
+    "ChoiceElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/ChoiceProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "choice",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "ChoiceElement",
+      "type": "object"
+    },
+    "ChoiceOption": {
+      "additionalProperties": false,
+      "properties": {
+        "correct": {
+          "default": false,
+          "title": "Correct",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "image": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Image"
+        },
+        "label": {
+          "maxLength": 100,
+          "title": "Label",
+          "type": "string"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Outcome"
+        },
+        "points": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": -1000,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Points"
+        },
+        "value": {
+          "default": "",
+          "maxLength": 100,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "title": "ChoiceOption",
+      "type": "object"
+    },
+    "ChoiceProps": {
+      "additionalProperties": false,
+      "properties": {
+        "autoAdvance": {
+          "default": false,
+          "title": "Autoadvance",
+          "type": "boolean"
+        },
+        "branchByAnswer": {
+          "default": false,
+          "title": "Branchbyanswer",
+          "type": "boolean"
+        },
+        "display": {
+          "default": "list",
+          "enum": [
+            "list",
+            "buttons",
+            "pictures",
+            "dropdown",
+            "yesno"
+          ],
+          "title": "Display",
+          "type": "string"
+        },
+        "key": {
+          "maxLength": 40,
+          "title": "Key",
+          "type": "string"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "maximum": 24,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "maximum": 24,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min"
+        },
+        "multiple": {
+          "default": false,
+          "title": "Multiple",
+          "type": "boolean"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/$defs/ChoiceOption"
+          },
+          "maxItems": 24,
+          "title": "Options",
+          "type": "array"
+        },
+        "other": {
+          "default": false,
+          "title": "Other",
+          "type": "boolean"
+        },
+        "question": {
+          "maxLength": 200,
+          "title": "Question",
+          "type": "string"
+        },
+        "randomize": {
+          "default": false,
+          "title": "Randomize",
+          "type": "boolean"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "scoring": {
+          "default": "none",
+          "enum": [
+            "none",
+            "points",
+            "outcomes"
+          ],
+          "title": "Scoring",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "key",
+        "options"
+      ],
+      "title": "ChoiceProps",
+      "type": "object"
+    },
+    "ConditionStep": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "condition",
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "maxLength": 60,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/Rule"
+          },
+          "maxItems": 10,
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "title": "ConditionStep",
+      "type": "object"
+    },
+    "CopyAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "copy",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 250,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "CopyAction",
+      "type": "object"
+    },
+    "CountdownElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/CountdownProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "countdown",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "CountdownElement",
+      "type": "object"
+    },
+    "CountdownLabels": {
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "default": "Days",
+          "maxLength": 30,
+          "title": "Days",
+          "type": "string"
+        },
+        "hours": {
+          "default": "Hours",
+          "maxLength": 30,
+          "title": "Hours",
+          "type": "string"
+        },
+        "minutes": {
+          "default": "Minutes",
+          "maxLength": 30,
+          "title": "Minutes",
+          "type": "string"
+        },
+        "seconds": {
+          "default": "Seconds",
+          "maxLength": 30,
+          "title": "Seconds",
+          "type": "string"
+        }
+      },
+      "title": "CountdownLabels",
+      "type": "object"
+    },
+    "CountdownProps": {
+      "additionalProperties": false,
+      "properties": {
+        "deadline": {
+          "maxLength": 40,
+          "title": "Deadline",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/$defs/CountdownLabels",
+          "default": {
+            "days": "Days",
+            "hours": "Hours",
+            "minutes": "Minutes",
+            "seconds": "Seconds"
+          }
+        },
+        "message": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        },
+        "onExpire": {
+          "default": "hide",
+          "enum": [
+            "hide",
+            "message"
+          ],
+          "title": "Onexpire",
+          "type": "string"
+        }
+      },
+      "required": [
+        "deadline"
+      ],
+      "title": "CountdownProps",
+      "type": "object"
+    },
+    "DateCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "maxLength": 40,
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "before",
+            "after"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 40,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "answer",
+        "value"
+      ],
+      "title": "DateCondition",
+      "type": "object"
+    },
+    "DeviceCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "const": "device",
+          "default": "device",
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "const": "is",
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "default": "mobile",
+          "enum": [
+            "mobile",
+            "tablet",
+            "desktop"
+          ],
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op"
+      ],
+      "title": "DeviceCondition",
+      "type": "object"
+    },
+    "Focal": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "default": 50.0,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "default": 50.0,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "title": "Focal",
+      "type": "object"
+    },
+    "FormElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/FormProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "form",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "FormElement",
+      "type": "object"
+    },
+    "FormField": {
+      "additionalProperties": false,
+      "properties": {
+        "consentText": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Consenttext"
+        },
+        "half": {
+          "default": false,
+          "title": "Half",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "key": {
+          "maxLength": 40,
+          "title": "Key",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "name",
+            "email",
+            "phone",
+            "company",
+            "text",
+            "longtext",
+            "number",
+            "date",
+            "dropdown",
+            "consent"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 80,
+          "title": "Label",
+          "type": "string"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min"
+        },
+        "options": {
+          "anyOf": [
+            {
+              "items": {
+                "maxLength": 100,
+                "type": "string"
+              },
+              "maxItems": 24,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Options"
+        },
+        "placeholder": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Placeholder"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "unique": {
+          "default": false,
+          "title": "Unique",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "key"
+      ],
+      "title": "FormField",
+      "type": "object"
+    },
+    "FormProps": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FormField"
+          },
+          "maxItems": 12,
+          "title": "Fields",
+          "type": "array"
+        },
+        "prefill": {
+          "default": false,
+          "title": "Prefill",
+          "type": "boolean"
+        },
+        "submitLabel": {
+          "default": "Submit",
+          "maxLength": 40,
+          "title": "Submitlabel",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fields"
+      ],
+      "title": "FormProps",
+      "type": "object"
+    },
+    "GotoAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "goto",
+          "title": "Kind",
+          "type": "string"
+        },
+        "skipValidation": {
+          "default": false,
+          "title": "Skipvalidation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "GotoAction",
+      "type": "object"
+    },
+    "Gradient": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "default": "down",
+          "enum": [
+            "down",
+            "right",
+            "diagonal"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "from": {
+          "anyOf": [
+            {
+              "enum": [
+                "primary",
+                "accent",
+                "text",
+                "muted",
+                "surface",
+                "background"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            }
+          ],
+          "default": "background",
+          "title": "From"
+        },
+        "to": {
+          "anyOf": [
+            {
+              "enum": [
+                "primary",
+                "accent",
+                "text",
+                "muted",
+                "surface",
+                "background"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            }
+          ],
+          "default": "surface",
+          "title": "To"
+        }
+      },
+      "title": "Gradient",
+      "type": "object"
+    },
+    "HeadingElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/HeadingProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "heading",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "HeadingElement",
+      "type": "object"
+    },
+    "HeadingProps": {
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "default": 1,
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "title": "Level",
+          "type": "integer"
+        },
+        "text": {
+          "maxLength": 140,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "HeadingProps",
+      "type": "object"
+    },
+    "ImageElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/ImageProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "image",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "ImageElement",
+      "type": "object"
+    },
+    "ImageProps": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "calendar": "#/$defs/CalendarAction",
+                  "copy": "#/$defs/CopyAction",
+                  "goto": "#/$defs/GotoAction",
+                  "mailto": "#/$defs/MailtoAction",
+                  "next": "#/$defs/NextAction",
+                  "tel": "#/$defs/TelAction",
+                  "url": "#/$defs/UrlAction"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/NextAction"
+                },
+                {
+                  "$ref": "#/$defs/GotoAction"
+                },
+                {
+                  "$ref": "#/$defs/UrlAction"
+                },
+                {
+                  "$ref": "#/$defs/CopyAction"
+                },
+                {
+                  "$ref": "#/$defs/CalendarAction"
+                },
+                {
+                  "$ref": "#/$defs/TelAction"
+                },
+                {
+                  "$ref": "#/$defs/MailtoAction"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Action"
+        },
+        "alt": {
+          "default": "",
+          "maxLength": 250,
+          "title": "Alt",
+          "type": "string"
+        },
+        "aspect": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "1:1",
+            "4:5",
+            "3:2",
+            "16:9"
+          ],
+          "title": "Aspect",
+          "type": "string"
+        },
+        "attribution": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attribution"
+        },
+        "dominantColor": {
+          "anyOf": [
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dominantcolor"
+        },
+        "focal": {
+          "$ref": "#/$defs/Focal",
+          "default": {
+            "x": 50.0,
+            "y": 50.0
+          }
+        },
+        "height": {
+          "anyOf": [
+            {
+              "maximum": 20000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height"
+        },
+        "src": {
+          "maxLength": 2048,
+          "title": "Src",
+          "type": "string"
+        },
+        "srcset": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Srcset"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "maximum": 20000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        }
+      },
+      "required": [
+        "src"
+      ],
+      "title": "ImageProps",
+      "type": "object"
+    },
+    "JourneySettings": {
+      "additionalProperties": false,
+      "properties": {
+        "allowBack": {
+          "default": false,
+          "title": "Allowback",
+          "type": "boolean"
+        },
+        "legal": {
+          "$ref": "#/$defs/Legal",
+          "default": {
+            "company": null,
+            "privacyUrl": null,
+            "termsUrl": null
+          }
+        },
+        "progress": {
+          "default": "bar",
+          "enum": [
+            "none",
+            "bar"
+          ],
+          "title": "Progress",
+          "type": "string"
+        },
+        "seo": {
+          "$ref": "#/$defs/Seo",
+          "default": {
+            "description": null,
+            "image": null,
+            "title": null
+          }
+        }
+      },
+      "title": "JourneySettings",
+      "type": "object"
+    },
+    "Legal": {
+      "additionalProperties": false,
+      "properties": {
+        "company": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Company"
+        },
+        "privacyUrl": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Privacyurl"
+        },
+        "termsUrl": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Termsurl"
+        }
+      },
+      "title": "Legal",
+      "type": "object"
+    },
+    "MailtoAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "mailto",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 254,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "MailtoAction",
+      "type": "object"
+    },
+    "MediaSlot": {
+      "additionalProperties": false,
+      "properties": {
+        "alt": {
+          "default": "",
+          "maxLength": 250,
+          "title": "Alt",
+          "type": "string"
+        },
+        "darken": {
+          "default": 35,
+          "maximum": 80,
+          "minimum": 0,
+          "title": "Darken",
+          "type": "integer"
+        },
+        "focal": {
+          "$ref": "#/$defs/Focal",
+          "default": {
+            "x": 50.0,
+            "y": 50.0
+          }
+        },
+        "kind": {
+          "default": "image",
+          "enum": [
+            "image",
+            "video"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "onMobile": {
+          "default": "top",
+          "enum": [
+            "top",
+            "background",
+            "hidden"
+          ],
+          "title": "Onmobile",
+          "type": "string"
+        },
+        "side": {
+          "default": "right",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "title": "Side",
+          "type": "string"
+        },
+        "src": {
+          "default": "",
+          "maxLength": 2048,
+          "title": "Src",
+          "type": "string"
+        },
+        "srcset": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Srcset"
+        }
+      },
+      "title": "MediaSlot",
+      "type": "object"
+    },
+    "NextAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "next",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "NextAction",
+      "type": "object"
+    },
+    "NumberCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "maxLength": 40,
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "neq",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "between"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "value2": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value2"
+        }
+      },
+      "required": [
+        "op",
+        "answer"
+      ],
+      "title": "NumberCondition",
+      "type": "object"
+    },
+    "OutcomeCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "const": "outcomes",
+          "default": "outcomes",
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "const": "topOutcome",
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "value"
+      ],
+      "title": "OutcomeCondition",
+      "type": "object"
+    },
+    "RatingBand": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 40,
+          "title": "Label",
+          "type": "string"
+        },
+        "max": {
+          "default": 10,
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Max",
+          "type": "integer"
+        },
+        "min": {
+          "default": 0,
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Min",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "title": "RatingBand",
+      "type": "object"
+    },
+    "RatingElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/RatingProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "rating",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "RatingElement",
+      "type": "object"
+    },
+    "RatingProps": {
+      "additionalProperties": false,
+      "properties": {
+        "bands": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/RatingBand"
+              },
+              "maxItems": 6,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bands"
+        },
+        "branchByScore": {
+          "default": false,
+          "title": "Branchbyscore",
+          "type": "boolean"
+        },
+        "key": {
+          "maxLength": 40,
+          "title": "Key",
+          "type": "string"
+        },
+        "max": {
+          "default": 5,
+          "maximum": 10,
+          "minimum": 3,
+          "title": "Max",
+          "type": "integer"
+        },
+        "maxLabel": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maxlabel"
+        },
+        "minLabel": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minlabel"
+        },
+        "question": {
+          "maxLength": 200,
+          "title": "Question",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "scale": {
+          "default": "stars",
+          "enum": [
+            "stars",
+            "emoji",
+            "numbers",
+            "nps"
+          ],
+          "title": "Scale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "key"
+      ],
+      "title": "RatingProps",
+      "type": "object"
+    },
+    "RedirectStep": {
+      "additionalProperties": false,
+      "properties": {
+        "delayMs": {
+          "default": 0,
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Delayms",
+          "type": "integer"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "redirect",
+          "title": "Kind",
+          "type": "string"
+        },
+        "passParams": {
+          "default": true,
+          "title": "Passparams",
+          "type": "boolean"
+        },
+        "url": {
+          "maxLength": 2048,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "url"
+      ],
+      "title": "RedirectStep",
+      "type": "object"
+    },
+    "ResponsiveOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hidden"
+        },
+        "src": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Src"
+        },
+        "srcset": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Srcset"
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ResponsiveOverride",
+      "type": "object"
+    },
+    "ResponsiveOverrides": {
+      "additionalProperties": false,
+      "properties": {
+        "desktop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverride"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tablet": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverride"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ResponsiveOverrides",
+      "type": "object"
+    },
+    "Rule": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 60,
+          "title": "Label",
+          "type": "string"
+        },
+        "when": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            }
+          ],
+          "title": "When"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "when"
+      ],
+      "title": "Rule",
+      "type": "object"
+    },
+    "Screen": {
+      "additionalProperties": false,
+      "properties": {
+        "allowBack": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allowback"
+        },
+        "background": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Background"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "colorScheme": {
+          "default": "theme",
+          "enum": [
+            "theme",
+            "inverse"
+          ],
+          "title": "Colorscheme",
+          "type": "string"
+        },
+        "elements": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "buttons": "#/$defs/ButtonsElement",
+                "cards": "#/$defs/CardsElement",
+                "choice": "#/$defs/ChoiceElement",
+                "countdown": "#/$defs/CountdownElement",
+                "form": "#/$defs/FormElement",
+                "heading": "#/$defs/HeadingElement",
+                "image": "#/$defs/ImageElement",
+                "rating": "#/$defs/RatingElement",
+                "spacer": "#/$defs/SpacerElement",
+                "text": "#/$defs/TextElement",
+                "video": "#/$defs/VideoElement"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/HeadingElement"
+              },
+              {
+                "$ref": "#/$defs/TextElement"
+              },
+              {
+                "$ref": "#/$defs/ImageElement"
+              },
+              {
+                "$ref": "#/$defs/VideoElement"
+              },
+              {
+                "$ref": "#/$defs/ButtonsElement"
+              },
+              {
+                "$ref": "#/$defs/CardsElement"
+              },
+              {
+                "$ref": "#/$defs/CountdownElement"
+              },
+              {
+                "$ref": "#/$defs/SpacerElement"
+              },
+              {
+                "$ref": "#/$defs/ChoiceElement"
+              },
+              {
+                "$ref": "#/$defs/RatingElement"
+              },
+              {
+                "$ref": "#/$defs/FormElement"
+              }
+            ]
+          },
+          "maxItems": 30,
+          "title": "Elements",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "layout": {
+          "$ref": "#/$defs/ScreenLayout",
+          "default": {
+            "hAlign": "left",
+            "media": null,
+            "preset": "stack",
+            "spacing": "comfortable",
+            "vAlign": "top",
+            "width": "normal"
+          }
+        },
+        "name": {
+          "maxLength": 60,
+          "title": "Name",
+          "type": "string"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScreenResponsive"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "showAssistant": {
+          "default": false,
+          "title": "Showassistant",
+          "type": "boolean"
+        },
+        "stickyAction": {
+          "default": false,
+          "title": "Stickyaction",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Screen",
+      "type": "object"
+    },
+    "ScreenLayout": {
+      "additionalProperties": false,
+      "properties": {
+        "hAlign": {
+          "default": "left",
+          "enum": [
+            "left",
+            "center"
+          ],
+          "title": "Halign",
+          "type": "string"
+        },
+        "media": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MediaSlot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "preset": {
+          "default": "stack",
+          "enum": [
+            "stack",
+            "split",
+            "cover"
+          ],
+          "title": "Preset",
+          "type": "string"
+        },
+        "spacing": {
+          "default": "comfortable",
+          "enum": [
+            "compact",
+            "comfortable",
+            "spacious"
+          ],
+          "title": "Spacing",
+          "type": "string"
+        },
+        "vAlign": {
+          "default": "top",
+          "enum": [
+            "top",
+            "center"
+          ],
+          "title": "Valign",
+          "type": "string"
+        },
+        "width": {
+          "default": "normal",
+          "enum": [
+            "narrow",
+            "normal",
+            "wide"
+          ],
+          "title": "Width",
+          "type": "string"
+        }
+      },
+      "title": "ScreenLayout",
+      "type": "object"
+    },
+    "ScreenOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "hAlign": {
+          "anyOf": [
+            {
+              "enum": [
+                "left",
+                "center"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Halign"
+        },
+        "mediaSide": {
+          "anyOf": [
+            {
+              "enum": [
+                "left",
+                "right"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mediaside"
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "enum": [
+                "stack",
+                "split",
+                "cover"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preset"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "narrow",
+                "normal",
+                "wide"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        }
+      },
+      "title": "ScreenOverride",
+      "type": "object"
+    },
+    "ScreenResponsive": {
+      "additionalProperties": false,
+      "properties": {
+        "desktop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScreenOverride"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tablet": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScreenOverride"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ScreenResponsive",
+      "type": "object"
+    },
+    "ScreenStep": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "screen",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "title": "ScreenStep",
+      "type": "object"
+    },
+    "Seo": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "image": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Image"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 70,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        }
+      },
+      "title": "Seo",
+      "type": "object"
+    },
+    "SpacerElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/SpacerProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "spacer",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "SpacerElement",
+      "type": "object"
+    },
+    "SpacerProps": {
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "default": false,
+          "title": "Line",
+          "type": "boolean"
+        },
+        "size": {
+          "default": "md",
+          "enum": [
+            "sm",
+            "md",
+            "lg",
+            "xl"
+          ],
+          "title": "Size",
+          "type": "string"
+        }
+      },
+      "title": "SpacerProps",
+      "type": "object"
+    },
+    "StartStep": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "start",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "title": "StartStep",
+      "type": "object"
+    },
+    "StyleProps": {
+      "additionalProperties": false,
+      "properties": {
+        "align": {
+          "anyOf": [
+            {
+              "enum": [
+                "left",
+                "center",
+                "right"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Align"
+        },
+        "colorRole": {
+          "anyOf": [
+            {
+              "enum": [
+                "primary",
+                "accent",
+                "text",
+                "muted",
+                "surface",
+                "background"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Colorrole"
+        },
+        "columns": {
+          "anyOf": [
+            {
+              "enum": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Columns"
+        },
+        "emphasis": {
+          "anyOf": [
+            {
+              "enum": [
+                "normal",
+                "strong",
+                "subtle"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Emphasis"
+        },
+        "fullWidth": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fullwidth"
+        },
+        "radius": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "sm",
+                "md",
+                "lg",
+                "full"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Radius"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "enum": [
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        },
+        "spacingAfter": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spacingafter"
+        },
+        "spacingBefore": {
+          "anyOf": [
+            {
+              "enum": [
+                "none",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spacingbefore"
+        },
+        "variant": {
+          "anyOf": [
+            {
+              "enum": [
+                "primary",
+                "secondary",
+                "outline",
+                "link",
+                "solid",
+                "soft"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Variant"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "enum": [
+                "auto",
+                "full",
+                "narrow",
+                "normal",
+                "wide"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        }
+      },
+      "title": "StyleProps",
+      "type": "object"
+    },
+    "TelAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "tel",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 32,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "TelAction",
+      "type": "object"
+    },
+    "TextCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "answer": {
+          "maxLength": 40,
+          "title": "Answer",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "equals",
+            "notEquals",
+            "contains",
+            "notContains",
+            "isEmpty",
+            "isNotEmpty"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maxLength": 250,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "op",
+        "answer"
+      ],
+      "title": "TextCondition",
+      "type": "object"
+    },
+    "TextElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/TextProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "text",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "TextElement",
+      "type": "object"
+    },
+    "TextProps": {
+      "additionalProperties": false,
+      "properties": {
+        "listStyle": {
+          "anyOf": [
+            {
+              "enum": [
+                "bullet",
+                "check",
+                "number"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Liststyle"
+        },
+        "preset": {
+          "default": "body",
+          "enum": [
+            "body",
+            "lead",
+            "caption",
+            "quote",
+            "eyebrow",
+            "notice"
+          ],
+          "title": "Preset",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 2000,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "TextProps",
+      "type": "object"
+    },
+    "Theme": {
+      "additionalProperties": false,
+      "properties": {
+        "background": {
+          "$ref": "#/$defs/Background",
+          "default": {
+            "color": null,
+            "gradient": null,
+            "image": null,
+            "type": "color"
+          }
+        },
+        "buttons": {
+          "$ref": "#/$defs/ThemeButtons",
+          "default": {
+            "case": "normal",
+            "style": "solid"
+          }
+        },
+        "colors": {
+          "$ref": "#/$defs/ThemeColors",
+          "default": {
+            "accent": "#f97316",
+            "background": "#ffffff",
+            "border": null,
+            "muted": null,
+            "onPrimary": null,
+            "primary": "#4f46e5",
+            "surface": "#ffffff",
+            "text": "#111827"
+          }
+        },
+        "density": {
+          "default": "comfortable",
+          "enum": [
+            "compact",
+            "comfortable",
+            "spacious"
+          ],
+          "title": "Density",
+          "type": "string"
+        },
+        "fonts": {
+          "$ref": "#/$defs/ThemeFonts",
+          "default": {
+            "body": null,
+            "heading": null,
+            "pairing": "classic"
+          }
+        },
+        "inputs": {
+          "$ref": "#/$defs/ThemeInputs",
+          "default": {
+            "style": "outline"
+          }
+        },
+        "logo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ThemeLogo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preset"
+        },
+        "radius": {
+          "default": "md",
+          "enum": [
+            "none",
+            "sm",
+            "md",
+            "lg",
+            "full"
+          ],
+          "title": "Radius",
+          "type": "string"
+        },
+        "typeScale": {
+          "default": "default",
+          "enum": [
+            "compact",
+            "default",
+            "large"
+          ],
+          "title": "Typescale",
+          "type": "string"
+        },
+        "voice": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voice"
+        }
+      },
+      "title": "Theme",
+      "type": "object"
+    },
+    "ThemeButtons": {
+      "additionalProperties": false,
+      "properties": {
+        "case": {
+          "default": "normal",
+          "enum": [
+            "normal",
+            "upper"
+          ],
+          "title": "Case",
+          "type": "string"
+        },
+        "style": {
+          "default": "solid",
+          "enum": [
+            "solid",
+            "outline",
+            "soft"
+          ],
+          "title": "Style",
+          "type": "string"
+        }
+      },
+      "title": "ThemeButtons",
+      "type": "object"
+    },
+    "ThemeColors": {
+      "additionalProperties": false,
+      "properties": {
+        "accent": {
+          "default": "#f97316",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+          "title": "Accent",
+          "type": "string"
+        },
+        "background": {
+          "default": "#ffffff",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+          "title": "Background",
+          "type": "string"
+        },
+        "border": {
+          "anyOf": [
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Border"
+        },
+        "muted": {
+          "anyOf": [
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Muted"
+        },
+        "onPrimary": {
+          "anyOf": [
+            {
+              "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Onprimary"
+        },
+        "primary": {
+          "default": "#4f46e5",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+          "title": "Primary",
+          "type": "string"
+        },
+        "surface": {
+          "default": "#ffffff",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+          "title": "Surface",
+          "type": "string"
+        },
+        "text": {
+          "default": "#111827",
+          "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "title": "ThemeColors",
+      "type": "object"
+    },
+    "ThemeFonts": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "anyOf": [
+            {
+              "enum": [
+                "inter",
+                "source-sans-3",
+                "playfair-display",
+                "space-grotesk",
+                "nunito",
+                "cormorant-garamond",
+                "lato",
+                "archivo",
+                "ibm-plex-sans",
+                "poppins",
+                "open-sans",
+                "dm-sans"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Body"
+        },
+        "heading": {
+          "anyOf": [
+            {
+              "enum": [
+                "inter",
+                "source-sans-3",
+                "playfair-display",
+                "space-grotesk",
+                "nunito",
+                "cormorant-garamond",
+                "lato",
+                "archivo",
+                "ibm-plex-sans",
+                "poppins",
+                "open-sans",
+                "dm-sans"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heading"
+        },
+        "pairing": {
+          "default": "classic",
+          "enum": [
+            "classic",
+            "editorial",
+            "modern",
+            "friendly",
+            "elegant",
+            "bold",
+            "tech",
+            "rounded"
+          ],
+          "title": "Pairing",
+          "type": "string"
+        }
+      },
+      "title": "ThemeFonts",
+      "type": "object"
+    },
+    "ThemeInputs": {
+      "additionalProperties": false,
+      "properties": {
+        "style": {
+          "default": "outline",
+          "enum": [
+            "outline",
+            "filled",
+            "underline"
+          ],
+          "title": "Style",
+          "type": "string"
+        }
+      },
+      "title": "ThemeInputs",
+      "type": "object"
+    },
+    "ThemeLogo": {
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "default": "left",
+          "enum": [
+            "left",
+            "center"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "size": {
+          "default": "md",
+          "enum": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "title": "Size",
+          "type": "string"
+        },
+        "src": {
+          "maxLength": 2048,
+          "title": "Src",
+          "type": "string"
+        }
+      },
+      "required": [
+        "src"
+      ],
+      "title": "ThemeLogo",
+      "type": "object"
+    },
+    "UrlAction": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "url",
+          "title": "Kind",
+          "type": "string"
+        },
+        "newTab": {
+          "default": true,
+          "title": "Newtab",
+          "type": "boolean"
+        },
+        "passParams": {
+          "default": true,
+          "title": "Passparams",
+          "type": "boolean"
+        },
+        "url": {
+          "maxLength": 2048,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "url"
+      ],
+      "title": "UrlAction",
+      "type": "object"
+    },
+    "VideoElement": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "default": false,
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "props": {
+          "$ref": "#/$defs/VideoProps"
+        },
+        "responsive": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResponsiveOverrides"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "style": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StyleProps"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "const": "video",
+          "title": "Type",
+          "type": "string"
+        },
+        "visibleIf": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllGroup"
+            },
+            {
+              "$ref": "#/$defs/AnyGroup"
+            },
+            {
+              "discriminator": {
+                "mapping": {
+                  "after": "#/$defs/DateCondition",
+                  "anyOf": "#/$defs/ChoiceCondition",
+                  "before": "#/$defs/DateCondition",
+                  "between": "#/$defs/NumberCondition",
+                  "contains": "#/$defs/TextCondition",
+                  "eq": "#/$defs/NumberCondition",
+                  "equals": "#/$defs/TextCondition",
+                  "gt": "#/$defs/NumberCondition",
+                  "gte": "#/$defs/NumberCondition",
+                  "includesAll": "#/$defs/ChoiceCondition",
+                  "includesAny": "#/$defs/ChoiceCondition",
+                  "includesNone": "#/$defs/ChoiceCondition",
+                  "is": "#/$defs/DeviceCondition",
+                  "isEmpty": "#/$defs/TextCondition",
+                  "isFalse": "#/$defs/BoolCondition",
+                  "isNotEmpty": "#/$defs/TextCondition",
+                  "isTrue": "#/$defs/BoolCondition",
+                  "lt": "#/$defs/NumberCondition",
+                  "lte": "#/$defs/NumberCondition",
+                  "neq": "#/$defs/NumberCondition",
+                  "noneOf": "#/$defs/ChoiceCondition",
+                  "notContains": "#/$defs/TextCondition",
+                  "notEquals": "#/$defs/TextCondition",
+                  "topOutcome": "#/$defs/OutcomeCondition"
+                },
+                "propertyName": "op"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/TextCondition"
+                },
+                {
+                  "$ref": "#/$defs/NumberCondition"
+                },
+                {
+                  "$ref": "#/$defs/ChoiceCondition"
+                },
+                {
+                  "$ref": "#/$defs/BoolCondition"
+                },
+                {
+                  "$ref": "#/$defs/DeviceCondition"
+                },
+                {
+                  "$ref": "#/$defs/OutcomeCondition"
+                },
+                {
+                  "$ref": "#/$defs/DateCondition"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibleif"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "props"
+      ],
+      "title": "VideoElement",
+      "type": "object"
+    },
+    "VideoProps": {
+      "additionalProperties": false,
+      "properties": {
+        "aspect": {
+          "default": "16:9",
+          "enum": [
+            "16:9",
+            "4:5",
+            "1:1",
+            "9:16"
+          ],
+          "title": "Aspect",
+          "type": "string"
+        },
+        "autoplay": {
+          "default": false,
+          "title": "Autoplay",
+          "type": "boolean"
+        },
+        "loop": {
+          "default": false,
+          "title": "Loop",
+          "type": "boolean"
+        },
+        "poster": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Poster"
+        },
+        "source": {
+          "$ref": "#/$defs/VideoSource"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "VideoProps",
+      "type": "object"
+    },
+    "VideoSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "youtube",
+            "vimeo",
+            "file"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 2048,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "url"
+      ],
+      "title": "VideoSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assistant": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Assistant"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "links": {
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]{5,20}$": {
+          "additionalProperties": {
+            "pattern": "^[a-z][a-z0-9_-]{5,20}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "type": "object"
+        }
+      },
+      "title": "Links",
+      "type": "object"
+    },
+    "schemaVersion": {
+      "const": 4,
+      "title": "Schemaversion",
+      "type": "integer"
+    },
+    "screens": {
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]{5,20}$": {
+          "$ref": "#/$defs/Screen"
+        }
+      },
+      "title": "Screens",
+      "type": "object"
+    },
+    "settings": {
+      "$ref": "#/$defs/JourneySettings",
+      "default": {
+        "allowBack": false,
+        "legal": {
+          "company": null,
+          "privacyUrl": null,
+          "termsUrl": null
+        },
+        "progress": "bar",
+        "seo": {
+          "description": null,
+          "image": null,
+          "title": null
+        }
+      }
+    },
+    "steps": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "condition": "#/$defs/ConditionStep",
+            "redirect": "#/$defs/RedirectStep",
+            "screen": "#/$defs/ScreenStep",
+            "start": "#/$defs/StartStep"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/StartStep"
+          },
+          {
+            "$ref": "#/$defs/ScreenStep"
+          },
+          {
+            "$ref": "#/$defs/ConditionStep"
+          },
+          {
+            "$ref": "#/$defs/RedirectStep"
+          }
+        ]
+      },
+      "maxItems": 60,
+      "title": "Steps",
+      "type": "array"
+    },
+    "theme": {
+      "$ref": "#/$defs/Theme",
+      "default": {
+        "background": {
+          "color": null,
+          "gradient": null,
+          "image": null,
+          "type": "color"
+        },
+        "buttons": {
+          "case": "normal",
+          "style": "solid"
+        },
+        "colors": {
+          "accent": "#f97316",
+          "background": "#ffffff",
+          "border": null,
+          "muted": null,
+          "onPrimary": null,
+          "primary": "#4f46e5",
+          "surface": "#ffffff",
+          "text": "#111827"
+        },
+        "density": "comfortable",
+        "fonts": {
+          "body": null,
+          "heading": null,
+          "pairing": "classic"
+        },
+        "inputs": {
+          "style": "outline"
+        },
+        "logo": null,
+        "preset": null,
+        "radius": "md",
+        "typeScale": "default",
+        "voice": null
+      }
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "title": "JourneyDoc",
+  "type": "object"
+}

@@ -1,0 +1,56 @@
+{
+  "id": "lead-form",
+  "name": "Lead form",
+  "category": "lead",
+  "layout": {
+    "preset": "stack"
+  },
+  "stickyAction": true,
+  "elements": [
+    {
+      "type": "heading",
+      "props": {
+        "text": "Where should we send it?",
+        "level": 2
+      }
+    },
+    {
+      "type": "text",
+      "props": {
+        "text": "Leave your details and we'll be in touch.",
+        "preset": "body"
+      }
+    },
+    {
+      "type": "form",
+      "props": {
+        "fields": [
+          {
+            "kind": "name",
+            "label": "First name",
+            "key": "first_name",
+            "required": true,
+            "half": true,
+            "placeholder": "Alex"
+          },
+          {
+            "kind": "email",
+            "label": "Email",
+            "key": "email",
+            "required": true,
+            "half": true,
+            "placeholder": "you@example.com"
+          },
+          {
+            "kind": "consent",
+            "label": "I agree to receive emails about this offer.",
+            "key": "consent",
+            "required": true,
+            "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time."
+          }
+        ],
+        "submitLabel": "Send"
+      }
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "askAi": {
+    "allowJourneyJump": true,
+    "allowRag": true,
+    "buttonLabel": "Ask",
+    "id": "ask-ai",
+    "placeholder": "Ask...",
+    "ragK": 8,
+    "refusalMessage": "Out of context."
+  },
+  "edges": [
+    {
+      "id": "e1",
+      "source": "trigger",
+      "sourceHandle": null,
+      "target": "s1"
+    },
+    {
+      "id": "e2",
+      "source": "s1",
+      "sourceHandle": "default",
+      "target": "c1"
+    },
+    {
+      "id": "e3",
+      "source": "c1",
+      "sourceHandle": "yes",
+      "target": "s2"
+    },
+    {
+      "id": "e4",
+      "source": "c1",
+      "sourceHandle": "else",
+      "target": "end"
+    },
+    {
+      "id": "e5",
+      "source": "s2",
+      "sourceHandle": "default",
+      "target": "end"
+    }
+  ],
+  "nodes": [
+    {
+      "config": {},
+      "id": "trigger",
+      "position": {
+        "x": -260,
+        "y": 220
+      },
+      "type": "trigger"
+    },
+    {
+      "config": {
+        "branches": [
+          {
+            "handle": "yes",
+            "operator": "lte",
+            "value": 18
+          }
+        ],
+        "field": "age",
+        "operator": "lte",
+        "value": 18
+      },
+      "id": "c1",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "type": "condition"
+    },
+    {
+      "config": {
+        "content": "A"
+      },
+      "id": "b1",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "text"
+    },
+    {
+      "config": {
+        "content": "B"
+      },
+      "id": "b2",
+      "position": {
+        "x": 0,
+        "y": 1
+      },
+      "type": "text"
+    },
+    {
+      "config": {
+        "redirectDelayMs": 1500,
+        "redirectUrl": "https://example.com/done"
+      },
+      "id": "end",
+      "position": {
+        "x": 700,
+        "y": 220
+      },
+      "type": "end"
+    }
+  ],
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "advance": {
+        "handle": "default",
+        "label": "Continue",
+        "mode": "button"
+      },
+      "back": {
+        "label": "Back",
+        "show": false
+      },
+      "blocks": [
+        "b1"
+      ],
+      "id": "s1",
+      "layout": {
+        "mode": "stack"
+      },
+      "name": "s1",
+      "position": {
+        "x": 60,
+        "y": 160
+      },
+      "size": {
+        "height": 560,
+        "width": 440
+      }
+    },
+    {
+      "advance": {
+        "handle": "default",
+        "label": "Continue",
+        "mode": "button"
+      },
+      "back": {
+        "label": "Back",
+        "show": false
+      },
+      "blocks": [
+        "b2"
+      ],
+      "id": "s2",
+      "layout": {
+        "mode": "stack"
+      },
+      "name": "s2",
+      "position": {
+        "x": 60,
+        "y": 160
+      },
+      "size": {
+        "height": 560,
+        "width": 440
+      }
+    }
+  ],
+  "theme": {
+    "accent": "#f97316",
+    "cta": "Continue",
+    "font": "Inter",
+    "foreground": "#111827",
+    "primary": "#4f46e5",
+    "radius": 16,
+    "surface": "#ffffff"
+  }
+}

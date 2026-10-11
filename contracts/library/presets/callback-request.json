@@ -1,0 +1,30 @@
+{
+  "id": "callback-request",
+  "name": "Callback request",
+  "category": "lead",
+  "element": {
+    "type": "form",
+    "props": {
+      "fields": [
+        {
+          "kind": "name",
+          "label": "Name",
+          "key": "name",
+          "required": true
+        },
+        {
+          "kind": "phone",
+          "label": "Phone",
+          "key": "phone",
+          "required": true
+        },
+        {
+          "kind": "date",
+          "label": "Best day to call",
+          "key": "callback_date"
+        }
+      ],
+      "submitLabel": "Request a call"
+    }
+  }
+}

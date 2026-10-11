@@ -1,0 +1,42 @@
+{
+  "id": "video",
+  "name": "Video",
+  "category": "content",
+  "layout": {
+    "preset": "stack"
+  },
+  "elements": [
+    {
+      "type": "heading",
+      "props": {
+        "text": "See it in action",
+        "level": 2
+      }
+    },
+    {
+      "type": "video",
+      "props": {
+        "source": {
+          "kind": "youtube",
+          "url": ""
+        },
+        "autoplay": false
+      }
+    },
+    {
+      "type": "buttons",
+      "props": {
+        "items": [
+          {
+            "label": "Continue",
+            "variant": "primary",
+            "action": {
+              "kind": "next"
+            }
+          }
+        ],
+        "layout": "auto"
+      }
+    }
+  ]
+}

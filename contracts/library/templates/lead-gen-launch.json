@@ -1,0 +1,214 @@
+{
+  "id": "lead-gen-launch",
+  "name": "Launch waitlist",
+  "goal": "leads",
+  "description": "Collect sign-ups for a launch with a welcome, a lead form and a thank-you screen.",
+  "checklist": [
+    "Add your logo",
+    "Replace sample photos",
+    "Choose where leads go"
+  ],
+  "doc": {
+    "schemaVersion": 4,
+    "theme": {},
+    "screens": {
+      "scr_welcome": {
+        "id": "scr_welcome",
+        "name": "Welcome",
+        "layout": {
+          "preset": "split",
+          "media": {
+            "kind": "image",
+            "src": "/placeholders/photo-1.svg",
+            "alt": "Summer collection preview",
+            "side": "right",
+            "onMobile": "top"
+          },
+          "vAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "text",
+            "props": {
+              "text": "Coming this summer",
+              "preset": "eyebrow"
+            },
+            "id": "el_eyebrow1"
+          },
+          {
+            "type": "heading",
+            "props": {
+              "text": "Be first in line for our summer collection",
+              "level": 1
+            },
+            "id": "el_heading1"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "Join the waitlist for early access and an exclusive launch discount.",
+              "preset": "lead"
+            },
+            "id": "el_text0001"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Join the waitlist",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_join0001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons1"
+          }
+        ]
+      },
+      "scr_leadform": {
+        "id": "scr_leadform",
+        "name": "Your details",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Where should we send your invite?",
+              "level": 2
+            },
+            "id": "el_heading2"
+          },
+          {
+            "type": "form",
+            "props": {
+              "fields": [
+                {
+                  "kind": "name",
+                  "label": "First name",
+                  "key": "first_name",
+                  "required": true,
+                  "half": true,
+                  "placeholder": "Alex",
+                  "id": "fld_name0001"
+                },
+                {
+                  "kind": "email",
+                  "label": "Email",
+                  "key": "email",
+                  "required": true,
+                  "half": true,
+                  "placeholder": "you@example.com",
+                  "unique": true,
+                  "id": "fld_email001"
+                },
+                {
+                  "kind": "consent",
+                  "label": "I agree to receive emails about this offer.",
+                  "key": "consent",
+                  "required": true,
+                  "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time.",
+                  "id": "fld_consnt01"
+                }
+              ],
+              "submitLabel": "Join the waitlist"
+            },
+            "id": "el_form0001"
+          }
+        ],
+        "stickyAction": true
+      },
+      "scr_thanks01": {
+        "id": "scr_thanks01",
+        "name": "Thank you",
+        "layout": {
+          "preset": "stack",
+          "vAlign": "center",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "You're on the list, {{first_name|friend}}!",
+              "level": 1
+            },
+            "id": "el_heading3"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "We'll email you before launch day with your early-access link.",
+              "preset": "lead"
+            },
+            "id": "el_text0002"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Share with a friend",
+                  "variant": "outline",
+                  "action": {
+                    "kind": "url",
+                    "url": "https://example.com",
+                    "newTab": true,
+                    "passParams": false
+                  },
+                  "id": "it_share001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons2"
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_welcome",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_leadform",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "links": {
+      "stp_start0": {
+        "next": "scr_welcome"
+      },
+      "scr_welcome": {
+        "next": "scr_leadform"
+      },
+      "scr_leadform": {
+        "next": "scr_thanks01"
+      }
+    },
+    "settings": {
+      "progress": "bar",
+      "allowBack": false,
+      "seo": {
+        "title": "Join the summer waitlist",
+        "description": "Early access and an exclusive launch discount."
+      },
+      "legal": {}
+    }
+  }
+}

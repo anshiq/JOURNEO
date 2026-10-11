@@ -1,0 +1,197 @@
+{
+  "assistant": {
+    "fallback": "Out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_c1"
+    },
+    "scr_s2": {
+      "next": "stp_redirect-end"
+    },
+    "scr_s3": {
+      "next": "stp_redirect-end"
+    },
+    "stp_c1": {
+      "else": "stp_redirect-end",
+      "rule:rule_c1-basic": "scr_s3",
+      "rule:rule_c1-premium": "scr_s2"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b1x",
+          "props": {
+            "preset": "body",
+            "text": "Start"
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_s1-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s1-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "preset": "stack"
+      },
+      "name": "s1",
+      "showAssistant": true
+    },
+    "scr_s2": {
+      "elements": [
+        {
+          "id": "el_b2x",
+          "props": {
+            "preset": "body",
+            "text": "Premium"
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_s2-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s2-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s2",
+      "layout": {
+        "preset": "stack"
+      },
+      "name": "s2",
+      "showAssistant": true
+    },
+    "scr_s3": {
+      "elements": [
+        {
+          "id": "el_b3x",
+          "props": {
+            "preset": "body",
+            "text": "Basic"
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_s3-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s3-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s3",
+      "layout": {
+        "preset": "stack"
+      },
+      "name": "s3",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "id": "scr_s2",
+      "kind": "screen"
+    },
+    {
+      "id": "scr_s3",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://example.com/done"
+    },
+    {
+      "id": "stp_c1",
+      "kind": "condition",
+      "rules": [
+        {
+          "id": "rule_c1-premium",
+          "label": "Premium",
+          "when": {
+            "answer": "budget",
+            "op": "equals",
+            "value": "high"
+          }
+        },
+        {
+          "id": "rule_c1-basic",
+          "label": "Basic",
+          "when": {
+            "answer": "budget",
+            "op": "equals",
+            "value": "low"
+          }
+        }
+      ]
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

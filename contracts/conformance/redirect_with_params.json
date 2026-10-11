@@ -1,0 +1,94 @@
+{
+  "doc": {
+    "links": {
+      "scr_aaaaaa": {
+        "next": "stp_redir1"
+      },
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Go"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      },
+      {
+        "delayMs": 500,
+        "id": "stp_redir1",
+        "kind": "redirect",
+        "passParams": true,
+        "url": "https://example.com/shop?x=1"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_aaaaaa": []
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next"
+      ],
+      "stp_redir1": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {},
+            "at": "scr_aaaaaa",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_aaaaaa"
+        ],
+        "redirect": "https://example.com/shop?x=1&utm_source=ig&ref=abc",
+        "status": "redirect",
+        "system": {
+          "param.ref": "abc",
+          "utm_source": "ig"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "picture-choice",
+  "name": "Picture choice",
+  "category": "question",
+  "element": {
+    "type": "choice",
+    "props": {
+      "question": "Pick your favourite",
+      "key": "favourite",
+      "display": "pictures",
+      "options": [
+        {
+          "label": "Classic",
+          "image": "/placeholders/photo-1.svg"
+        },
+        {
+          "label": "Bold",
+          "image": "/placeholders/photo-2.svg"
+        }
+      ]
+    }
+  }
+}

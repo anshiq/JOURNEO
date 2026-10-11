@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "outDir": "./node_modules/.tsbuild/test",
+    "tsBuildInfoFile": "./node_modules/.tsbuild/test.tsbuildinfo"
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.shared.json"
+    },
+    {
+      "path": "./tsconfig.journey.json"
+    },
+    {
+      "path": "./tsconfig.experience.json"
+    },
+    {
+      "path": "./tsconfig.editor.json"
+    },
+    {
+      "path": "./tsconfig.player.json"
+    }
+  ]
+}

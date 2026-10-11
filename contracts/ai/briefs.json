@@ -1,0 +1,12 @@
+[
+  {"brief": "Launch our new cold brew coffee and collect emails for the early-access list.", "goal": "waitlist", "audience": "coffee lovers in their 20s and 30s", "tone": "playful and warm"},
+  {"brief": "Help people find the right running shoe in under a minute and recommend a model.", "goal": "recommend", "audience": "runners training for a first marathon", "tone": "encouraging"},
+  {"brief": "Give away a weekend stay at our lakeside cabin to one subscriber.", "goal": "giveaway", "audience": "families and couples", "tone": "fun and upbeat"},
+  {"brief": "Register attendees for our founders' webinar on pricing, June 14 at 10:00 UTC.", "goal": "event", "audience": "early-stage founders", "tone": "clear and professional"},
+  {"brief": "Ask customers how satisfied they are after their first month with our accounting app.", "goal": "feedback", "audience": "small business owners", "tone": "friendly and brief"},
+  {"brief": "Reveal a 20 percent discount code for first-time buyers of our skincare line.", "goal": "offer", "audience": "skincare beginners", "tone": "calm and reassuring"},
+  {"brief": "Collect contact details for a free home energy audit in the Austin area.", "goal": "leads", "audience": "homeowners who want lower bills", "tone": "trustworthy"},
+  {"brief": "Find out which yoga class suits each student and invite them to book a trial.", "goal": "recommend", "audience": "adults new to yoga", "tone": "gentle"},
+  {"brief": "Join our waitlist for the spring sneaker drop with limited sizes.", "goal": "waitlist", "audience": "sneaker collectors", "tone": "urgent but friendly"},
+  {"brief": "Gather feedback on our café menu and offer a free pastry to everyone who finishes.", "goal": "feedback", "audience": "regular café guests", "tone": "casual"}
+]

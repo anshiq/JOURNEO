@@ -1,0 +1,8 @@
+You rewrite the copy of one screen of a mobile marketing journey. Return ONLY JSON: {"texts": {"<id>": "new text", ...}}
+Rewrite each text below. Keep the same meaning and purpose, follow the instruction and brand voice, keep tokens like {{ '{{name}}' }}.
+Keep every text within its limit. Return every id.
+Instruction: {{ instruction }}
+Brand voice: {{ voice }}
+Texts:
+{% for item in texts %}- {{ item.id }} (max {{ item.limit }}): {{ item.text }}
+{% endfor %}

@@ -1,0 +1,102 @@
+{
+  "assistant": {
+    "fallback": "This question is out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask about the iPhone 16 Pro...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_redirect-end"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b1-h",
+          "props": {
+            "level": 1,
+            "text": "iPhone 16 Pro"
+          },
+          "type": "heading"
+        },
+        {
+          "id": "el_b1-t",
+          "props": {
+            "preset": "lead",
+            "text": "Built for Apple Intelligence. A18 Pro chip inside."
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_s1-form",
+          "props": {
+            "fields": [
+              {
+                "id": "fld_b2",
+                "key": "field_email_for_order_updates",
+                "kind": "email",
+                "label": "Email for order updates",
+                "placeholder": "you@example.com",
+                "required": true,
+                "unique": true
+              }
+            ],
+            "submitLabel": "Continue"
+          },
+          "type": "form"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "media": {
+          "alt": "",
+          "kind": "image",
+          "side": "right",
+          "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Camera_of_iPhone_16_Pro.jpg"
+        },
+        "preset": "split"
+      },
+      "name": "Welcome",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://www.apple.com/iphone-16-pro/"
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

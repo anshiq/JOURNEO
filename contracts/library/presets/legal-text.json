@@ -1,0 +1,12 @@
+{
+  "id": "legal-text",
+  "name": "Legal text",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "By continuing you agree to our terms and privacy policy.",
+      "preset": "caption"
+    }
+  }
+}

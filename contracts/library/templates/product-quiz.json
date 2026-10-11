@@ -1,0 +1,340 @@
+{
+  "id": "product-quiz",
+  "name": "Product quiz",
+  "goal": "recommend",
+  "description": "Ask a few questions and recommend the right product, then capture the lead.",
+  "checklist": [
+    "Add your logo",
+    "Replace sample photos",
+    "Choose where leads go"
+  ],
+  "doc": {
+    "schemaVersion": 4,
+    "theme": {},
+    "screens": {
+      "scr_welcome": {
+        "id": "scr_welcome",
+        "name": "Welcome",
+        "layout": {
+          "preset": "stack",
+          "vAlign": "center",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Find your perfect plan in 30 seconds",
+              "level": 1
+            },
+            "id": "el_heading1"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "Answer two quick questions and we'll recommend the right fit.",
+              "preset": "lead"
+            },
+            "id": "el_text0001"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Start the quiz",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_start001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons1"
+          }
+        ]
+      },
+      "scr_usage01": {
+        "id": "scr_usage01",
+        "name": "How you'll use it",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "choice",
+            "props": {
+              "question": "How will you mostly use it?",
+              "key": "usage",
+              "display": "buttons",
+              "options": [
+                {
+                  "label": "Just for me",
+                  "id": "opt_solo0001",
+                  "value": "just-for-me"
+                },
+                {
+                  "label": "With my team",
+                  "id": "opt_team0001",
+                  "value": "with-my-team"
+                }
+              ],
+              "autoAdvance": true
+            },
+            "id": "el_choice01"
+          }
+        ]
+      },
+      "scr_budget1": {
+        "id": "scr_budget1",
+        "name": "Your budget",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "choice",
+            "props": {
+              "question": "What's your monthly budget?",
+              "key": "budget",
+              "display": "buttons",
+              "options": [
+                {
+                  "label": "Under $25",
+                  "id": "opt_low00001",
+                  "value": "under-$25"
+                },
+                {
+                  "label": "$25 or more",
+                  "id": "opt_high0001",
+                  "value": "$25-or-more"
+                }
+              ],
+              "autoAdvance": true,
+              "branchByAnswer": true
+            },
+            "id": "el_choice02"
+          }
+        ]
+      },
+      "scr_offera1": {
+        "id": "scr_offera1",
+        "name": "Starter pick",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "We recommend: Starter",
+              "level": 2
+            },
+            "id": "el_heading2"
+          },
+          {
+            "type": "cards",
+            "props": {
+              "layout": "auto",
+              "items": [
+                {
+                  "title": "Starter",
+                  "text": "Everything you need to get going, at a friendly price.",
+                  "price": "$19/mo",
+                  "image": "/placeholders/photo-2.svg",
+                  "button": {
+                    "label": "Get Starter",
+                    "action": {
+                      "kind": "next"
+                    }
+                  },
+                  "id": "it_starter1"
+                }
+              ]
+            },
+            "id": "el_cards001"
+          }
+        ]
+      },
+      "scr_offerb1": {
+        "id": "scr_offerb1",
+        "name": "Plus pick",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "We recommend: Plus",
+              "level": 2
+            },
+            "id": "el_heading3"
+          },
+          {
+            "type": "cards",
+            "props": {
+              "layout": "auto",
+              "items": [
+                {
+                  "title": "Plus",
+                  "text": "More power and priority support for growing needs.",
+                  "price": "$39/mo",
+                  "badge": "Popular",
+                  "image": "/placeholders/photo-3.svg",
+                  "button": {
+                    "label": "Get Plus",
+                    "action": {
+                      "kind": "next"
+                    }
+                  },
+                  "id": "it_plus0001"
+                }
+              ]
+            },
+            "id": "el_cards002"
+          }
+        ]
+      },
+      "scr_leadform": {
+        "id": "scr_leadform",
+        "name": "Your details",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Get your recommendation by email",
+              "level": 2
+            },
+            "id": "el_heading4"
+          },
+          {
+            "type": "form",
+            "props": {
+              "fields": [
+                {
+                  "kind": "email",
+                  "label": "Email",
+                  "key": "email",
+                  "required": true,
+                  "placeholder": "you@example.com",
+                  "id": "fld_email001"
+                },
+                {
+                  "kind": "consent",
+                  "label": "I agree to receive emails about this offer.",
+                  "key": "consent",
+                  "required": true,
+                  "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time.",
+                  "id": "fld_consnt01"
+                }
+              ],
+              "submitLabel": "Send it to me"
+            },
+            "id": "el_form0001"
+          }
+        ],
+        "stickyAction": true
+      },
+      "scr_thanks01": {
+        "id": "scr_thanks01",
+        "name": "Thank you",
+        "layout": {
+          "preset": "stack",
+          "vAlign": "center",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Check your inbox!",
+              "level": 1
+            },
+            "id": "el_heading5"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "Your recommendation is on its way.",
+              "preset": "lead"
+            },
+            "id": "el_text0002"
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_welcome",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_usage01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_budget1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_offera1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_offerb1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_leadform",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "links": {
+      "stp_start0": {
+        "next": "scr_welcome"
+      },
+      "scr_welcome": {
+        "next": "scr_usage01"
+      },
+      "scr_usage01": {
+        "next": "scr_budget1"
+      },
+      "scr_budget1": {
+        "next": "scr_offera1",
+        "el_choice02:opt:opt_high0001": "scr_offerb1"
+      },
+      "scr_offera1": {
+        "next": "scr_leadform"
+      },
+      "scr_offerb1": {
+        "next": "scr_leadform"
+      },
+      "scr_leadform": {
+        "next": "scr_thanks01"
+      }
+    },
+    "settings": {
+      "progress": "bar",
+      "allowBack": false,
+      "seo": {
+        "title": "Find your perfect plan",
+        "description": "Two quick questions, one tailored recommendation."
+      },
+      "legal": {}
+    }
+  }
+}

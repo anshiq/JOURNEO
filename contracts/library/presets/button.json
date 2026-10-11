@@ -1,0 +1,20 @@
+{
+  "id": "button",
+  "name": "Button",
+  "category": "action",
+  "element": {
+    "type": "buttons",
+    "props": {
+      "items": [
+        {
+          "label": "Continue",
+          "variant": "primary",
+          "action": {
+            "kind": "next"
+          }
+        }
+      ],
+      "layout": "auto"
+    }
+  }
+}

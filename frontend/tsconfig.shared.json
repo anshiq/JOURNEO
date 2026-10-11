@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "outDir": "./node_modules/.tsbuild/shared",
+    "tsBuildInfoFile": "./node_modules/.tsbuild/shared.tsbuildinfo"
+  },
+  "include": ["src/shared/**/*"],
+  "references": [],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

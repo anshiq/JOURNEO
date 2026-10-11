@@ -1,0 +1,46 @@
+{
+  "id": "contact-form",
+  "name": "Contact form",
+  "category": "lead",
+  "element": {
+    "type": "form",
+    "props": {
+      "fields": [
+        {
+          "kind": "name",
+          "label": "Name",
+          "key": "name",
+          "required": true,
+          "half": true
+        },
+        {
+          "kind": "email",
+          "label": "Email",
+          "key": "email",
+          "required": true,
+          "half": true
+        },
+        {
+          "kind": "phone",
+          "label": "Phone",
+          "key": "phone",
+          "half": true
+        },
+        {
+          "kind": "company",
+          "label": "Company",
+          "key": "company",
+          "half": true
+        },
+        {
+          "kind": "consent",
+          "label": "I agree to receive emails about this offer.",
+          "key": "consent",
+          "required": true,
+          "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time."
+        }
+      ],
+      "submitLabel": "Send"
+    }
+  }
+}

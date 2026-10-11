@@ -1,0 +1,255 @@
+{
+  "doc": {
+    "links": {
+      "scr_register": {
+        "next": "scr_thanks01"
+      },
+      "scr_welcome": {
+        "next": "scr_register"
+      },
+      "stp_start0": {
+        "next": "scr_welcome"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_register": {
+        "elements": [
+          {
+            "id": "el_heading2",
+            "props": {
+              "level": 2,
+              "text": "Reserve your free seat"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_form0001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_name0001",
+                  "key": "name",
+                  "kind": "name",
+                  "label": "Full name",
+                  "required": true
+                },
+                {
+                  "id": "fld_email001",
+                  "key": "email",
+                  "kind": "email",
+                  "label": "Work email",
+                  "required": true,
+                  "unique": true
+                },
+                {
+                  "id": "fld_comp0001",
+                  "key": "company",
+                  "kind": "company",
+                  "label": "Company"
+                },
+                {
+                  "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time.",
+                  "id": "fld_consnt01",
+                  "key": "consent",
+                  "kind": "consent",
+                  "label": "I agree to receive emails about this offer.",
+                  "required": true
+                }
+              ],
+              "submitLabel": "Register"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_register",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Register",
+        "stickyAction": true
+      },
+      "scr_thanks01": {
+        "elements": [
+          {
+            "id": "el_heading3",
+            "props": {
+              "level": 1,
+              "text": "You're registered!"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_text0002",
+            "props": {
+              "preset": "lead",
+              "text": "Add the event to your calendar so you don't miss it."
+            },
+            "type": "text"
+          },
+          {
+            "id": "el_buttons2",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "end": "2027-06-30T16:45:00Z",
+                    "kind": "calendar",
+                    "location": "Online",
+                    "start": "2027-06-30T16:00:00Z",
+                    "title": "Grow faster with smarter campaigns"
+                  },
+                  "id": "it_calndr01",
+                  "label": "Add to calendar",
+                  "variant": "primary"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_thanks01",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack",
+          "vAlign": "center"
+        },
+        "name": "You're in"
+      },
+      "scr_welcome": {
+        "elements": [
+          {
+            "id": "el_eyebrow1",
+            "props": {
+              "preset": "eyebrow",
+              "text": "Free live webinar"
+            },
+            "type": "text"
+          },
+          {
+            "id": "el_heading1",
+            "props": {
+              "level": 1,
+              "text": "Grow faster with smarter campaigns"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_text0001",
+            "props": {
+              "preset": "lead",
+              "text": "Join us live for 45 minutes of practical tips and a Q&A."
+            },
+            "type": "text"
+          },
+          {
+            "id": "el_countdn1",
+            "props": {
+              "deadline": "2027-06-30T16:00:00Z",
+              "message": "Registration has closed.",
+              "onExpire": "message"
+            },
+            "type": "countdown"
+          },
+          {
+            "id": "el_buttons1",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_save0001",
+                  "label": "Save my seat",
+                  "variant": "primary"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_welcome",
+        "layout": {
+          "media": {
+            "alt": "Speaker on stage",
+            "kind": "image",
+            "onMobile": "top",
+            "side": "right",
+            "src": "/placeholders/photo-4.svg"
+          },
+          "preset": "split",
+          "vAlign": "center"
+        },
+        "name": "Event"
+      }
+    },
+    "settings": {
+      "allowBack": false,
+      "legal": {},
+      "progress": "bar",
+      "seo": {
+        "description": "45 minutes of practical tips and a live Q&A.",
+        "title": "Free webinar: grow faster"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_welcome",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_register",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_register": [
+        {
+          "key": "name",
+          "type": "text"
+        },
+        {
+          "key": "email",
+          "type": "email"
+        },
+        {
+          "key": "company",
+          "type": "text"
+        },
+        {
+          "key": "consent",
+          "type": "boolean"
+        }
+      ],
+      "scr_thanks01": [],
+      "scr_welcome": []
+    },
+    "ports": {
+      "scr_register": [
+        "next"
+      ],
+      "scr_thanks01": [],
+      "scr_welcome": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

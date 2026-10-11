@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "allowJs": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@journey/*": ["./src/journey/*"],
+      "@experience/*": ["./src/experience/*"],
+      "@editor/*": ["./src/editor/*"],
+      "@player/*": ["./src/player/*"]
+    }
+  }
+}

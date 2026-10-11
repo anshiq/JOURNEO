@@ -1,0 +1,345 @@
+{
+  "doc": {
+    "links": {
+      "scr_improve": {
+        "next": "scr_thanks01"
+      },
+      "scr_review1": {
+        "next": "scr_thanks01"
+      },
+      "scr_score01": {
+        "el_rating01:band:band_high001": "scr_review1",
+        "el_rating01:band:band_low0001": "scr_improve",
+        "next": "scr_thanks01"
+      },
+      "stp_start0": {
+        "next": "scr_score01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_improve": {
+        "elements": [
+          {
+            "id": "el_heading2",
+            "props": {
+              "level": 2,
+              "text": "Sorry to hear that. What could we do better?"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_form0001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_feedbk01",
+                  "key": "feedback",
+                  "kind": "longtext",
+                  "label": "Your feedback",
+                  "required": true
+                },
+                {
+                  "id": "fld_email001",
+                  "key": "email",
+                  "kind": "email",
+                  "label": "Email (optional)"
+                }
+              ],
+              "submitLabel": "Send feedback"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_improve",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Improve"
+      },
+      "scr_review1": {
+        "elements": [
+          {
+            "id": "el_heading3",
+            "props": {
+              "level": 2,
+              "text": "Thank you! Would you leave us a review?"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_buttons2",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "url",
+                    "newTab": true,
+                    "passParams": false,
+                    "url": "https://example.com/review"
+                  },
+                  "id": "it_review01",
+                  "label": "Write a review",
+                  "variant": "primary"
+                },
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_later001",
+                  "label": "Maybe later",
+                  "variant": "link"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_review1",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack"
+        },
+        "name": "Review"
+      },
+      "scr_score01": {
+        "elements": [
+          {
+            "id": "el_heading1",
+            "props": {
+              "level": 2,
+              "text": "Quick question"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_rating01",
+            "props": {
+              "bands": [
+                {
+                  "id": "band_low0001",
+                  "label": "Detractors",
+                  "max": 6,
+                  "min": 0
+                },
+                {
+                  "id": "band_mid0001",
+                  "label": "Passives",
+                  "max": 8,
+                  "min": 7
+                },
+                {
+                  "id": "band_high001",
+                  "label": "Promoters",
+                  "max": 10,
+                  "min": 9
+                }
+              ],
+              "branchByScore": true,
+              "key": "nps",
+              "max": 10,
+              "maxLabel": "Very likely",
+              "minLabel": "Not likely",
+              "question": "How likely are you to recommend us to a friend?",
+              "scale": "nps"
+            },
+            "type": "rating"
+          },
+          {
+            "id": "el_buttons1",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_cont0001",
+                  "label": "Continue",
+                  "variant": "primary"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_score01",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack",
+          "vAlign": "center"
+        },
+        "name": "Score"
+      },
+      "scr_thanks01": {
+        "elements": [
+          {
+            "id": "el_heading4",
+            "props": {
+              "level": 1,
+              "text": "Thanks for your feedback!"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_text0001",
+            "props": {
+              "preset": "lead",
+              "text": "It helps us get better every day."
+            },
+            "type": "text"
+          }
+        ],
+        "id": "scr_thanks01",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack",
+          "vAlign": "center"
+        },
+        "name": "Thank you"
+      }
+    },
+    "settings": {
+      "allowBack": false,
+      "legal": {},
+      "progress": "bar",
+      "seo": {
+        "description": "One quick question.",
+        "title": "Tell us what you think"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_score01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_improve",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_review1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "W_CONSENT",
+        "target": {
+          "field": "fields",
+          "id": "el_form0001",
+          "kind": "element",
+          "screenId": "scr_improve"
+        }
+      },
+      {
+        "code": "W_SEO_IMAGE",
+        "target": {
+          "field": "image",
+          "id": "seo",
+          "kind": "settings"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_improve": [
+        {
+          "key": "feedback",
+          "type": "text"
+        },
+        {
+          "key": "email",
+          "type": "email"
+        }
+      ],
+      "scr_review1": [],
+      "scr_score01": [
+        {
+          "key": "nps",
+          "type": "rating"
+        }
+      ],
+      "scr_thanks01": []
+    },
+    "ports": {
+      "scr_improve": [
+        "next"
+      ],
+      "scr_review1": [
+        "next"
+      ],
+      "scr_score01": [
+        "next",
+        "el_rating01:band:band_low0001",
+        "el_rating01:band:band_mid0001",
+        "el_rating01:band:band_high001"
+      ],
+      "scr_thanks01": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 2
+            },
+            "at": "scr_score01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score01",
+          "scr_improve"
+        ],
+        "status": "running"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 7
+            },
+            "at": "scr_score01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score01",
+          "scr_thanks01"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 10
+            },
+            "at": "scr_score01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_score01",
+          "scr_review1"
+        ],
+        "status": "running"
+      }
+    ]
+  }
+}

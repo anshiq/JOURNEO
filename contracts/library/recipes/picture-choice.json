@@ -1,0 +1,38 @@
+{
+  "id": "picture-choice",
+  "name": "Picture choice",
+  "category": "question",
+  "layout": {
+    "preset": "stack",
+    "width": "wide"
+  },
+  "elements": [
+    {
+      "type": "choice",
+      "props": {
+        "question": "Which style do you like?",
+        "key": "style",
+        "display": "pictures",
+        "options": [
+          {
+            "label": "Classic",
+            "image": "/placeholders/photo-1.svg"
+          },
+          {
+            "label": "Bold",
+            "image": "/placeholders/photo-2.svg"
+          },
+          {
+            "label": "Fresh",
+            "image": "/placeholders/photo-3.svg"
+          },
+          {
+            "label": "Playful",
+            "image": "/placeholders/photo-4.svg"
+          }
+        ],
+        "autoAdvance": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "deadline-timer",
+  "name": "Deadline timer",
+  "category": "offer",
+  "element": {
+    "type": "countdown",
+    "props": {
+      "deadline": "2027-12-31T23:59:00Z",
+      "onExpire": "hide"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "product-picks",
+  "name": "Product picks",
+  "category": "offer",
+  "layout": {
+    "preset": "stack",
+    "width": "wide"
+  },
+  "elements": [
+    {
+      "type": "heading",
+      "props": {
+        "text": "Our top picks for you",
+        "level": 2
+      }
+    },
+    {
+      "type": "cards",
+      "props": {
+        "layout": "auto",
+        "items": [
+          {
+            "title": "Starter",
+            "text": "Everything you need to begin.",
+            "price": "$19",
+            "image": "/placeholders/photo-1.svg",
+            "button": {
+              "label": "Choose Starter",
+              "action": {
+                "kind": "next"
+              }
+            }
+          },
+          {
+            "title": "Plus",
+            "text": "Our most popular choice.",
+            "price": "$39",
+            "badge": "Popular",
+            "image": "/placeholders/photo-2.svg",
+            "button": {
+              "label": "Choose Plus",
+              "action": {
+                "kind": "next"
+              }
+            }
+          },
+          {
+            "title": "Pro",
+            "text": "For teams that want it all.",
+            "price": "$79",
+            "image": "/placeholders/photo-3.svg",
+            "button": {
+              "label": "Choose Pro",
+              "action": {
+                "kind": "next"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

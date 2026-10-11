@@ -1,0 +1,12 @@
+{
+  "id": "notice",
+  "name": "Notice",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "Offer valid while stocks last.",
+      "preset": "notice"
+    }
+  }
+}

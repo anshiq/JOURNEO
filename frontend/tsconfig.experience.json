@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./node_modules/.tsbuild/experience",
+    "tsBuildInfoFile": "./node_modules/.tsbuild/experience.tsbuildinfo"
+  },
+  "include": ["src/experience/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.shared.json"
+    },
+    {
+      "path": "./tsconfig.journey.json"
+    }
+  ],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

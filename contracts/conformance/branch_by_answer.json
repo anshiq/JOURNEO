@@ -1,0 +1,183 @@
+{
+  "doc": {
+    "links": {
+      "scr_quiz01": {
+        "el_c00001:opt:opt_high01": "scr_high01",
+        "next": "scr_low001"
+      },
+      "stp_start0": {
+        "next": "scr_quiz01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_high01": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_high01",
+        "name": "scr_high01"
+      },
+      "scr_low001": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_low001",
+        "name": "scr_low001"
+      },
+      "scr_quiz01": {
+        "elements": [
+          {
+            "id": "el_c00001",
+            "props": {
+              "branchByAnswer": true,
+              "key": "budget",
+              "options": [
+                {
+                  "id": "opt_low001",
+                  "label": "Low"
+                },
+                {
+                  "id": "opt_high01",
+                  "label": "High"
+                }
+              ],
+              "other": true,
+              "question": "Pick"
+            },
+            "type": "choice"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Continue"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_quiz01",
+        "name": "scr_quiz01"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_quiz01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_low001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_high01",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_high01": [],
+      "scr_low001": [],
+      "scr_quiz01": [
+        {
+          "key": "budget",
+          "type": "choice"
+        }
+      ]
+    },
+    "ports": {
+      "scr_high01": [],
+      "scr_low001": [],
+      "scr_quiz01": [
+        "next",
+        "el_c00001:opt:opt_low001",
+        "el_c00001:opt:opt_high01",
+        "el_c00001:opt:other"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "budget": "opt_high01"
+            },
+            "at": "scr_quiz01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_quiz01",
+          "scr_high01"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "budget": "opt_low001"
+            },
+            "at": "scr_quiz01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_quiz01",
+          "scr_low001"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "budget": "other"
+            },
+            "at": "scr_quiz01",
+            "port": "el_c00001:opt:other"
+          }
+        ],
+        "path": [
+          "scr_quiz01",
+          "scr_low001"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

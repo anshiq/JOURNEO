@@ -1,0 +1,35 @@
+{
+  "id": "product-cards",
+  "name": "Product cards",
+  "category": "offer",
+  "element": {
+    "type": "cards",
+    "props": {
+      "layout": "auto",
+      "items": [
+        {
+          "title": "Product one",
+          "text": "Short description.",
+          "image": "/placeholders/photo-1.svg",
+          "button": {
+            "label": "View",
+            "action": {
+              "kind": "next"
+            }
+          }
+        },
+        {
+          "title": "Product two",
+          "text": "Short description.",
+          "image": "/placeholders/photo-2.svg",
+          "button": {
+            "label": "View",
+            "action": {
+              "kind": "next"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "divider",
+  "name": "Divider",
+  "category": "layout",
+  "element": {
+    "type": "spacer",
+    "props": {
+      "size": "md",
+      "line": true
+    }
+  }
+}

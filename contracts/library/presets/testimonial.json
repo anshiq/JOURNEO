@@ -1,0 +1,12 @@
+{
+  "id": "testimonial",
+  "name": "Testimonial",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "“The easiest decision we made all year.” — Sam, customer",
+      "preset": "quote"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "rating-nps",
+  "name": "Rating / NPS",
+  "category": "question",
+  "layout": {
+    "preset": "stack",
+    "hAlign": "center"
+  },
+  "elements": [
+    {
+      "type": "rating",
+      "props": {
+        "question": "How likely are you to recommend us to a friend?",
+        "key": "nps",
+        "scale": "nps",
+        "max": 10,
+        "minLabel": "Not likely",
+        "maxLabel": "Very likely"
+      }
+    },
+    {
+      "type": "buttons",
+      "props": {
+        "items": [
+          {
+            "label": "Continue",
+            "variant": "primary",
+            "action": {
+              "kind": "next"
+            }
+          }
+        ],
+        "layout": "auto"
+      }
+    }
+  ]
+}

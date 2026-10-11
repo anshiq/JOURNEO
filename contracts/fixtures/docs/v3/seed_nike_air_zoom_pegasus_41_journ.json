@@ -1,0 +1,162 @@
+{
+  "askAi": {
+    "allowAdjust": true,
+    "allowJourneyJump": true,
+    "allowPin": true,
+    "allowRag": true,
+    "answerStyle": "thread",
+    "buttonLabel": "Ask",
+    "historyLimit": 100,
+    "id": "ask-ai",
+    "maxConcurrentQueries": 3,
+    "persistence": "session",
+    "pinnedPanel": true,
+    "placeholder": "Ask about the Pegasus 41...",
+    "ragK": 8,
+    "refusalMessage": "This question is out of context."
+  },
+  "edges": [
+    {
+      "id": "e-trigger-s1",
+      "source": "trigger",
+      "sourceHandle": null,
+      "target": "s1"
+    },
+    {
+      "id": "e-s1-end",
+      "source": "s1",
+      "sourceHandle": "default",
+      "target": "end"
+    }
+  ],
+  "nodes": [
+    {
+      "config": {},
+      "id": "trigger",
+      "position": {
+        "x": -260,
+        "y": 220
+      },
+      "type": "trigger"
+    },
+    {
+      "config": {
+        "allowJourneyJump": true,
+        "allowRag": true,
+        "buttonLabel": "Ask",
+        "placeholder": "Ask about the Pegasus 41...",
+        "ragK": 8,
+        "refusalMessage": "This question is out of context.",
+        "suggestedQuestions": []
+      },
+      "id": "ask-ai-node",
+      "position": {
+        "x": -260,
+        "y": -60
+      },
+      "type": "ask_ai"
+    },
+    {
+      "config": {
+        "ctas": [],
+        "headline": "Nike Air Zoom Pegasus 41",
+        "image": "https://commons.wikimedia.org/wiki/Special:FilePath/Nike_Zoom_Pegasus_38_running_shoe.jpg",
+        "imagePosition": "right",
+        "subheadline": "ReactX foam. Dual Air Zoom. Ready for every mile."
+      },
+      "id": "b1",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "hero_section"
+    },
+    {
+      "config": {
+        "blockKey": "field_size",
+        "label": "Size",
+        "options": [
+          {
+            "label": "US 9",
+            "value": "9"
+          },
+          {
+            "label": "US 10",
+            "value": "10"
+          }
+        ],
+        "placeholder": "Choose your US size",
+        "required": true
+      },
+      "id": "b2",
+      "position": {
+        "x": 0,
+        "y": 1
+      },
+      "type": "select"
+    },
+    {
+      "config": {
+        "redirectDelayMs": 1500,
+        "redirectUrl": "https://www.nike.com/t/air-zoom-pegasus-41-road-running-shoes"
+      },
+      "id": "end",
+      "position": {
+        "x": 700,
+        "y": 220
+      },
+      "type": "end"
+    }
+  ],
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "advance": {
+        "fullWidth": true,
+        "handle": "default",
+        "label": "Continue",
+        "mode": "button",
+        "position": "bottom-sticky",
+        "requireBlocks": [],
+        "requireValid": false,
+        "variant": "solid"
+      },
+      "back": {
+        "label": "Back",
+        "show": false
+      },
+      "blocks": [
+        "b1",
+        "b2"
+      ],
+      "id": "s1",
+      "layout": {
+        "align": "stretch",
+        "direction": "column",
+        "gap": "16px",
+        "justify": "start",
+        "mode": "stack",
+        "padding": "16px",
+        "scroll": "auto"
+      },
+      "name": "Welcome",
+      "position": {
+        "x": 60,
+        "y": 160
+      },
+      "size": {
+        "height": 540,
+        "width": 440
+      }
+    }
+  ],
+  "theme": {
+    "accent": "#f97316",
+    "cta": "Continue",
+    "font": "Inter",
+    "foreground": "#111827",
+    "primary": "#4f46e5",
+    "radius": 16,
+    "surface": "#ffffff"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "multiple-choice",
+  "name": "Multiple choice",
+  "category": "question",
+  "element": {
+    "type": "choice",
+    "props": {
+      "question": "What matters most to you?",
+      "key": "priority",
+      "display": "list",
+      "options": [
+        {
+          "label": "Price"
+        },
+        {
+          "label": "Quality"
+        },
+        {
+          "label": "Speed"
+        }
+      ]
+    }
+  }
+}

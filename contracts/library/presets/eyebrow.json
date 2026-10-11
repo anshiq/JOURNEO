@@ -1,0 +1,12 @@
+{
+  "id": "eyebrow",
+  "name": "Eyebrow",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "New",
+      "preset": "eyebrow"
+    }
+  }
+}

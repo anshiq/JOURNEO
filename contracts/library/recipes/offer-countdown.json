@@ -1,0 +1,48 @@
+{
+  "id": "offer-countdown",
+  "name": "Offer + countdown",
+  "category": "offer",
+  "layout": {
+    "preset": "stack",
+    "hAlign": "center"
+  },
+  "elements": [
+    {
+      "type": "text",
+      "props": {
+        "text": "Limited time",
+        "preset": "eyebrow"
+      }
+    },
+    {
+      "type": "heading",
+      "props": {
+        "text": "20% off ends soon",
+        "level": 1
+      }
+    },
+    {
+      "type": "countdown",
+      "props": {
+        "deadline": "2027-12-31T23:59:00Z",
+        "onExpire": "message",
+        "message": "This offer has ended."
+      }
+    },
+    {
+      "type": "buttons",
+      "props": {
+        "items": [
+          {
+            "label": "Claim my discount",
+            "variant": "primary",
+            "action": {
+              "kind": "next"
+            }
+          }
+        ],
+        "layout": "auto"
+      }
+    }
+  ]
+}

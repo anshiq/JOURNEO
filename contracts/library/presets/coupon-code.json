@@ -1,0 +1,21 @@
+{
+  "id": "coupon-code",
+  "name": "Coupon code",
+  "category": "offer",
+  "element": {
+    "type": "buttons",
+    "props": {
+      "items": [
+        {
+          "label": "Copy code SAVE10",
+          "variant": "primary",
+          "action": {
+            "kind": "copy",
+            "value": "SAVE10"
+          }
+        }
+      ],
+      "layout": "auto"
+    }
+  }
+}

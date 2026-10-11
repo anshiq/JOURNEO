@@ -1,0 +1,94 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main, mvp]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: journeo
+          POSTGRES_PASSWORD: journeo
+          POSTGRES_DB: journeo
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U journeo" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://journeo:journeo@localhost:5432/journeo
+      TEST_DATABASE_URL: postgresql://journeo:journeo@localhost:5432/journeo
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run lint-imports
+      - run: uv run pyright
+      - run: uv run python ../../scripts/check_no_comments.py
+      - run: uv run alembic upgrade head && uv run alembic upgrade head && uv run alembic check
+      - run: uv run pytest -n auto --cov=app --cov-report=term-missing
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx biome ci .
+      - run: node ../scripts/check-source.mjs
+      - run: npx tsc -b
+      - run: npx vitest run
+      - run: npm run build && npm run size
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23
+      - run: cd services/api && uv sync --frozen
+      - run: cd frontend && npm ci
+      - run: make contracts
+      - run: git diff --exit-code
+  e2e:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.64.0-noble
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: journeo
+          POSTGRES_PASSWORD: journeo
+          POSTGRES_DB: journeo_e2e
+        options: --health-cmd "pg_isready -U journeo" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://journeo:journeo@postgres:5432/journeo_e2e
+      LLM__MODE: "off"
+      RATE_LIMIT_ENABLED: "false"
+      E2E: "true"
+      BASE_URL: http://127.0.0.1:4173
+      API_URL: http://127.0.0.1:8100
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: cd services/api && uv sync --frozen
+      - run: cd frontend && npm ci
+      - run: ./scripts/ci-start-stack.sh
+      - run: cd frontend && npx playwright test --workers=4

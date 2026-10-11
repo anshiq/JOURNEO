@@ -1,0 +1,22 @@
+{
+  "id": "yes-no",
+  "name": "Yes / No",
+  "category": "question",
+  "element": {
+    "type": "choice",
+    "props": {
+      "question": "Have you tried us before?",
+      "key": "tried_before",
+      "display": "yesno",
+      "options": [
+        {
+          "label": "Yes"
+        },
+        {
+          "label": "No"
+        }
+      ],
+      "autoAdvance": true
+    }
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "doc": {
+    "links": {
+      "scr_budget1": {
+        "el_choice02:opt:opt_high0001": "scr_offerb1",
+        "next": "scr_offera1"
+      },
+      "scr_leadform": {
+        "next": "scr_thanks01"
+      },
+      "scr_offera1": {
+        "next": "scr_leadform"
+      },
+      "scr_offerb1": {
+        "next": "scr_leadform"
+      },
+      "scr_usage01": {
+        "next": "scr_budget1"
+      },
+      "scr_welcome": {
+        "next": "scr_usage01"
+      },
+      "stp_start0": {
+        "next": "scr_welcome"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_budget1": {
+        "elements": [
+          {
+            "id": "el_choice02",
+            "props": {
+              "autoAdvance": true,
+              "branchByAnswer": true,
+              "display": "buttons",
+              "key": "budget",
+              "options": [
+                {
+                  "id": "opt_low00001",
+                  "label": "Under $25",
+                  "value": "under-$25"
+                },
+                {
+                  "id": "opt_high0001",
+                  "label": "$25 or more",
+                  "value": "$25-or-more"
+                }
+              ],
+              "question": "What's your monthly budget?"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_budget1",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Your budget"
+      },
+      "scr_leadform": {
+        "elements": [
+          {
+            "id": "el_heading4",
+            "props": {
+              "level": 2,
+              "text": "Get your recommendation by email"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_form0001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_email001",
+                  "key": "email",
+                  "kind": "email",
+                  "label": "Email",
+                  "placeholder": "you@example.com",
+                  "required": true
+                },
+                {
+                  "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time.",
+                  "id": "fld_consnt01",
+                  "key": "consent",
+                  "kind": "consent",
+                  "label": "I agree to receive emails about this offer.",
+                  "required": true
+                }
+              ],
+              "submitLabel": "Send it to me"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_leadform",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Your details",
+        "stickyAction": true
+      },
+      "scr_offera1": {
+        "elements": [
+          {
+            "id": "el_heading2",
+            "props": {
+              "level": 2,
+              "text": "We recommend: Starter"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_cards001",
+            "props": {
+              "items": [
+                {
+                  "button": {
+                    "action": {
+                      "kind": "next"
+                    },
+                    "label": "Get Starter"
+                  },
+                  "id": "it_starter1",
+                  "image": "/placeholders/photo-2.svg",
+                  "price": "$19/mo",
+                  "text": "Everything you need to get going, at a friendly price.",
+                  "title": "Starter"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "cards"
+          }
+        ],
+        "id": "scr_offera1",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Starter pick"
+      },
+      "scr_offerb1": {
+        "elements": [
+          {
+            "id": "el_heading3",
+            "props": {
+              "level": 2,
+              "text": "We recommend: Plus"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_cards002",
+            "props": {
+              "items": [
+                {
+                  "badge": "Popular",
+                  "button": {
+                    "action": {
+                      "kind": "next"
+                    },
+                    "label": "Get Plus"
+                  },
+                  "id": "it_plus0001",
+                  "image": "/placeholders/photo-3.svg",
+                  "price": "$39/mo",
+                  "text": "More power and priority support for growing needs.",
+                  "title": "Plus"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "cards"
+          }
+        ],
+        "id": "scr_offerb1",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "Plus pick"
+      },
+      "scr_thanks01": {
+        "elements": [
+          {
+            "id": "el_heading5",
+            "props": {
+              "level": 1,
+              "text": "Check your inbox!"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_text0002",
+            "props": {
+              "preset": "lead",
+              "text": "Your recommendation is on its way."
+            },
+            "type": "text"
+          }
+        ],
+        "id": "scr_thanks01",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack",
+          "vAlign": "center"
+        },
+        "name": "Thank you"
+      },
+      "scr_usage01": {
+        "elements": [
+          {
+            "id": "el_choice01",
+            "props": {
+              "autoAdvance": true,
+              "display": "buttons",
+              "key": "usage",
+              "options": [
+                {
+                  "id": "opt_solo0001",
+                  "label": "Just for me",
+                  "value": "just-for-me"
+                },
+                {
+                  "id": "opt_team0001",
+                  "label": "With my team",
+                  "value": "with-my-team"
+                }
+              ],
+              "question": "How will you mostly use it?"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_usage01",
+        "layout": {
+          "preset": "stack"
+        },
+        "name": "How you'll use it"
+      },
+      "scr_welcome": {
+        "elements": [
+          {
+            "id": "el_heading1",
+            "props": {
+              "level": 1,
+              "text": "Find your perfect plan in 30 seconds"
+            },
+            "type": "heading"
+          },
+          {
+            "id": "el_text0001",
+            "props": {
+              "preset": "lead",
+              "text": "Answer two quick questions and we'll recommend the right fit."
+            },
+            "type": "text"
+          },
+          {
+            "id": "el_buttons1",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_start001",
+                  "label": "Start the quiz",
+                  "variant": "primary"
+                }
+              ],
+              "layout": "auto"
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_welcome",
+        "layout": {
+          "hAlign": "center",
+          "preset": "stack",
+          "vAlign": "center"
+        },
+        "name": "Welcome"
+      }
+    },
+    "settings": {
+      "allowBack": false,
+      "legal": {},
+      "progress": "bar",
+      "seo": {
+        "description": "Two quick questions, one tailored recommendation.",
+        "title": "Find your perfect plan"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_welcome",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_usage01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_budget1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_offera1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_offerb1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_leadform",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "W_SEO_IMAGE",
+        "target": {
+          "field": "image",
+          "id": "seo",
+          "kind": "settings"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_budget1": [
+        {
+          "key": "budget",
+          "type": "choice"
+        }
+      ],
+      "scr_leadform": [
+        {
+          "key": "email",
+          "type": "email"
+        },
+        {
+          "key": "consent",
+          "type": "boolean"
+        }
+      ],
+      "scr_offera1": [],
+      "scr_offerb1": [],
+      "scr_thanks01": [],
+      "scr_usage01": [
+        {
+          "key": "usage",
+          "type": "choice"
+        }
+      ],
+      "scr_welcome": []
+    },
+    "ports": {
+      "scr_budget1": [
+        "next",
+        "el_choice02:opt:opt_low00001",
+        "el_choice02:opt:opt_high0001"
+      ],
+      "scr_leadform": [
+        "next"
+      ],
+      "scr_offera1": [
+        "next"
+      ],
+      "scr_offerb1": [
+        "next"
+      ],
+      "scr_thanks01": [],
+      "scr_usage01": [
+        "next"
+      ],
+      "scr_welcome": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {},
+            "at": "scr_welcome",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "usage": "opt_team0001"
+            },
+            "at": "scr_usage01",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "budget": "opt_high0001"
+            },
+            "at": "scr_budget1",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_welcome",
+          "scr_usage01",
+          "scr_budget1",
+          "scr_offerb1"
+        ],
+        "status": "running"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {},
+            "at": "scr_welcome",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "usage": "opt_solo0001"
+            },
+            "at": "scr_usage01",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "budget": "opt_low00001"
+            },
+            "at": "scr_budget1",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_welcome",
+          "scr_usage01",
+          "scr_budget1",
+          "scr_offera1"
+        ],
+        "status": "running"
+      }
+    ]
+  }
+}

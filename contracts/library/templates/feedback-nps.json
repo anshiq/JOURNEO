@@ -1,0 +1,245 @@
+{
+  "id": "feedback-nps",
+  "name": "Feedback / NPS",
+  "goal": "feedback",
+  "description": "Measure satisfaction and route detractors and promoters to different follow-ups.",
+  "checklist": [
+    "Add your logo",
+    "Set your review link",
+    "Choose where leads go"
+  ],
+  "doc": {
+    "schemaVersion": 4,
+    "theme": {},
+    "screens": {
+      "scr_score01": {
+        "id": "scr_score01",
+        "name": "Score",
+        "layout": {
+          "preset": "stack",
+          "hAlign": "center",
+          "vAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Quick question",
+              "level": 2
+            },
+            "id": "el_heading1"
+          },
+          {
+            "type": "rating",
+            "props": {
+              "question": "How likely are you to recommend us to a friend?",
+              "key": "nps",
+              "scale": "nps",
+              "max": 10,
+              "minLabel": "Not likely",
+              "maxLabel": "Very likely",
+              "branchByScore": true,
+              "bands": [
+                {
+                  "label": "Detractors",
+                  "min": 0,
+                  "max": 6,
+                  "id": "band_low0001"
+                },
+                {
+                  "label": "Passives",
+                  "min": 7,
+                  "max": 8,
+                  "id": "band_mid0001"
+                },
+                {
+                  "label": "Promoters",
+                  "min": 9,
+                  "max": 10,
+                  "id": "band_high001"
+                }
+              ]
+            },
+            "id": "el_rating01"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Continue",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_cont0001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons1"
+          }
+        ]
+      },
+      "scr_improve": {
+        "id": "scr_improve",
+        "name": "Improve",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Sorry to hear that. What could we do better?",
+              "level": 2
+            },
+            "id": "el_heading2"
+          },
+          {
+            "type": "form",
+            "props": {
+              "fields": [
+                {
+                  "kind": "longtext",
+                  "label": "Your feedback",
+                  "key": "feedback",
+                  "required": true,
+                  "id": "fld_feedbk01"
+                },
+                {
+                  "kind": "email",
+                  "label": "Email (optional)",
+                  "key": "email",
+                  "id": "fld_email001"
+                }
+              ],
+              "submitLabel": "Send feedback"
+            },
+            "id": "el_form0001"
+          }
+        ]
+      },
+      "scr_review1": {
+        "id": "scr_review1",
+        "name": "Review",
+        "layout": {
+          "preset": "stack",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Thank you! Would you leave us a review?",
+              "level": 2
+            },
+            "id": "el_heading3"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Write a review",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "url",
+                    "url": "https://example.com/review",
+                    "newTab": true,
+                    "passParams": false
+                  },
+                  "id": "it_review01"
+                },
+                {
+                  "label": "Maybe later",
+                  "variant": "link",
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_later001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons2"
+          }
+        ]
+      },
+      "scr_thanks01": {
+        "id": "scr_thanks01",
+        "name": "Thank you",
+        "layout": {
+          "preset": "stack",
+          "vAlign": "center",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Thanks for your feedback!",
+              "level": 1
+            },
+            "id": "el_heading4"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "It helps us get better every day.",
+              "preset": "lead"
+            },
+            "id": "el_text0001"
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_score01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_improve",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_review1",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "links": {
+      "stp_start0": {
+        "next": "scr_score01"
+      },
+      "scr_score01": {
+        "next": "scr_thanks01",
+        "el_rating01:band:band_low0001": "scr_improve",
+        "el_rating01:band:band_high001": "scr_review1"
+      },
+      "scr_improve": {
+        "next": "scr_thanks01"
+      },
+      "scr_review1": {
+        "next": "scr_thanks01"
+      }
+    },
+    "settings": {
+      "progress": "bar",
+      "allowBack": false,
+      "seo": {
+        "title": "Tell us what you think",
+        "description": "One quick question."
+      },
+      "legal": {}
+    }
+  }
+}

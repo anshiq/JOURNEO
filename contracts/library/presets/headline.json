@@ -1,0 +1,12 @@
+{
+  "id": "headline",
+  "name": "Headline",
+  "category": "text",
+  "element": {
+    "type": "heading",
+    "props": {
+      "text": "A headline that grabs attention",
+      "level": 1
+    }
+  }
+}

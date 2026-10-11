@@ -1,0 +1,48 @@
+{
+  "id": "welcome",
+  "name": "Welcome",
+  "category": "start",
+  "layout": {
+    "preset": "stack",
+    "vAlign": "center",
+    "hAlign": "center"
+  },
+  "elements": [
+    {
+      "type": "text",
+      "props": {
+        "text": "New",
+        "preset": "eyebrow"
+      }
+    },
+    {
+      "type": "heading",
+      "props": {
+        "text": "Welcome! Let's find what fits you",
+        "level": 1
+      }
+    },
+    {
+      "type": "text",
+      "props": {
+        "text": "It takes less than a minute.",
+        "preset": "lead"
+      }
+    },
+    {
+      "type": "buttons",
+      "props": {
+        "items": [
+          {
+            "label": "Get started",
+            "variant": "primary",
+            "action": {
+              "kind": "next"
+            }
+          }
+        ],
+        "layout": "auto"
+      }
+    }
+  ]
+}

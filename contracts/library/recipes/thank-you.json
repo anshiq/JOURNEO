@@ -1,0 +1,26 @@
+{
+  "id": "thank-you",
+  "name": "Thank you",
+  "category": "end",
+  "layout": {
+    "preset": "stack",
+    "vAlign": "center",
+    "hAlign": "center"
+  },
+  "elements": [
+    {
+      "type": "heading",
+      "props": {
+        "text": "Thank you!",
+        "level": 1
+      }
+    },
+    {
+      "type": "text",
+      "props": {
+        "text": "We've got your details and will be in touch soon.",
+        "preset": "lead"
+      }
+    }
+  ]
+}

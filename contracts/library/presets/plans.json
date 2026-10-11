@@ -1,0 +1,36 @@
+{
+  "id": "plans",
+  "name": "Plans",
+  "category": "offer",
+  "element": {
+    "type": "cards",
+    "props": {
+      "layout": "grid",
+      "items": [
+        {
+          "title": "Basic",
+          "price": "$9/mo",
+          "text": "For individuals.",
+          "button": {
+            "label": "Choose Basic",
+            "action": {
+              "kind": "next"
+            }
+          }
+        },
+        {
+          "title": "Team",
+          "price": "$29/mo",
+          "badge": "Best value",
+          "text": "For small teams.",
+          "button": {
+            "label": "Choose Team",
+            "action": {
+              "kind": "next"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

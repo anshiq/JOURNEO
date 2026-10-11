@@ -4,3 +4,5 @@ storybook-static/
 *.log
 .env
 debug-storybook.log
+test-results/
+playwright-report/

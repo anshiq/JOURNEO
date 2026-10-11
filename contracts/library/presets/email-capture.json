@@ -1,0 +1,27 @@
+{
+  "id": "email-capture",
+  "name": "Email capture",
+  "category": "lead",
+  "element": {
+    "type": "form",
+    "props": {
+      "fields": [
+        {
+          "kind": "email",
+          "label": "Email",
+          "key": "email",
+          "required": true,
+          "placeholder": "you@example.com"
+        },
+        {
+          "kind": "consent",
+          "label": "I agree to receive emails about this offer.",
+          "key": "consent",
+          "required": true,
+          "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time."
+        }
+      ],
+      "submitLabel": "Subscribe"
+    }
+  }
+}

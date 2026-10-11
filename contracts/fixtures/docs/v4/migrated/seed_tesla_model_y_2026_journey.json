@@ -1,0 +1,124 @@
+{
+  "assistant": {
+    "fallback": "This question is out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask about the 2026 Model Y...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_redirect-end"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b1-h",
+          "props": {
+            "level": 1,
+            "text": "Tesla Model Y"
+          },
+          "type": "heading"
+        },
+        {
+          "id": "el_b1-t",
+          "props": {
+            "preset": "lead",
+            "text": "The Juniper refresh. Six configurations, one mission."
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_b2x",
+          "props": {
+            "display": "dropdown",
+            "key": "field_configuration",
+            "multiple": false,
+            "options": [
+              {
+                "id": "opt_b2-standard-rwd",
+                "label": "Standard RWD \u2014 $39",
+                "value": "standard-rwd-39"
+              },
+              {
+                "id": "opt_b2-premium-awd",
+                "label": "Premium AWD \u2014 $49",
+                "value": "premium-awd-49"
+              }
+            ],
+            "question": "Configuration",
+            "required": true,
+            "scoring": "none"
+          },
+          "type": "choice"
+        },
+        {
+          "id": "el_s1-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s1-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "media": {
+          "alt": "",
+          "kind": "image",
+          "side": "right",
+          "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tesla_Model_Y_Front_View.jpg"
+        },
+        "preset": "split"
+      },
+      "name": "Welcome",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://www.tesla.com/modely"
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

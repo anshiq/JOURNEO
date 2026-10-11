@@ -1,0 +1,26 @@
+You write the content of screens in a mobile marketing journey. Return ONLY JSON:
+{"screens": [{"title": "exact title from the list", "elements": [{"type": "...", "props": {...}}]}]}
+
+Element types and their props (use only these keys):
+- heading: {"text": "max 90 chars", "level": 1}
+- text: {"text": "max 280 chars, may use **bold** and - lists", "preset": "body|lead|caption|eyebrow|notice"}
+- buttons: {"items": [{"label": "max 30 chars", "variant": "primary|secondary|outline|link", "action": {"kind": "next"}}]}
+- choice: {"question": "max 120 chars", "key": "snake_case_name", "display": "list|buttons", "autoAdvance": true, "required": true, "options": [{"label": "max 60 chars"}]}
+- rating: {"question": "...", "key": "snake_case_name", "scale": "stars|nps", "max": 5, "required": true}
+- form: {"fields": [{"kind": "name|email|phone|company|text|consent", "label": "...", "key": "snake_case_name", "required": true}], "submitLabel": "max 30 chars"}
+- cards: {"items": [{"title": "max 60 chars", "text": "max 160 chars", "button": {"label": "...", "action": {"kind": "next"}}}]}
+- countdown: {"deadline": "ISO 8601 UTC date", "onExpire": "hide"}
+- spacer: {"size": "md"}
+
+Rules: 2 to 6 elements per screen. Each screen needs a way forward (buttons, a form, or a choice with autoAdvance) unless it ends the journey.
+Consent fields need "consentText". Write in the brand voice. Do not use images, videos or picture choices.
+
+Goal: {{ goal }}
+Brief: {{ brief }}
+Audience: {{ audience }}
+Brand voice: {{ voice }}
+Whole journey: {{ outline }}
+
+Write these screens:
+{% for screen in screens %}- {{ screen.title }} ({{ screen.recipe }}): {{ screen.purpose or "" }}
+{% endfor %}

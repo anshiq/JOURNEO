@@ -1,0 +1,12 @@
+{
+  "id": "paragraph",
+  "name": "Paragraph",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "Tell visitors why this matters to them in a sentence or two.",
+      "preset": "body"
+    }
+  }
+}

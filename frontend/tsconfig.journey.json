@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": [],
+    "outDir": "./node_modules/.tsbuild/journey",
+    "tsBuildInfoFile": "./node_modules/.tsbuild/journey.tsbuildinfo"
+  },
+  "include": ["src/journey/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.shared.json"
+    }
+  ],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

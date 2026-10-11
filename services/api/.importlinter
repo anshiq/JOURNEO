@@ -1,0 +1,61 @@
+[importlinter]
+root_package = app
+include_external_packages = True
+
+[importlinter:contract:domain-is-pure]
+name = Journey domain has no I/O dependencies
+type = forbidden
+source_modules =
+    app.modules.journeys.domain
+    app.modules.journeys.upgraders
+forbidden_modules =
+    fastapi
+    sqlalchemy
+    app.core.db
+    app.modules.journeys.repo
+    app.modules.journeys.models
+    app.modules.journeys.service
+
+[importlinter:contract:layers]
+name = Module layering
+type = layers
+layers =
+    router
+    service
+    (repo)
+    (queries)
+    (models)
+containers =
+    app.modules.campaigns
+    app.modules.journeys
+    app.modules.runtime
+    app.modules.leads
+    app.modules.results
+    app.modules.assistant
+    app.modules.media
+exhaustive = false
+
+[importlinter:contract:core-independent]
+name = Core never imports modules
+type = forbidden
+source_modules =
+    app.core
+forbidden_modules =
+    app.modules
+    app.lifespan
+    app.main
+
+[importlinter:contract:no-foreign-repos]
+name = Modules use other modules only through their service
+type = forbidden
+source_modules =
+    app.modules.campaigns
+    app.modules.runtime
+    app.modules.leads
+    app.modules.results
+    app.modules.assistant
+    app.modules.media
+forbidden_modules =
+    app.modules.journeys.repo
+    app.modules.journeys.models
+allow_indirect_imports = True

@@ -1,0 +1,120 @@
+{
+  "doc": {
+    "links": {
+      "scr_aaaaaa": {
+        "el_k00001:it_card001": "scr_cccccc",
+        "next": "scr_bbbbbb"
+      },
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_k00001",
+            "props": {
+              "items": [
+                {
+                  "button": {
+                    "action": {
+                      "kind": "goto"
+                    },
+                    "label": "Pick"
+                  },
+                  "id": "it_card001",
+                  "title": "One"
+                },
+                {
+                  "button": {
+                    "action": {
+                      "kind": "next"
+                    },
+                    "label": "Pick two"
+                  },
+                  "id": "it_card002",
+                  "title": "Two"
+                }
+              ]
+            },
+            "type": "cards"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      },
+      "scr_bbbbbb": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_bbbbbb",
+        "name": "scr_bbbbbb"
+      },
+      "scr_cccccc": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_cccccc",
+        "name": "scr_cccccc"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_bbbbbb",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_cccccc",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_aaaaaa": [],
+      "scr_bbbbbb": [],
+      "scr_cccccc": []
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next",
+        "el_k00001:it_card001"
+      ],
+      "scr_bbbbbb": [],
+      "scr_cccccc": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

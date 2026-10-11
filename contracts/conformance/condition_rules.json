@@ -1,0 +1,242 @@
+{
+  "doc": {
+    "links": {
+      "scr_quiz01": {
+        "next": "stp_cond01"
+      },
+      "stp_cond01": {
+        "else": "scr_else01",
+        "rule:rule_mob001": "scr_mob001",
+        "rule:rule_vip001": "scr_vip001"
+      },
+      "stp_start0": {
+        "next": "scr_quiz01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_else01": {
+        "elements": [
+          {
+            "id": "el_h00004",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_else01",
+        "name": "scr_else01"
+      },
+      "scr_mob001": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_mob001",
+        "name": "scr_mob001"
+      },
+      "scr_quiz01": {
+        "elements": [
+          {
+            "id": "el_c00001",
+            "props": {
+              "autoAdvance": true,
+              "key": "tier",
+              "options": [
+                {
+                  "id": "opt_vip001",
+                  "label": "VIP",
+                  "points": 5
+                },
+                {
+                  "id": "opt_std001",
+                  "label": "Standard",
+                  "points": 1
+                }
+              ],
+              "question": "Pick",
+              "scoring": "points"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_quiz01",
+        "name": "scr_quiz01"
+      },
+      "scr_vip001": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_vip001",
+        "name": "scr_vip001"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_quiz01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_vip001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_mob001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_else01",
+        "kind": "screen"
+      },
+      {
+        "id": "stp_cond01",
+        "kind": "condition",
+        "rules": [
+          {
+            "id": "rule_vip001",
+            "label": "VIP",
+            "when": {
+              "all": [
+                {
+                  "answer": "tier",
+                  "op": "anyOf",
+                  "value": [
+                    "opt_vip001"
+                  ]
+                },
+                {
+                  "answer": "score",
+                  "op": "gte",
+                  "value": 5
+                }
+              ]
+            }
+          },
+          {
+            "id": "rule_mob001",
+            "label": "Mobile",
+            "when": {
+              "answer": "device",
+              "op": "is",
+              "value": "mobile"
+            }
+          }
+        ]
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_else01": [],
+      "scr_mob001": [],
+      "scr_quiz01": [
+        {
+          "key": "tier",
+          "type": "choice"
+        }
+      ],
+      "scr_vip001": []
+    },
+    "ports": {
+      "scr_else01": [],
+      "scr_mob001": [],
+      "scr_quiz01": [
+        "next"
+      ],
+      "scr_vip001": [],
+      "stp_cond01": [
+        "rule:rule_vip001",
+        "rule:rule_mob001",
+        "else"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "tier": "opt_vip001"
+            },
+            "at": "scr_quiz01",
+            "port": "next"
+          }
+        ],
+        "matched": "rule_vip001",
+        "path": [
+          "scr_quiz01",
+          "scr_vip001"
+        ],
+        "status": "ended",
+        "system": {
+          "device": "desktop"
+        }
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "tier": "opt_std001"
+            },
+            "at": "scr_quiz01",
+            "port": "next"
+          }
+        ],
+        "matched": "rule_mob001",
+        "path": [
+          "scr_quiz01",
+          "scr_mob001"
+        ],
+        "status": "ended",
+        "system": {
+          "device": "mobile"
+        }
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "tier": "opt_std001"
+            },
+            "at": "scr_quiz01",
+            "port": "next"
+          }
+        ],
+        "matched": "else",
+        "path": [
+          "scr_quiz01",
+          "scr_else01"
+        ],
+        "status": "ended",
+        "system": {
+          "device": "desktop"
+        }
+      }
+    ]
+  }
+}

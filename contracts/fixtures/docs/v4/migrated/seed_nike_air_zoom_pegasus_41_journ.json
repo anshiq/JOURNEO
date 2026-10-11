@@ -1,0 +1,124 @@
+{
+  "assistant": {
+    "fallback": "This question is out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask about the Pegasus 41...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_redirect-end"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b1-h",
+          "props": {
+            "level": 1,
+            "text": "Nike Air Zoom Pegasus 41"
+          },
+          "type": "heading"
+        },
+        {
+          "id": "el_b1-t",
+          "props": {
+            "preset": "lead",
+            "text": "ReactX foam. Dual Air Zoom. Ready for every mile."
+          },
+          "type": "text"
+        },
+        {
+          "id": "el_b2x",
+          "props": {
+            "display": "dropdown",
+            "key": "field_size",
+            "multiple": false,
+            "options": [
+              {
+                "id": "opt_b2-9",
+                "label": "US 9",
+                "value": "us-9"
+              },
+              {
+                "id": "opt_b2-10",
+                "label": "US 10",
+                "value": "us-10"
+              }
+            ],
+            "question": "Size",
+            "required": true,
+            "scoring": "none"
+          },
+          "type": "choice"
+        },
+        {
+          "id": "el_s1-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s1-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "media": {
+          "alt": "",
+          "kind": "image",
+          "side": "right",
+          "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Nike_Zoom_Pegasus_38_running_shoe.jpg"
+        },
+        "preset": "split"
+      },
+      "name": "Welcome",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://www.nike.com/t/air-zoom-pegasus-41-road-running-shoes"
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

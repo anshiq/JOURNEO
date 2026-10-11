@@ -1,0 +1,226 @@
+{
+  "id": "event-registration",
+  "name": "Event registration",
+  "goal": "event",
+  "description": "Promote an event with a countdown, registration form and Add to calendar.",
+  "checklist": [
+    "Set the event date",
+    "Replace sample photos",
+    "Choose where leads go"
+  ],
+  "doc": {
+    "schemaVersion": 4,
+    "theme": {},
+    "screens": {
+      "scr_welcome": {
+        "id": "scr_welcome",
+        "name": "Event",
+        "layout": {
+          "preset": "split",
+          "media": {
+            "kind": "image",
+            "src": "/placeholders/photo-4.svg",
+            "alt": "Speaker on stage",
+            "side": "right",
+            "onMobile": "top"
+          },
+          "vAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "text",
+            "props": {
+              "text": "Free live webinar",
+              "preset": "eyebrow"
+            },
+            "id": "el_eyebrow1"
+          },
+          {
+            "type": "heading",
+            "props": {
+              "text": "Grow faster with smarter campaigns",
+              "level": 1
+            },
+            "id": "el_heading1"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "Join us live for 45 minutes of practical tips and a Q&A.",
+              "preset": "lead"
+            },
+            "id": "el_text0001"
+          },
+          {
+            "type": "countdown",
+            "props": {
+              "deadline": "2027-06-30T16:00:00Z",
+              "onExpire": "message",
+              "message": "Registration has closed."
+            },
+            "id": "el_countdn1"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Save my seat",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_save0001"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons1"
+          }
+        ]
+      },
+      "scr_register": {
+        "id": "scr_register",
+        "name": "Register",
+        "layout": {
+          "preset": "stack"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "Reserve your free seat",
+              "level": 2
+            },
+            "id": "el_heading2"
+          },
+          {
+            "type": "form",
+            "props": {
+              "fields": [
+                {
+                  "kind": "name",
+                  "label": "Full name",
+                  "key": "name",
+                  "required": true,
+                  "id": "fld_name0001"
+                },
+                {
+                  "kind": "email",
+                  "label": "Work email",
+                  "key": "email",
+                  "required": true,
+                  "unique": true,
+                  "id": "fld_email001"
+                },
+                {
+                  "kind": "company",
+                  "label": "Company",
+                  "key": "company",
+                  "id": "fld_comp0001"
+                },
+                {
+                  "kind": "consent",
+                  "label": "I agree to receive emails about this offer.",
+                  "key": "consent",
+                  "required": true,
+                  "consentText": "I agree to receive emails about this offer. I can unsubscribe at any time.",
+                  "id": "fld_consnt01"
+                }
+              ],
+              "submitLabel": "Register"
+            },
+            "id": "el_form0001"
+          }
+        ],
+        "stickyAction": true
+      },
+      "scr_thanks01": {
+        "id": "scr_thanks01",
+        "name": "You're in",
+        "layout": {
+          "preset": "stack",
+          "vAlign": "center",
+          "hAlign": "center"
+        },
+        "elements": [
+          {
+            "type": "heading",
+            "props": {
+              "text": "You're registered!",
+              "level": 1
+            },
+            "id": "el_heading3"
+          },
+          {
+            "type": "text",
+            "props": {
+              "text": "Add the event to your calendar so you don't miss it.",
+              "preset": "lead"
+            },
+            "id": "el_text0002"
+          },
+          {
+            "type": "buttons",
+            "props": {
+              "items": [
+                {
+                  "label": "Add to calendar",
+                  "variant": "primary",
+                  "action": {
+                    "kind": "calendar",
+                    "title": "Grow faster with smarter campaigns",
+                    "start": "2027-06-30T16:00:00Z",
+                    "end": "2027-06-30T16:45:00Z",
+                    "location": "Online"
+                  },
+                  "id": "it_calndr01"
+                }
+              ],
+              "layout": "auto"
+            },
+            "id": "el_buttons2"
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_welcome",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_register",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks01",
+        "kind": "screen"
+      }
+    ],
+    "links": {
+      "stp_start0": {
+        "next": "scr_welcome"
+      },
+      "scr_welcome": {
+        "next": "scr_register"
+      },
+      "scr_register": {
+        "next": "scr_thanks01"
+      }
+    },
+    "settings": {
+      "progress": "bar",
+      "allowBack": false,
+      "seo": {
+        "title": "Free webinar: grow faster",
+        "description": "45 minutes of practical tips and a live Q&A."
+      },
+      "legal": {}
+    }
+  }
+}

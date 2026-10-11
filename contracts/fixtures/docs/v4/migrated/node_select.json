@@ -1,0 +1,102 @@
+{
+  "assistant": {
+    "fallback": "Out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_redirect-end"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b_select",
+          "props": {
+            "display": "dropdown",
+            "key": "size",
+            "multiple": false,
+            "options": [
+              {
+                "id": "opt_b_select-s",
+                "label": "Small",
+                "value": "small"
+              },
+              {
+                "id": "opt_b_select-m",
+                "label": "Medium",
+                "value": "medium"
+              }
+            ],
+            "question": "Size",
+            "required": true,
+            "scoring": "none"
+          },
+          "type": "choice"
+        },
+        {
+          "id": "el_s1-next",
+          "props": {
+            "items": [
+              {
+                "action": {
+                  "kind": "next"
+                },
+                "id": "it_s1-next",
+                "label": "Continue",
+                "variant": "primary"
+              }
+            ]
+          },
+          "type": "buttons"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "preset": "stack"
+      },
+      "name": "s1",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://example.com/done"
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

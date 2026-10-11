@@ -1,0 +1,52 @@
+{
+  "id": "coupon-reveal",
+  "name": "Coupon reveal",
+  "category": "offer",
+  "layout": {
+    "preset": "stack",
+    "hAlign": "center",
+    "vAlign": "center"
+  },
+  "elements": [
+    {
+      "type": "heading",
+      "props": {
+        "text": "Here's your code",
+        "level": 2
+      }
+    },
+    {
+      "type": "text",
+      "props": {
+        "text": "**WELCOME20**",
+        "preset": "lead"
+      }
+    },
+    {
+      "type": "buttons",
+      "props": {
+        "items": [
+          {
+            "label": "Copy code",
+            "variant": "primary",
+            "action": {
+              "kind": "copy",
+              "value": "WELCOME20"
+            }
+          },
+          {
+            "label": "Shop now",
+            "variant": "outline",
+            "action": {
+              "kind": "url",
+              "url": "https://example.com",
+              "newTab": true,
+              "passParams": true
+            }
+          }
+        ],
+        "layout": "auto"
+      }
+    }
+  ]
+}

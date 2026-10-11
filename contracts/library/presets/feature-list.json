@@ -1,0 +1,13 @@
+{
+  "id": "feature-list",
+  "name": "Feature list",
+  "category": "text",
+  "element": {
+    "type": "text",
+    "props": {
+      "text": "Free delivery\nCancel anytime\nFriendly support",
+      "preset": "body",
+      "listStyle": "check"
+    }
+  }
+}

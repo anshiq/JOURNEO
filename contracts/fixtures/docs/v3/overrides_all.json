@@ -1,0 +1,112 @@
+{
+  "askAi": {
+    "allowJourneyJump": true,
+    "allowRag": true,
+    "buttonLabel": "Ask",
+    "id": "ask-ai",
+    "placeholder": "Ask...",
+    "ragK": 8,
+    "refusalMessage": "Out of context."
+  },
+  "edges": [
+    {
+      "id": "e1",
+      "source": "trigger",
+      "sourceHandle": null,
+      "target": "s1"
+    },
+    {
+      "id": "e2",
+      "source": "s1",
+      "sourceHandle": "default",
+      "target": "end"
+    }
+  ],
+  "nodes": [
+    {
+      "config": {},
+      "id": "trigger",
+      "position": {
+        "x": -260,
+        "y": 220
+      },
+      "type": "trigger"
+    },
+    {
+      "config": {
+        "content": "Hi",
+        "responsive": {
+          "desktop": {
+            "fontSize": "20px"
+          },
+          "mobile": {
+            "fontSize": "16px"
+          },
+          "tablet": {
+            "fontSize": "18px"
+          }
+        },
+        "style": {
+          "fontSize": "14px"
+        }
+      },
+      "id": "b1",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "type": "text"
+    },
+    {
+      "config": {
+        "redirectDelayMs": 1500,
+        "redirectUrl": "https://example.com/done"
+      },
+      "id": "end",
+      "position": {
+        "x": 700,
+        "y": 220
+      },
+      "type": "end"
+    }
+  ],
+  "schemaVersion": 3,
+  "screens": [
+    {
+      "advance": {
+        "handle": "default",
+        "label": "Continue",
+        "mode": "button"
+      },
+      "back": {
+        "label": "Back",
+        "show": false
+      },
+      "blocks": [
+        "b1"
+      ],
+      "id": "s1",
+      "layout": {
+        "mode": "stack"
+      },
+      "name": "s1",
+      "position": {
+        "x": 60,
+        "y": 160
+      },
+      "size": {
+        "height": 560,
+        "width": 440
+      }
+    }
+  ],
+  "theme": {
+    "accent": "#f97316",
+    "cta": "Continue",
+    "font": "Inter",
+    "foreground": "#111827",
+    "primary": "#4f46e5",
+    "radius": 16,
+    "surface": "#ffffff"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "doc": {
+    "links": {},
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_h00001",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "J_ENTRY",
+        "target": {
+          "id": "stp_start0",
+          "kind": "step"
+        }
+      },
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "scr_aaaaaa",
+          "kind": "screen"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_aaaaaa": []
+    },
+    "ports": {
+      "scr_aaaaaa": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

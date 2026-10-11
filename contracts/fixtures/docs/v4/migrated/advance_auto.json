@@ -1,0 +1,82 @@
+{
+  "assistant": {
+    "fallback": "Out of context.",
+    "greeting": "Questions? Ask me anything.",
+    "placeholder": "Ask...",
+    "suggested": []
+  },
+  "links": {
+    "scr_s1": {
+      "next": "stp_redirect-end"
+    },
+    "stp_start": {
+      "next": "scr_s1"
+    }
+  },
+  "schemaVersion": 4,
+  "screens": {
+    "scr_s1": {
+      "elements": [
+        {
+          "id": "el_b1x",
+          "props": {
+            "autoAdvance": true,
+            "display": "list",
+            "key": "q1",
+            "multiple": false,
+            "options": [
+              {
+                "id": "opt_b1-o1",
+                "label": "A",
+                "value": "a"
+              }
+            ],
+            "question": "Q?",
+            "required": true,
+            "scoring": "none"
+          },
+          "type": "choice"
+        }
+      ],
+      "id": "scr_s1",
+      "layout": {
+        "preset": "stack"
+      },
+      "name": "s1",
+      "showAssistant": true
+    }
+  },
+  "settings": {
+    "allowBack": false,
+    "progress": "bar"
+  },
+  "steps": [
+    {
+      "id": "stp_start",
+      "kind": "start"
+    },
+    {
+      "id": "scr_s1",
+      "kind": "screen"
+    },
+    {
+      "delayMs": 1500,
+      "id": "stp_redirect-end",
+      "kind": "redirect",
+      "passParams": true,
+      "url": "https://example.com/done"
+    }
+  ],
+  "theme": {
+    "colors": {
+      "accent": "#f97316",
+      "primary": "#4f46e5",
+      "surface": "#ffffff",
+      "text": "#111827"
+    },
+    "fonts": {
+      "pairing": "classic"
+    },
+    "radius": "lg"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "doc": {
+    "links": {
+      "scr_form01": {
+        "next": "scr_thanks"
+      },
+      "stp_start0": {
+        "next": "scr_form01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_form01": {
+        "elements": [
+          {
+            "id": "el_f00001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_e00001",
+                  "key": "email",
+                  "kind": "email",
+                  "label": "email",
+                  "required": true
+                },
+                {
+                  "id": "fld_c00001",
+                  "key": "consent",
+                  "kind": "consent",
+                  "label": "consent",
+                  "required": true
+                }
+              ],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_form01",
+        "name": "scr_form01"
+      },
+      "scr_thanks": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_thanks",
+        "name": "scr_thanks"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_form01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_form01": [
+        {
+          "key": "email",
+          "type": "email"
+        },
+        {
+          "key": "consent",
+          "type": "boolean"
+        }
+      ],
+      "scr_thanks": []
+    },
+    "ports": {
+      "scr_form01": [
+        "next"
+      ],
+      "scr_thanks": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "consent": true,
+              "email": "a@b.co"
+            },
+            "at": "scr_form01",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_form01",
+          "scr_thanks"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

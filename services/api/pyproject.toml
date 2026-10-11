@@ -1,18 +1,53 @@
 [project]
 name = "journeo-api"
 version = "1.0.0"
-requires-python = ">=3.12"
+requires-python = ">=3.13,<3.15"
 dependencies = [
-  "fastapi>=0.115",
-  "uvicorn[standard]",
-  "sqlalchemy>=2.0",
-  "psycopg2-binary",
-  "pgvector",
-  "pydantic>=2",
-  "pydantic-settings",
-  "boto3",
-  "PyYAML",
-  "alembic",
+  "fastapi==0.143.*",
+  "uvicorn[standard]==0.54.*",
+  "pydantic[email]==2.14.*",
+  "pydantic-settings==2.15.*",
+  "sqlalchemy[asyncio]==2.1.*",
+  "psycopg[binary,pool]==3.3.*",
+  "alembic==1.20.*",
+  "procrastinate==3.10.*",
+  "openai==3.28.*",
+  "httpx==0.28.*",
+  "tenacity==9.2.*",
+  "limits==5.8.*",
+  "orjson==3.13.*",
+  "pillow==12.3.*",
+  "trafilatura==2.3.*",
+  "pypdf==6.20.*",
+  "boto3==1.43.*",
+  "python-multipart==0.0.32",
+  "jinja2==3.1.*",
+  "cachetools==7.2.*",
+  "python-slugify==9.1.*",
+  "sentry-sdk==2.71.*",
 ]
+[dependency-groups]
+dev = ["pytest==9.1.*", "pytest-asyncio==1.4.*", "pytest-xdist==3.8.*", "pytest-cov==7.1.*", "hypothesis==6.168.*", "polyfactory==3.3.*", "respx==0.23.*", "ruff==0.17.*", "pyright==1.1.414", "import-linter==2.15"]
 [tool.ruff]
-line-length = 140
+line-length = 120
+target-version = "py313"
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "PLR2004", "ARG001"]
+"alembic/**" = ["S608", "E501"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "ASYNC", "S", "PL", "RUF", "PERF", "TID", "DTZ", "PT"]
+ignore = ["PLR0913", "S101", "PLR2004", "PLC0415", "PLR0911", "PLR0912", "PLR0915", "PLR0917", "RUF001", "RUF003", "S608", "B008", "PLW0603", "S311", "ASYNC109", "RUF012", "PERF401"]
+[tool.pyright]
+include = ["app"]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+strict = ["app/core"]
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+pythonpath = ["."]
+filterwarnings = ["ignore::DeprecationWarning:procrastinate.*"]

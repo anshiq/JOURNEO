@@ -1,0 +1,107 @@
+{
+  "doc": {
+    "links": {
+      "scr_aaaaaa": {
+        "next": "scr_bbbbbb"
+      },
+      "scr_bbbbbb": {
+        "next": "scr_aaaaaa"
+      },
+      "stp_start0": {
+        "next": "scr_aaaaaa"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_aaaaaa": {
+        "elements": [
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Go"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_aaaaaa",
+        "name": "scr_aaaaaa"
+      },
+      "scr_bbbbbb": {
+        "elements": [
+          {
+            "id": "el_b00002",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00002",
+                  "label": "Back"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_bbbbbb",
+        "name": "scr_bbbbbb"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_aaaaaa",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_bbbbbb",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "J_LOGIC_LOOP",
+        "target": {
+          "id": "scr_aaaaaa",
+          "kind": "screen"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_aaaaaa": [],
+      "scr_bbbbbb": []
+    },
+    "ports": {
+      "scr_aaaaaa": [
+        "next"
+      ],
+      "scr_bbbbbb": [
+        "next"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

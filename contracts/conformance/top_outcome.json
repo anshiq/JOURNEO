@@ -1,0 +1,280 @@
+{
+  "doc": {
+    "links": {
+      "scr_q00001": {
+        "next": "scr_q00002"
+      },
+      "scr_q00002": {
+        "next": "stp_cond01"
+      },
+      "stp_cond01": {
+        "else": "scr_resa01",
+        "rule:rule_resa01": "scr_resa01",
+        "rule:rule_resb01": "scr_resb01"
+      },
+      "stp_start0": {
+        "next": "scr_q00001"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_q00001": {
+        "elements": [
+          {
+            "id": "el_c00001",
+            "props": {
+              "autoAdvance": true,
+              "key": "q1",
+              "options": [
+                {
+                  "id": "opt_a00001",
+                  "label": "A",
+                  "outcome": "scr_resa01"
+                },
+                {
+                  "id": "opt_b00001",
+                  "label": "B",
+                  "outcome": "scr_resb01"
+                }
+              ],
+              "question": "Pick",
+              "scoring": "outcomes"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_q00001",
+        "name": "scr_q00001"
+      },
+      "scr_q00002": {
+        "elements": [
+          {
+            "id": "el_c00002",
+            "props": {
+              "autoAdvance": true,
+              "key": "q2",
+              "options": [
+                {
+                  "id": "opt_a00002",
+                  "label": "A",
+                  "outcome": "scr_resa01"
+                },
+                {
+                  "id": "opt_b00002",
+                  "label": "B",
+                  "outcome": "scr_resb01"
+                }
+              ],
+              "question": "Pick",
+              "scoring": "outcomes"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_q00002",
+        "name": "scr_q00002"
+      },
+      "scr_resa01": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_resa01",
+        "name": "scr_resa01"
+      },
+      "scr_resb01": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_resb01",
+        "name": "scr_resb01"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_q00001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_q00002",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_resa01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_resb01",
+        "kind": "screen"
+      },
+      {
+        "id": "stp_cond01",
+        "kind": "condition",
+        "rules": [
+          {
+            "id": "rule_resa01",
+            "label": "A",
+            "when": {
+              "answer": "outcomes",
+              "op": "topOutcome",
+              "value": "scr_resa01"
+            }
+          },
+          {
+            "id": "rule_resb01",
+            "label": "B",
+            "when": {
+              "answer": "outcomes",
+              "op": "topOutcome",
+              "value": "scr_resb01"
+            }
+          }
+        ]
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_q00001": [
+        {
+          "key": "q1",
+          "type": "choice"
+        }
+      ],
+      "scr_q00002": [
+        {
+          "key": "q2",
+          "type": "choice"
+        }
+      ],
+      "scr_resa01": [],
+      "scr_resb01": []
+    },
+    "ports": {
+      "scr_q00001": [
+        "next"
+      ],
+      "scr_q00002": [
+        "next"
+      ],
+      "scr_resa01": [],
+      "scr_resb01": [],
+      "stp_cond01": [
+        "rule:rule_resa01",
+        "rule:rule_resb01",
+        "else"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "q1": "opt_b00001"
+            },
+            "at": "scr_q00001",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "q2": "opt_b00002"
+            },
+            "at": "scr_q00002",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_q00001",
+          "scr_q00002",
+          "scr_resb01"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "q1": "opt_a00001"
+            },
+            "at": "scr_q00001",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "q2": "opt_b00002"
+            },
+            "at": "scr_q00002",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_q00001",
+          "scr_q00002",
+          "scr_resa01"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "q1": "opt_b00001"
+            },
+            "at": "scr_q00001",
+            "port": "next"
+          },
+          {
+            "back": true
+          },
+          {
+            "answers": {
+              "q1": "opt_a00001"
+            },
+            "at": "scr_q00001",
+            "port": "next"
+          },
+          {
+            "answers": {
+              "q2": "opt_a00002"
+            },
+            "at": "scr_q00002",
+            "port": "next"
+          }
+        ],
+        "path": [
+          "scr_q00001",
+          "scr_q00002",
+          "scr_q00001",
+          "scr_q00002",
+          "scr_resa01"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

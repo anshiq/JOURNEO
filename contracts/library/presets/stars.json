@@ -1,0 +1,14 @@
+{
+  "id": "stars",
+  "name": "Stars",
+  "category": "question",
+  "element": {
+    "type": "rating",
+    "props": {
+      "question": "How would you rate your experience?",
+      "key": "rating",
+      "scale": "stars",
+      "max": 5
+    }
+  }
+}
