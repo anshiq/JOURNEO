@@ -1,0 +1,96 @@
+{
+  "doc": {
+    "links": {
+      "scr_main01": {
+        "next": "scr_thanks"
+      },
+      "stp_start0": {
+        "next": "scr_main01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_main01": {
+        "elements": [
+          {
+            "id": "el_v00001",
+            "props": {
+              "source": {
+                "kind": "vimeo",
+                "url": "https://vimeo.com/76979871"
+              }
+            },
+            "type": "video"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Next"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_main01",
+        "name": "scr_main01"
+      },
+      "scr_thanks": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_thanks",
+        "name": "scr_thanks"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_main01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_main01": [],
+      "scr_thanks": []
+    },
+    "ports": {
+      "scr_main01": [
+        "next"
+      ],
+      "scr_thanks": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

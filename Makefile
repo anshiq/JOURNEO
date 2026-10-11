@@ -1,6 +1,8 @@
 API := services/api
 WEB := frontend
 
+.PHONY: setup db-up migrate contracts lint typecheck test build check
+
 setup:
 	cd $(API) && uv sync
 	cd $(WEB) && npm ci

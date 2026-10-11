@@ -1,0 +1,203 @@
+{
+  "doc": {
+    "links": {
+      "scr_ask001": {
+        "next": "stp_cond01"
+      },
+      "stp_cond01": {
+        "else": "scr_else01",
+        "rule:rule_hit001": "scr_hit001"
+      },
+      "stp_start0": {
+        "next": "scr_ask001"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_ask001": {
+        "elements": [
+          {
+            "id": "el_c00001",
+            "props": {
+              "key": "tags",
+              "multiple": true,
+              "options": [
+                {
+                  "id": "opt_a00001",
+                  "label": "A"
+                },
+                {
+                  "id": "opt_b00001",
+                  "label": "B"
+                },
+                {
+                  "id": "opt_c00001",
+                  "label": "C"
+                }
+              ],
+              "question": "Pick"
+            },
+            "type": "choice"
+          }
+        ],
+        "id": "scr_ask001",
+        "name": "scr_ask001"
+      },
+      "scr_else01": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_else01",
+        "name": "scr_else01"
+      },
+      "scr_hit001": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_hit001",
+        "name": "scr_hit001"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_ask001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_hit001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_else01",
+        "kind": "screen"
+      },
+      {
+        "id": "stp_cond01",
+        "kind": "condition",
+        "rules": [
+          {
+            "id": "rule_hit001",
+            "label": "Hit",
+            "when": {
+              "answer": "tags",
+              "op": "includesNone",
+              "value": [
+                "opt_a00001"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "scr_else01",
+          "kind": "screen"
+        }
+      },
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "scr_hit001",
+          "kind": "screen"
+        }
+      },
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "stp_cond01",
+          "kind": "step"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_ask001": [
+        {
+          "key": "tags",
+          "type": "choices"
+        }
+      ],
+      "scr_else01": [],
+      "scr_hit001": []
+    },
+    "ports": {
+      "scr_ask001": [],
+      "scr_else01": [],
+      "scr_hit001": [],
+      "stp_cond01": [
+        "rule:rule_hit001",
+        "else"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "tags": [
+                "opt_b00001"
+              ]
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "rule_hit001",
+        "path": [
+          "scr_ask001",
+          "scr_hit001"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "tags": [
+                "opt_a00001",
+                "opt_b00001"
+              ]
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "else",
+        "path": [
+          "scr_ask001",
+          "scr_else01"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

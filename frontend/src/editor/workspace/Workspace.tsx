@@ -1,4 +1,5 @@
 import { isProblem } from '@shared/api/problem'
+import { ErrorBoundary } from '@shared/ErrorBoundary'
 import { strings } from '@shared/strings'
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router'
@@ -68,12 +69,14 @@ function Loaded({ campaign, workspace }: { campaign: CampaignSummary; workspace:
         </p>
       ) : null}
       <div className="relative flex min-h-0 flex-1">
-        <Suspense fallback={<p className="p-10 text-slate-500">{strings.loading}</p>}>
-          {tab === 'build' || tab === 'design' ? <BuildArea campaignId={campaign.id} workspace={workspace} /> : null}
-          {tab === 'chat' ? <ChatTab campaignId={campaign.id} /> : null}
-          {tab === 'share' ? <ShareTab campaign={campaign} workspace={workspace} /> : null}
-          {tab === 'results' ? <ResultsTab campaign={campaign} /> : null}
-        </Suspense>
+        <ErrorBoundary key={tab} context={`tab:${tab}`}>
+          <Suspense fallback={<p className="p-10 text-slate-500">{strings.loading}</p>}>
+            {tab === 'build' || tab === 'design' ? <BuildArea campaignId={campaign.id} workspace={workspace} /> : null}
+            {tab === 'chat' ? <ChatTab campaignId={campaign.id} /> : null}
+            {tab === 'share' ? <ShareTab campaign={campaign} workspace={workspace} /> : null}
+            {tab === 'results' ? <ResultsTab campaign={campaign} /> : null}
+          </Suspense>
+        </ErrorBoundary>
       </div>
       <PublishDialog campaign={campaign} workspace={workspace} />
       <VersionsDialog campaignId={campaign.id} />

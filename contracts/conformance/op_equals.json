@@ -1,0 +1,168 @@
+{
+  "doc": {
+    "links": {
+      "scr_ask001": {
+        "next": "stp_cond01"
+      },
+      "stp_cond01": {
+        "else": "scr_else01",
+        "rule:rule_hit001": "scr_hit001"
+      },
+      "stp_start0": {
+        "next": "scr_ask001"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_ask001": {
+        "elements": [
+          {
+            "id": "el_f00001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_n00001",
+                  "key": "name",
+                  "kind": "text",
+                  "label": "name"
+                }
+              ],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          }
+        ],
+        "id": "scr_ask001",
+        "name": "scr_ask001"
+      },
+      "scr_else01": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_else01",
+        "name": "scr_else01"
+      },
+      "scr_hit001": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_hit001",
+        "name": "scr_hit001"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_ask001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_hit001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_else01",
+        "kind": "screen"
+      },
+      {
+        "id": "stp_cond01",
+        "kind": "condition",
+        "rules": [
+          {
+            "id": "rule_hit001",
+            "label": "Hit",
+            "when": {
+              "answer": "name",
+              "op": "equals",
+              "value": "Ada"
+            }
+          }
+        ]
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_ask001": [
+        {
+          "key": "name",
+          "type": "text"
+        }
+      ],
+      "scr_else01": [],
+      "scr_hit001": []
+    },
+    "ports": {
+      "scr_ask001": [
+        "next"
+      ],
+      "scr_else01": [],
+      "scr_hit001": [],
+      "stp_cond01": [
+        "rule:rule_hit001",
+        "else"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "name": "Ada"
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "rule_hit001",
+        "path": [
+          "scr_ask001",
+          "scr_hit001"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "name": "Bob"
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "else",
+        "path": [
+          "scr_ask001",
+          "scr_else01"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

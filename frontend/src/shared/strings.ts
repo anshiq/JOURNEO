@@ -6,6 +6,8 @@ export const strings = {
   loading: 'Loading…',
   loadFailed: 'We could not load this page. Try again.',
   retry: 'Try again',
+  somethingWrong: 'Something went wrong.',
+  reload: 'Reload',
   open: 'Open',
   publish: 'Publish',
   publishing: 'Publishing…',

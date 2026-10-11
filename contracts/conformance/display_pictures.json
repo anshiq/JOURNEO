@@ -1,0 +1,112 @@
+{
+  "doc": {
+    "links": {
+      "scr_main01": {
+        "next": "scr_thanks"
+      },
+      "stp_start0": {
+        "next": "scr_main01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_main01": {
+        "elements": [
+          {
+            "id": "el_c00001",
+            "props": {
+              "display": "pictures",
+              "key": "style",
+              "options": [
+                {
+                  "id": "opt_p00001",
+                  "image": "https://cdn.example.com/red.webp",
+                  "label": "Red"
+                },
+                {
+                  "id": "opt_p00002",
+                  "image": "https://cdn.example.com/blue.webp",
+                  "label": "Blue"
+                }
+              ],
+              "question": "Pick"
+            },
+            "type": "choice"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Next"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_main01",
+        "name": "scr_main01"
+      },
+      "scr_thanks": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_thanks",
+        "name": "scr_thanks"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_main01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [],
+    "outputs": {
+      "scr_main01": [
+        {
+          "key": "style",
+          "type": "choice"
+        }
+      ],
+      "scr_thanks": []
+    },
+    "ports": {
+      "scr_main01": [
+        "next"
+      ],
+      "scr_thanks": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}

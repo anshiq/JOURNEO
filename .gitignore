@@ -30,3 +30,5 @@ frontend/storybook-static/
 frontend/debug-storybook.log
 infra/.env
 *.class
+frontend/lhci-reports/
+frontend/.lighthouseci/

@@ -159,7 +159,7 @@ class PageTemplates:
             await self.fetch(settings)
         return self.template or FALLBACK
 
-    async def refresh_forever(self, settings: Any, interval: float = 300.0) -> None:
+    async def refresh_forever(self, settings: Any, interval: float = 60.0) -> None:
         while True:
             await self.fetch(settings)
             await asyncio.sleep(interval if self.template else 10.0)

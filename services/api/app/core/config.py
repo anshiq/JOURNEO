@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_nested_delimiter="__", env_file=".env", extra="ignore")
     service: str = "api"
     log_level: str = "INFO"
+    sentry_dsn: str | None = None
     database_url: PostgresDsn = Field(default=PostgresDsn("postgresql://journeo:journeo_dev@localhost:5437/journeo"))
     frontend_origin: str = "http://localhost:5173"
     public_base_url: str = "http://localhost:5173"

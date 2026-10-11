@@ -5,7 +5,10 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "services" / "api"))
 
+from datetime import datetime
+
 from app.modules.journeys.domain.ports import ports_of, screen_outputs
+from app.modules.journeys.domain.rules.model import ValidationContext
 from app.modules.journeys.domain.schema.doc import JourneyDoc
 from app.modules.journeys.domain.validate import validate
 
@@ -157,19 +160,109 @@ cases["template_feedback-nps"] = (cases["template_feedback-nps"][0], [
     {"inputs": [{"at": "scr_score01", "port": "next", "answers": {"nps": 7}}], "path": ["scr_score01", "scr_thanks01"], "status": "ended"},
     {"inputs": [{"at": "scr_score01", "port": "next", "answers": {"nps": 10}}], "path": ["scr_score01", "scr_review1"], "status": "running"}])
 
+def op_case(name, question, condition, hit, miss):
+    branch = {"id": "stp_cond01", "kind": "condition", "rules": [{"id": "rule_hit001", "label": "Hit", "when": condition}]}
+    cases[name] = (
+        doc(
+            [scr("scr_ask001", question), scr("scr_hit001", heading("el_h00002")), scr("scr_else01", heading("el_h00003"))],
+            [branch],
+            links={"scr_ask001": {"next": "stp_cond01"}, "stp_cond01": {"rule:rule_hit001": "scr_hit001", "else": "scr_else01"}},
+        ),
+        [
+            {"inputs": [{"at": "scr_ask001", "port": "next", "answers": hit}], "path": ["scr_ask001", "scr_hit001"], "status": "ended", "matched": "rule_hit001"},
+            {"inputs": [{"at": "scr_ask001", "port": "next", "answers": miss}], "path": ["scr_ask001", "scr_else01"], "status": "ended", "matched": "else"},
+        ],
+    )
+
+
+def single_screen_case(name, element):
+    cases[name] = (
+        doc(
+            [scr("scr_main01", element, buttons("el_b00001", ("it_n00001", "Next", NEXT))), scr("scr_thanks", heading("el_h00002"))],
+            links={"scr_main01": {"next": "scr_thanks"}},
+        ),
+        [],
+    )
+
+
+name_field = form("el_f00001", ("fld_n00001", "text", "name"))
+note_field = form("el_f00001", ("fld_n00002", "longtext", "note"))
+score_rating = rating("el_r00001", "nps")
+tier_choice = choice("el_c00001", "tier", [("opt_vip001", "VIP"), ("opt_std001", "Std")])
+tags_choice = choice("el_c00001", "tags", [("opt_a00001", "A"), ("opt_b00001", "B"), ("opt_c00001", "C")], multiple=True)
+consent_field = form("el_f00001", ("fld_a00001", "consent", "agree"))
+date_field = form("el_f00001", ("fld_d00001", "date", "start"))
+
+op_case("op_equals", name_field, {"op": "equals", "answer": "name", "value": "Ada"}, {"name": "Ada"}, {"name": "Bob"})
+op_case("op_notEquals", name_field, {"op": "notEquals", "answer": "name", "value": "Ada"}, {"name": "Bob"}, {"name": "Ada"})
+op_case("op_contains", name_field, {"op": "contains", "answer": "name", "value": "Ada"}, {"name": "Adaline"}, {"name": "Bob"})
+op_case("op_notContains", name_field, {"op": "notContains", "answer": "name", "value": "Ada"}, {"name": "Bob"}, {"name": "Adaline"})
+op_case("op_isEmpty", note_field, {"op": "isEmpty", "answer": "note"}, {"note": ""}, {"note": "Hello"})
+op_case("op_isNotEmpty", note_field, {"op": "isNotEmpty", "answer": "note"}, {"note": "Hello"}, {"note": ""})
+op_case("op_eq", score_rating, {"op": "eq", "answer": "nps", "value": 5}, {"nps": 5}, {"nps": 4})
+op_case("op_neq", score_rating, {"op": "neq", "answer": "nps", "value": 5}, {"nps": 4}, {"nps": 5})
+op_case("op_lt", score_rating, {"op": "lt", "answer": "nps", "value": 5}, {"nps": 4}, {"nps": 5})
+op_case("op_lte", score_rating, {"op": "lte", "answer": "nps", "value": 5}, {"nps": 5}, {"nps": 6})
+op_case("op_between", score_rating, {"op": "between", "answer": "nps", "value": 3, "value2": 6}, {"nps": 4}, {"nps": 9})
+op_case("op_noneOf", tier_choice, {"op": "noneOf", "answer": "tier", "value": ["opt_vip001"]}, {"tier": "opt_std001"}, {"tier": "opt_vip001"})
+op_case("op_includesAny", tags_choice, {"op": "includesAny", "answer": "tags", "value": ["opt_a00001"]}, {"tags": ["opt_a00001", "opt_c00001"]}, {"tags": ["opt_c00001"]})
+op_case("op_includesAll", tags_choice, {"op": "includesAll", "answer": "tags", "value": ["opt_a00001", "opt_b00001"]}, {"tags": ["opt_a00001", "opt_b00001", "opt_c00001"]}, {"tags": ["opt_a00001"]})
+op_case("op_includesNone", tags_choice, {"op": "includesNone", "answer": "tags", "value": ["opt_a00001"]}, {"tags": ["opt_b00001"]}, {"tags": ["opt_a00001", "opt_b00001"]})
+op_case("op_isTrue", consent_field, {"op": "isTrue", "answer": "agree"}, {"agree": True}, {"agree": False})
+op_case("op_isFalse", consent_field, {"op": "isFalse", "answer": "agree"}, {"agree": False}, {"agree": True})
+op_case("op_before", date_field, {"op": "before", "answer": "start", "value": "2030-01-01T00:00:00Z"}, {"start": "2029-06-01T00:00:00Z"}, {"start": "2031-01-01T00:00:00Z"})
+op_case("op_after", date_field, {"op": "after", "answer": "start", "value": "2030-01-01T00:00:00Z"}, {"start": "2031-01-01T00:00:00Z"}, {"start": "2029-06-01T00:00:00Z"})
+
+cases["issue_empty_screen"] = (doc([scr("scr_empty1"), scr("scr_thanks", heading("el_h00002"))], links={"scr_empty1": {"next": "scr_thanks"}}), [])
+cases["issue_countdown_past"] = (
+    doc(
+        [scr("scr_timer1", {"id": "el_k00001", "type": "countdown", "props": {"deadline": "2000-01-01T00:00:00Z"}}, buttons("el_b00001", ("it_n00001", "Next", NEXT))), scr("scr_thanks", heading("el_h00002"))],
+        links={"scr_timer1": {"next": "scr_thanks"}},
+    ),
+    [],
+)
+cases["issue_chat_sources"] = (doc([scr("scr_help01", heading("el_h00001")), scr("scr_thanks", heading("el_h00002"))], links={"scr_help01": {"next": "scr_thanks"}}, assistant={"greeting": "Hi there"}), [])
+contexts = {
+    "issue_countdown_past": {"now": "2026-10-11T00:00:00Z"},
+    "issue_chat_sources": {"chatReady": False},
+}
+
+single_screen_case("element_spacer", {"id": "el_s00001", "type": "spacer", "props": {"size": "lg"}})
+single_screen_case("element_video_youtube", {"id": "el_v00001", "type": "video", "props": {"source": {"kind": "youtube", "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}}})
+single_screen_case("element_video_vimeo", {"id": "el_v00001", "type": "video", "props": {"source": {"kind": "vimeo", "url": "https://vimeo.com/76979871"}}})
+single_screen_case("element_video_file", {"id": "el_v00001", "type": "video", "props": {"source": {"kind": "file", "url": "https://cdn.example.com/intro.mp4"}}})
+single_screen_case("field_phone", form("el_f00001", ("fld_p00001", "phone", "phone", {"required": True})))
+single_screen_case("field_number", form("el_f00001", ("fld_q00001", "number", "qty", {"min": 1, "max": 10})))
+single_screen_case("field_date", form("el_f00001", ("fld_t00001", "date", "when")))
+single_screen_case("field_dropdown", form("el_f00001", ("fld_s00001", "dropdown", "plan", {"options": ["Basic", "Pro"]})))
+single_screen_case("display_pictures", choice("el_c00001", "style", [("opt_p00001", "Red", {"image": "https://cdn.example.com/red.webp"}), ("opt_p00002", "Blue", {"image": "https://cdn.example.com/blue.webp"})], display="pictures"))
+single_screen_case("display_dropdown", choice("el_c00001", "plan2", [("opt_d00001", "Basic"), ("opt_d00002", "Pro")], display="dropdown"))
+single_screen_case("display_yesno", choice("el_c00001", "agree2", [("opt_y00001", "Yes"), ("opt_n00001", "No")], display="yesno"))
+single_screen_case("scale_stars", rating("el_r00001", "stars", scale="stars", max=5))
+single_screen_case("scale_emoji", rating("el_r00001", "mood", scale="emoji", max=5))
+single_screen_case("scale_numbers", rating("el_r00001", "rate", scale="numbers", max=5))
+
 import shutil
 shutil.rmtree(OUT, ignore_errors=True)
 OUT.mkdir(parents=True)
 for name, (raw, runs) in sorted(cases.items()):
     parsed = JourneyDoc.model_validate(raw)
+    context = contexts.get(name)
+    ctx = None
+    if context is not None:
+        ctx = ValidationContext(
+            now=datetime.fromisoformat(context["now"]) if "now" in context else None,
+            chat_ready=context.get("chatReady"),
+        )
     expect = {
         "ports": {s.id: [p.port for p in ports_of(parsed, s.id)] for s in parsed.steps},
         "outputs": {sid: [{"key": o.key, "type": o.type} for o in screen_outputs(s)] for sid, s in parsed.screens.items()},
         "issues": sorted(
-            [{"code": i.code, "target": i.target.as_dict()} for i in validate(parsed)],
+            [{"code": i.code, "target": i.target.as_dict()} for i in validate(parsed, ctx)],
             key=lambda x: (x["code"], json.dumps(x["target"], sort_keys=True)),
         ),
         "runs": runs,
     }
-    (OUT / f"{name}.json").write_text(json.dumps({"doc": raw, "expect": expect}, indent=2, sort_keys=True) + "\n")
+    payload = {"doc": raw, "expect": expect} | ({"context": context} if context is not None else {})
+    (OUT / f"{name}.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 print(len(cases), "cases")

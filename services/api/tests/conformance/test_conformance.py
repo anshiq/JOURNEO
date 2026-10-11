@@ -1,9 +1,11 @@
 import json
 import pathlib
+from datetime import datetime
 
 import pytest
 
 from app.modules.journeys.domain.ports import ports_of, screen_outputs
+from app.modules.journeys.domain.rules.model import ValidationContext
 from app.modules.journeys.domain.schema.doc import JourneyDoc
 from app.modules.journeys.domain.validate import validate
 
@@ -11,8 +13,18 @@ ROOT = pathlib.Path(__file__).resolve().parents[4] / "contracts" / "conformance"
 CASES = sorted(ROOT.glob("*.json"))
 
 
+def context_of(case: dict) -> ValidationContext | None:
+    raw = case.get("context")
+    if raw is None:
+        return None
+    return ValidationContext(
+        now=datetime.fromisoformat(raw["now"]) if "now" in raw else None,
+        chat_ready=raw.get("chatReady"),
+    )
+
+
 def test_corpus_size():
-    assert len(CASES) >= 25
+    assert len(CASES) >= 60
 
 
 @pytest.mark.parametrize("path", CASES, ids=[p.stem for p in CASES])
@@ -24,7 +36,7 @@ def test_case(path: pathlib.Path):
     outputs = {sid: [{"key": o.key, "type": o.type} for o in screen_outputs(s)] for sid, s in parsed.screens.items()}
     assert outputs == expect["outputs"]
     issues = sorted(
-        [{"code": i.code, "target": i.target.as_dict()} for i in validate(parsed)],
+        [{"code": i.code, "target": i.target.as_dict()} for i in validate(parsed, context_of(case))],
         key=lambda x: (x["code"], json.dumps(x["target"], sort_keys=True)),
     )
     assert issues == expect["issues"]

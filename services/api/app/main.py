@@ -1,4 +1,7 @@
+import sentry_sdk
 from fastapi import FastAPI
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
 
 from app.core.config import Settings, get_settings
 from app.core.context import RequestContextMiddleware
@@ -16,8 +19,20 @@ from app.modules.results import router as results
 from app.modules.runtime import router as runtime
 
 
+def init_sentry(settings: Settings) -> None:
+    if not settings.sentry_dsn:
+        return
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        integrations=[StarletteIntegration(), FastApiIntegration()],
+        traces_sample_rate=0.0,
+        send_default_pii=False,
+    )
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    init_sentry(settings)
     app = FastAPI(
         title="Journeo API",
         version="1",

@@ -1,0 +1,183 @@
+{
+  "doc": {
+    "links": {
+      "scr_ask001": {
+        "next": "stp_cond01"
+      },
+      "stp_cond01": {
+        "else": "scr_else01",
+        "rule:rule_hit001": "scr_hit001"
+      },
+      "stp_start0": {
+        "next": "scr_ask001"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_ask001": {
+        "elements": [
+          {
+            "id": "el_r00001",
+            "props": {
+              "key": "nps",
+              "max": 10,
+              "question": "Rate",
+              "scale": "nps"
+            },
+            "type": "rating"
+          }
+        ],
+        "id": "scr_ask001",
+        "name": "scr_ask001"
+      },
+      "scr_else01": {
+        "elements": [
+          {
+            "id": "el_h00003",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_else01",
+        "name": "scr_else01"
+      },
+      "scr_hit001": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_hit001",
+        "name": "scr_hit001"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_ask001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_hit001",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_else01",
+        "kind": "screen"
+      },
+      {
+        "id": "stp_cond01",
+        "kind": "condition",
+        "rules": [
+          {
+            "id": "rule_hit001",
+            "label": "Hit",
+            "when": {
+              "answer": "nps",
+              "op": "lt",
+              "value": 5
+            }
+          }
+        ]
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "scr_else01",
+          "kind": "screen"
+        }
+      },
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "scr_hit001",
+          "kind": "screen"
+        }
+      },
+      {
+        "code": "J_UNREACHABLE",
+        "target": {
+          "id": "stp_cond01",
+          "kind": "step"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_ask001": [
+        {
+          "key": "nps",
+          "type": "rating"
+        }
+      ],
+      "scr_else01": [],
+      "scr_hit001": []
+    },
+    "ports": {
+      "scr_ask001": [],
+      "scr_else01": [],
+      "scr_hit001": [],
+      "stp_cond01": [
+        "rule:rule_hit001",
+        "else"
+      ],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": [
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 4
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "rule_hit001",
+        "path": [
+          "scr_ask001",
+          "scr_hit001"
+        ],
+        "status": "ended"
+      },
+      {
+        "inputs": [
+          {
+            "answers": {
+              "nps": 5
+            },
+            "at": "scr_ask001",
+            "port": "next"
+          }
+        ],
+        "matched": "else",
+        "path": [
+          "scr_ask001",
+          "scr_else01"
+        ],
+        "status": "ended"
+      }
+    ]
+  }
+}

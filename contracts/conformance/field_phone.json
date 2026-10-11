@@ -1,0 +1,117 @@
+{
+  "doc": {
+    "links": {
+      "scr_main01": {
+        "next": "scr_thanks"
+      },
+      "stp_start0": {
+        "next": "scr_main01"
+      }
+    },
+    "schemaVersion": 4,
+    "screens": {
+      "scr_main01": {
+        "elements": [
+          {
+            "id": "el_f00001",
+            "props": {
+              "fields": [
+                {
+                  "id": "fld_p00001",
+                  "key": "phone",
+                  "kind": "phone",
+                  "label": "phone",
+                  "required": true
+                }
+              ],
+              "submitLabel": "Send"
+            },
+            "type": "form"
+          },
+          {
+            "id": "el_b00001",
+            "props": {
+              "items": [
+                {
+                  "action": {
+                    "kind": "next"
+                  },
+                  "id": "it_n00001",
+                  "label": "Next"
+                }
+              ]
+            },
+            "type": "buttons"
+          }
+        ],
+        "id": "scr_main01",
+        "name": "scr_main01"
+      },
+      "scr_thanks": {
+        "elements": [
+          {
+            "id": "el_h00002",
+            "props": {
+              "text": "Hello"
+            },
+            "type": "heading"
+          }
+        ],
+        "id": "scr_thanks",
+        "name": "scr_thanks"
+      }
+    },
+    "settings": {
+      "seo": {
+        "image": "https://example.com/s.png"
+      }
+    },
+    "steps": [
+      {
+        "id": "stp_start0",
+        "kind": "start"
+      },
+      {
+        "id": "scr_main01",
+        "kind": "screen"
+      },
+      {
+        "id": "scr_thanks",
+        "kind": "screen"
+      }
+    ],
+    "theme": {}
+  },
+  "expect": {
+    "issues": [
+      {
+        "code": "W_CONSENT",
+        "target": {
+          "field": "fields",
+          "id": "el_f00001",
+          "kind": "element",
+          "screenId": "scr_main01"
+        }
+      }
+    ],
+    "outputs": {
+      "scr_main01": [
+        {
+          "key": "phone",
+          "type": "phone"
+        }
+      ],
+      "scr_thanks": []
+    },
+    "ports": {
+      "scr_main01": [
+        "next"
+      ],
+      "scr_thanks": [],
+      "stp_start0": [
+        "next"
+      ]
+    },
+    "runs": []
+  }
+}
